@@ -25,6 +25,11 @@ module.exports = {
     {loader: {type: 'route'}, filePath: 'components2/Inventory/InventoryStock.vue', name: 'InventoryStock', path: '/pos-inventory-stock'},
     {loader: {type: 'route'}, filePath: 'components2/Reservation/ReservationsList2.vue', name: 'Reservation', path: '/pos-reservation'},
     // {loader: {type: 'route'}, filePath: 'components2/OtherViews/OrderHistory.vue', name: 'OrderHistory', path: '/pos-order-history'},
+    {loader: {type: 'route'}, filePath: 'components2/OtherViews/OrderHistory.vue', name: 'OrderHistory', path: '/pos-order-history'},
+    {loader: {type: 'route'}, filePath: 'components2/Retail/Order/PosOrderRetail.vue', name: 'Retail', path: '/retail--order' },
+    {loader: {type: 'route'}, filePath: 'components2/Retail/Order/PosOrderRetail.vue', name: 'RetailRefund', path: '/retail--order-refund' },
+    {loader: {type: 'route'}, filePath: 'components2/Retail/Article/PosArticle.vue', name: 'Article', path: '/retail--article' },
+    {loader: {type: 'route'}, filePath: 'components2/Customer/Customer.vue', name: 'Customer', path: '/pos-customer'},
     /// old components
     //{ loader: { type: 'route' }, filePath: 'components2/Dashboard/DashboardSidebar/PosDashboardSidebar2.vue', name: 'Dashboard2', path: '/pos2-dashboard' },
     //{ loader: { type: 'route' }, filePath: 'components/View/FirstTimeSetUp.vue', name: 'Setup', path: '/pos-setup' },
@@ -53,7 +58,13 @@ module.exports = {
     {loader: {type: 'init '}, path: 'composition/plugin-init.js'},
     {loader: {type: 'vue-singleton'}, path: 'components/Store/Snackbar.vue',},
     {loader: {type: 'vue-singleton'}, path: 'components/Store/PosStore.vue',},
-    {loader: {type: 'vue-singleton'}, path: 'components/Store/ReportsStore.vue',},
+    {loader: {type: 'vue-singleton'}, path: 'components/Store/OrderStore.vue',
+    },
+    {
+      loader: {
+        type: 'vue-singleton'
+      },
+      path: 'components/Store/ReportsStore.vue',},
     {loader: {type: 'vue-singleton'}, path: 'components/Store/SettingsStore.vue',},
     {loader: {type: 'vue-singleton'}, path: 'components/Store/RoomStore.vue',},
     {loader: {type: 'vue-singleton'}, path: 'components/Store/InventoryStore.vue',},

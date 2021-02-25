@@ -12,7 +12,7 @@ export default {
     const currentTarget = ref('items.0')
 
     const treeViewRender = genScopeId(() =>
-        <g-side-bar-tree-view data={sidebarData}
+        <g-side-bar-tree-view data={sidebarData.value}
                               auto-collapse={false}
                               v-model={currentTarget.value}
                               onNodeSelected={node => (node.target && changeView(node.target))}

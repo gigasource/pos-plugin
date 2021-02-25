@@ -528,6 +528,11 @@
         }))
       },
       async getActiveProducts() {
+        if (!this.activeCategory) {
+          this.activeCategoryProducts = []
+          return
+        }
+
         let products
         if (this.activeCategory.name === 'Favourite') {
           products = await cms.getModel('Product').find({'option.favorite': true})

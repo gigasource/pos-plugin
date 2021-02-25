@@ -43,9 +43,18 @@
       "schemaType": "string",
       "key": "by",
       "type": "input"
+    },
+    {
+      "schemaType": "string",
+      "key": "appType",
+      "default": null,
+      "unique": null
     }
   ],
-  "name": "InventoryHistory",
+  "name": "InventoryAction",
   "tabs": [],
-  "type": "Collection"
+  "type": "Collection",
+  "alwaysLoad": null,
+  "class": null,
+  "title": null
 }

@@ -1,0 +1,586 @@
+{
+  "events": [],
+  "_id": "5e7983deefd5f205955ba034",
+  "data": {
+    "_code_": "module.exports = {\n  data: {\n      orderLayout: null,\n      selectedCategoryLayout: null,\n      selectedProductLayout: null,\n      productDblClicked: null,\n      keyboardConfig: null,\n      fontSize: '14px',\n      category: {\n        type: 'horizontal',\n        size: '64px',\n        singleRow: false,\n        differentSize: false,\n        fontSize: '13px'\n      },\n      minimumTextRow: true,\n      collapseBlankColumn: true,\n      hideTextRow: false,\n      hideBlankColumn: false,\n      collapseText: true,\n      actionMode: 'none',\n      showOverlay: true,\n      scrollabeLayout: true,\n  }\n}",
+    "_code_type_": "commonJs"
+  },
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "GGridLayout",
+      "content": {
+        "props": {
+          "layout": {
+            "name": "app",
+            "top": -1,
+            "left": -1,
+            "width": 0,
+            "height": 0,
+            "margin": "",
+            "padding": "",
+            "bgColor": "hsl(145, 100%, 50%, 50%)",
+            "alignSelf": "",
+            "justifySelf": "",
+            "wrapInDiv": false,
+            "displayFlex": false,
+            "flexDirection": "row",
+            "flexWrap": false,
+            "flexJustifyContent": "",
+            "flexAlignItems": "",
+            "flexAlignContent": "",
+            "flexOrder": "",
+            "flexGrow": "",
+            "flexShrink": "",
+            "flexBasis": "",
+            "flexAlignSelf": "",
+            "alignItems": "",
+            "alignContent": "",
+            "justifyItems": "",
+            "justifyContent": "",
+            "columns": [
+              "1fr",
+              "auto"
+            ],
+            "rows": [
+              "1fr"
+            ],
+            "columnGap": 0,
+            "rowGap": 0,
+            "subAreas": [
+              {
+                "name": "order",
+                "top": 1,
+                "left": 2,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(255, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              },
+              {
+                "name": "productLayout",
+                "top": 1,
+                "left": 1,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(139, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              }
+            ]
+          },
+          "style": {
+            "height": "100%"
+          }
+        }
+      },
+      "binding": [],
+      "slotScopeBinding": [],
+      "items": [
+        {
+          "choice": "view",
+          "component": "PosOrderLayout",
+          "binding": [
+            {
+              "type": ".sync",
+              "root": "data.selectedCategoryLayout",
+              "local": "selectedCategoryLayout"
+            },
+            {
+              "type": ".sync",
+              "root": "data.selectedProductLayout",
+              "local": "selectedProductLayout"
+            },
+            {
+              "type": ".sync",
+              "root": "data.orderLayout",
+              "local": "orderLayout"
+            },
+            {
+              "type": ".sync",
+              "root": "data.keyboardConfig",
+              "local": "keyboardConfig"
+            },
+            {
+              "type": ".sync",
+              "root": "data.fontSize",
+              "local": "fontSize"
+            },
+            {
+              "type": ".sync",
+              "root": "data.category",
+              "local": "category"
+            },
+            {
+              "type": ".sync",
+              "root": "data.minimumTextRow",
+              "local": "minimumTextRow"
+            },
+            {
+              "type": ".sync",
+              "root": "data.collapseBlankColumn",
+              "local": "collapseBlankColumn"
+            },
+            {
+              "type": ".sync",
+              "root": "data.collapseText",
+              "local": "collapseText"
+            },
+            {
+              "type": ".sync",
+              "root": "data.hideTextRow",
+              "local": "hideTextRow"
+            },
+            {
+              "type": ".sync",
+              "root": "data.hideBlankColumn",
+              "local": "hideBlankColumn"
+            },
+            {
+              "type": ".sync",
+              "root": "data.actionMode",
+              "local": "actionMode"
+            },
+            {
+              "type": ".sync",
+              "root": "data.showOverlay",
+              "local": "showOverlay"
+            },
+            {
+              "type": ".sync",
+              "root": "data.scrollabeLayout",
+              "local": "scrollabeLayout"
+            }
+          ],
+          "slotScopeBinding": [],
+          "slot": "productLayout",
+          "isScopedSlot": true,
+          "url": "plugins/pos-plugin/components/posOrder/PosOrderLayout.vue",
+          "path": "components/posOrder/PosOrderLayout.vue",
+          "pluginName": "pos-plugin",
+          "inject": [
+            {
+              "service": "OrderStore:addProductToOrder",
+              "local": "addProductToOrder",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:addModifierToProduct",
+              "local": "addModifierToProduct",
+              "type": "event"
+            },
+            {
+              "service": "SettingsStore:getKeyboardSetting",
+              "local": "getKeyboardSetting",
+              "type": "event"
+            },
+            {
+              "service": "PosStore:storeLocale",
+              "local": "storeLocale",
+              "type": "prop"
+            }
+          ]
+        },
+        {
+          "choice": "view",
+          "binding": [
+            {
+              "type": ".sync",
+              "root": "data.fontSize",
+              "local": "fontSize"
+            },
+            {
+              "type": ".sync",
+              "root": "data.category",
+              "local": "category"
+            },
+            {
+              "type": ".sync",
+              "root": "data.minimumTextRow",
+              "local": "minimumTextRow"
+            },
+            {
+              "type": ".sync",
+              "root": "data.collapseBlankColumn",
+              "local": "collapseBlankColumn"
+            },
+            {
+              "type": ".sync",
+              "root": "data.collapseText",
+              "local": "collapseText"
+            },
+            {
+              "type": ".sync",
+              "root": "data.hideTextRow",
+              "local": "hideTextRow"
+            },
+            {
+              "type": ".sync",
+              "root": "data.hideBlankColumn",
+              "local": "hideBlankColumn"
+            },
+            {
+              "type": ".sync",
+              "root": "data.actionMode",
+              "local": "actionMode"
+            },
+            {
+              "type": ".sync",
+              "root": "data.showOverlay",
+              "local": "showOverlay"
+            },
+            {
+              "type": ".sync",
+              "root": "data.scrollabeLayout",
+              "local": "scrollabeLayout"
+            }
+          ],
+          "slotScopeBinding": [],
+          "slot": "order",
+          "isScopedSlot": true,
+          "component": "posOrder",
+          "url": "plugins/pos-plugin/components/posOrder/posOrder.vue",
+          "path": "components/posOrder/posOrder.vue",
+          "pluginName": "pos-plugin",
+          "inject": [
+            {
+              "service": "OrderStore:currentOrder.items",
+              "local": "items",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:paymentTotal",
+              "local": "total",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:addItemQuantity",
+              "local": "addItemQuantity",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:removeItemQuantity",
+              "local": "removeItemQuantity",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:addModifierToProduct",
+              "local": "addModifierToProduct",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:setNewPrice",
+              "local": "changePrice",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:updateOrderTable",
+              "local": "updateOrderTable",
+              "type": "event"
+            },
+            {
+              "service": "PosStore:user",
+              "local": "user",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:updateOrderItems",
+              "local": "updateOrderItems",
+              "type": "event"
+            },
+            {
+              "service": "PosStore:storeLocale",
+              "local": "storeLocale",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:removeProductModifier",
+              "local": "removeProductModifier",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:actionList",
+              "local": "actionList",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:saveTableOrder",
+              "local": "saveTableOrder",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:resetOrderData",
+              "local": "resetOrderData",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:printedOrder",
+              "local": "printedOrder",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:updateOrderItem",
+              "local": "updateOrderItem",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:currentOrder.takeAway",
+              "local": "isTakeAwayOrder",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:updateCurrentOrder",
+              "local": "updateCurrentOrder",
+              "type": "event"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "choice": "view",
+      "component": "dialogProductSearchResult",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "dialogProductSearchResult",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      }
+    },
+    {
+      "choice": "view",
+      "component": "PosOrderSplitOrder",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "PosOrderSplitOrder",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "inject": [
+        {
+          "service": "OrderStore:currentOrder",
+          "local": "currentOrder",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:user",
+          "local": "user",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:storeLocale",
+          "local": "storeLocale",
+          "type": "prop"
+        },
+        {
+          "service": "OrderStore:updateCurrentOrder",
+          "local": "updateCurrentOrder",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:createOrderCommit",
+          "local": "createOrderCommit",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:saveSplitOrder",
+          "local": "saveSplitOrder",
+          "type": "event"
+        },
+        {
+          "service": "PosStore:isMobile",
+          "local": "isMobile",
+          "type": "prop"
+        },
+        {
+          "service": "OrderStore:resetOrderData",
+          "local": "resetOrderData",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:updatePrintedOrder",
+          "local": "updatePrintedOrder",
+          "type": "event"
+        }
+      ],
+      "url": "plugins/pos-plugin/components/posOrder/PosOrderSplitOrder.vue",
+      "path": "components/posOrder/PosOrderSplitOrder.vue",
+      "pluginName": "pos-plugin"
+    },
+    {
+      "choice": "view",
+      "component": "PosOrderReceipt",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "PosOrderReceipt",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "inject": [
+        {
+          "service": "OrderStore:currentOrder",
+          "local": "order",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:storeLocale",
+          "local": "storeLocale",
+          "type": "prop"
+        },
+        {
+          "service": "OrderStore:paymentTotal",
+          "local": "total",
+          "type": "prop"
+        },
+        {
+          "service": "OrderStore:updateCurrentOrder",
+          "local": "updateCurrentOrder",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:saveRestaurantOrder",
+          "local": "saveRestaurantOrder",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:printOrderReport",
+          "local": "printOrderReport",
+          "type": "event"
+        }
+      ],
+      "url": "plugins/pos-plugin/components/posOrder/PosOrderReceipt.vue",
+      "path": "components/posOrder/PosOrderReceipt.vue",
+      "pluginName": "pos-plugin"
+    },
+    {
+      "choice": "view",
+      "component": "PosOrderMoveItems",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "PosOrderMoveItems",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "inject": [
+        {
+          "service": "OrderStore:currentOrder",
+          "local": "currentOrder",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:user",
+          "local": "user",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:storeLocale",
+          "local": "storeLocale",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:isMobile",
+          "local": "isMobile",
+          "type": "prop"
+        },
+        {
+          "service": "OrderStore:moveItems",
+          "local": "moveItems",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:activeOrders",
+          "local": "activeOrders",
+          "type": "prop"
+        }
+      ],
+      "url": "plugins/pos-plugin/components/posOrder/PosOrderMoveItems.vue",
+      "path": "components/posOrder/PosOrderMoveItems.vue",
+      "pluginName": "pos-plugin"
+    },
+    {
+      "choice": "view",
+      "component": "PosOrderVoucherDialog",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "PosOrderVoucherDialog",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "inject": [
+        {
+          "service": "OrderStore:addVoucher",
+          "local": "addVoucher",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:redeemVoucher",
+          "local": "redeemVoucher",
+          "type": "event"
+        }
+      ],
+      "url": "plugins/pos-plugin/components/Order/PosOrderVoucherDialog.vue",
+      "path": "components/Order/PosOrderVoucherDialog.vue",
+      "pluginName": "pos-plugin"
+    }
+  ],
+  "name": "posOrderMobile",
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "pos-order-3/:name?"
+}

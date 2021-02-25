@@ -13,10 +13,13 @@ import cms from 'cms';
 import _ from 'lodash';
 import rdiff from 'recursive-diff';
 import Hooks from "schemahandler/hooks/hooks";
+import {v1} from 'uuid';
+import { currentAppType } from '../AppType';
 import dayjs from "dayjs";
 import delay from "delay";
 import {socketEmit} from "../utils";
 import {username} from "../AppSharedStates";
+import {ObjectID} from "bson";
 
 const Order = cms.getModel('Order');
 
@@ -116,10 +119,27 @@ export function addProduct(order, product, quantity) {
   //todo: compare to old-version;
 }
 
+export function makeRefundOrder(order, newOrder = true) {
+  order = _.cloneDeep(order)
+  order.items = order.items.filter(item => !item.option.nonRefundable)
+  order.items.forEach(item => {
+    item.maxQuantity = item.quantity
+    item.quantity = 0
+  })
+  const refundOrder = createOrder(order)
+  refundOrder.status = 'refund'
+  refundOrder.originalOrderId = order._id
+  if (newOrder) {
+    refundOrder._id = new ObjectID()
+  }
+  return refundOrder
+}
+
 //</editor-fold>
 
 export function orderBeFactory(id = 0) {
   let order = createOrder();
+  order.appType = currentAppType.value
   let _new, _split, _off;
   orderMap.set(order, id);
 
@@ -195,6 +215,7 @@ export function orderBeFactory(id = 0) {
     }
     clearOrder(clearActionList);
     order = createOrder(_.assign(order, __order));
+    order.appType = currentAppType.value
     hooks.emit(`pre:prepareOrder:${id}`, order);
     let _order = _.omit(_.cloneDeep(order), ['beforeSend']);
 
@@ -475,6 +496,10 @@ export function togglePayPrintBtn(cb) {
   hooks.emit('togglePayPrintBtn:step2', cb);
 }
 
+export async function toggleRefundOrder(refundOrder) {
+  await Order.create(refundOrder)
+}
+
 export const quickBtnAction = ref('pay');
 //todo: init from setting
 hooks.on('togglePayPrintBtn:step2', async (cb) => {
@@ -625,4 +650,19 @@ hooks.on('pay-split', async (printInvoice) => {
   if (!empty) await makeSplitOrder();
 })
 
+//</editor-fold>
+
+//<editor-fold desc="search">
+export async function searchOrderByDateRange(from, to) {
+  const query = {
+    status: {$in: ["paid" ]}
+  }
+  if (from && to)
+    query.date = {
+      ...from && {$gte: dayjs(from).format()},
+      ...to && {$lte: dayjs(to).format()},
+    }
+  const orders = await Order.find(query)
+  return orders
+}
 //</editor-fold>

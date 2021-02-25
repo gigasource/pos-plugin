@@ -6,6 +6,7 @@ import PosTextfieldNew from '../pos-shared-components/POSInput/PosTextfieldNew'
 import dialogFormInput from '../pos-shared-components/dialogFormInput'
 import dialogChangeStock from './helpers/dialogChangeStock'
 import dialogInventoryCategory from './helpers/dialogInventoryCategory'
+import dialogInventoryRetailCategory from './helpers/dialogInventoryRetailCategory'
 
 import {
   renderInventoryDialog,
@@ -16,9 +17,13 @@ import {
 
 
 import {
-  loadInventories,
-  loadInventoryCategories
+  loadInventories
 } from './inventory-logic-be'
+
+import {
+  loadProducts,
+  loadCategories
+} from '../Product/product-logic-be';
 
 import {
   renderMainInventoryTable
@@ -27,12 +32,13 @@ import { genScopeId } from '../utils';
 
 export default {
   name: 'Inventory',
-  components: {PosRangeSlider, PosTextfieldNew, dialogFormInput, dialogChangeStock, dialogInventoryCategory},
+  components: {PosRangeSlider, PosTextfieldNew, dialogFormInput, dialogChangeStock, dialogInventoryCategory, dialogInventoryRetailCategory},
   setup(props, { emit }) {
     const { t } = useI18n();
 
     onBeforeMount(async () => {
-      await loadInventoryCategories()
+      await loadCategories()
+      await loadProducts()
       await loadInventories()
     })
 

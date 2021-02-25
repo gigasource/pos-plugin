@@ -1,0 +1,350 @@
+{
+  "events": [],
+  "_id": "5e731c29be94c10a2f2a8a98",
+  "data": {
+    "_code_": "module.exports = {\n  data: {\n    productDblClicked: null,\n    view: null,\n    orderLayout: null,\n    selectedCategoryLayout: null,\n    selectedProductLayout: null,\n    keyboardConfig: null,\n    mode: 'basic'\n  }\n}",
+    "_code_type_": "commonJs"
+  },
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "GGridLayout",
+      "binding": [],
+      "slotScopeBinding": [],
+      "content": {
+        "props": {
+          "layout": {
+            "name": "app",
+            "top": -1,
+            "left": -1,
+            "width": 0,
+            "height": 0,
+            "margin": "",
+            "padding": "",
+            "bgColor": "hsl(227, 100%, 50%, 50%)",
+            "alignSelf": "",
+            "justifySelf": "",
+            "wrapInDiv": false,
+            "displayFlex": false,
+            "flexDirection": "row",
+            "flexWrap": false,
+            "flexJustifyContent": "",
+            "flexAlignItems": "",
+            "flexAlignContent": "",
+            "flexOrder": "",
+            "flexGrow": "",
+            "flexShrink": "",
+            "flexBasis": "",
+            "flexAlignSelf": "",
+            "alignItems": "",
+            "alignContent": "",
+            "justifyItems": "",
+            "justifyContent": "",
+            "columns": [
+              "70%",
+              "30%"
+            ],
+            "rows": [
+              "1fr",
+              "60px"
+            ],
+            "columnGap": 0,
+            "rowGap": 0,
+            "subAreas": [
+              {
+                "name": "editor",
+                "top": 1,
+                "left": 2,
+                "width": 1,
+                "height": 2,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(49, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              },
+              {
+                "name": "toolbar",
+                "top": 2,
+                "left": 1,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(274, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              },
+              {
+                "name": "menu",
+                "top": 1,
+                "left": 1,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(130, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              }
+            ]
+          },
+          "style": {
+            "_code_": "module.exports = {\n  height: '100%'\n}",
+            "_code_type_": "commonJs"
+          }
+        }
+      },
+      "items": [
+        {
+          "choice": "view",
+          "component": "PosOrderLayout",
+          "content": {
+            "props": {
+              "tag": "div",
+              "editable": true
+            }
+          },
+          "binding": [
+            {
+              "type": ".sync",
+              "root": "data.view",
+              "local": "view"
+            },
+            {
+              "type": ".sync",
+              "root": "data.orderLayout",
+              "local": "orderLayout"
+            },
+            {
+              "type": ".sync",
+              "root": "data.selectedCategoryLayout",
+              "local": "selectedCategoryLayout"
+            },
+            {
+              "type": ".sync",
+              "root": "data.selectedProductLayout",
+              "local": "selectedProductLayout"
+            },
+            {
+              "type": ".sync",
+              "root": "data.productDblClicked",
+              "local": "productDblClicked"
+            },
+            {
+              "type": ".sync",
+              "root": "data.keyboardConfig",
+              "local": "keyboardConfig"
+            },
+            {
+              "type": ".sync",
+              "root": "data.mode",
+              "local": "mode"
+            }
+          ],
+          "slotScopeBinding": [],
+          "slot": "menu",
+          "items": [],
+          "url": "plugins/pos-plugin/components/posOrder/PosOrderLayout.vue",
+          "path": "components/posOrder/PosOrderLayout.vue",
+          "pluginName": "pos-plugin"
+        },
+        {
+          "choice": "view",
+          "component": "EditMenuCardToolbar",
+          "binding": [
+            {
+              "type": ".sync",
+              "root": "data.view",
+              "local": "view"
+            },
+            {
+              "type": ".sync",
+              "root": "data.selectedCategoryLayout",
+              "local": "selectedCategoryLayout"
+            },
+            {
+              "type": ".sync",
+              "root": "data.selectedProductLayout",
+              "local": "selectedProductLayout"
+            },
+            {
+              "type": ".sync",
+              "root": "data.orderLayout",
+              "local": "orderLayout"
+            },
+            {
+              "type": ".sync",
+              "root": "data.productDblClicked",
+              "local": "productDblClicked"
+            },
+            {
+              "type": ".sync",
+              "root": "data.mode",
+              "local": "mode"
+            }
+          ],
+          "slotScopeBinding": [],
+          "slot": "toolbar",
+          "isScopedSlot": true,
+          "url": "plugins/pos-plugin/components/EditMenuCard/EditMenuCardToolbar.vue",
+          "path": "components/EditMenuCard/EditMenuCardToolbar.vue",
+          "pluginName": "pos-plugin"
+        },
+        {
+          "choice": "view",
+          "component": "ContentRender",
+          "binding": [
+            {
+              "type": ".sync",
+              "root": "data.view",
+              "local": "view"
+            }
+          ],
+          "slotScopeBinding": [],
+          "slot": "editor",
+          "items": [
+            {
+              "choice": "view",
+              "component": "CategoryEditor",
+              "binding": [
+                {
+                  "type": ".sync",
+                  "root": "data.orderLayout",
+                  "local": "orderLayout"
+                },
+                {
+                  "type": ".sync",
+                  "root": "data.selectedCategoryLayout",
+                  "local": "selectedCategoryLayout"
+                }
+              ],
+              "slotScopeBinding": [],
+              "isScopedSlot": true,
+              "slot": "CategoryEditor",
+              "url": "plugins/pos-plugin/components/EditMenuCard/CategoryEditor.vue",
+              "path": "components/EditMenuCard/CategoryEditor.vue",
+              "pluginName": "pos-plugin"
+            },
+            {
+              "choice": "view",
+              "component": "ProductEditor",
+              "binding": [
+                {
+                  "type": ".sync",
+                  "root": "data.orderLayout",
+                  "local": "orderLayout"
+                },
+                {
+                  "type": ".sync",
+                  "root": "data.selectedProductLayout",
+                  "local": "selectedProductLayout"
+                },
+                {
+                  "type": ".sync",
+                  "root": "data.selectedCategoryLayout",
+                  "local": "selectedCategoryLayout"
+                }
+              ],
+              "slotScopeBinding": [],
+              "isScopedSlot": true,
+              "slot": "ProductEditor",
+              "url": "plugins/pos-plugin/components/EditMenuCard/ProductEditor.vue",
+              "path": "components/EditMenuCard/ProductEditor.vue",
+              "pluginName": "pos-plugin"
+            },
+            {
+              "choice": "view",
+              "component": "KeyboardEditor",
+              "binding": [
+                {
+                  "type": ".sync",
+                  "root": "data.keyboardConfig",
+                  "local": "keyboardConfig"
+                },
+                {
+                  "type": ".sync",
+                  "root": "data.selectedCategoryLayout",
+                  "local": "selectedCategoryLayout"
+                }
+              ],
+              "slotScopeBinding": [],
+              "slot": "KeyboardEditor",
+              "isScopedSlot": true,
+              "url": "plugins/pos-plugin/components/EditMenuCard/KeyboardEditor.vue",
+              "path": "components/EditMenuCard/KeyboardEditor.vue",
+              "pluginName": "pos-plugin"
+            },
+            {
+              "choice": "view",
+              "component": "IngredientEditor",
+              "binding": [
+                {
+                  "type": ".sync",
+                  "root": "data.selectedProductLayout",
+                  "local": "layout"
+                },
+                {
+                  "type": ".sync",
+                  "root": "data.orderLayout",
+                  "local": "orderLayout"
+                }
+              ],
+              "slotScopeBinding": [],
+              "slot": "IngredientEditor",
+              "url": "plugins/pos-plugin/components/EditMenuCard/IngredientEditor.vue",
+              "path": "components/EditMenuCard/IngredientEditor.vue",
+              "pluginName": "pos-plugin"
+            }
+          ],
+          "url": "plugins/pos-plugin/components/common/ContentRender.vue",
+          "path": "components/common/ContentRender.vue",
+          "pluginName": "pos-plugin"
+        }
+      ]
+    }
+  ],
+  "name": "posEditMenuCard",
+  "props": {
+    "fields": []
+  },
+  "renderInAdminPage": true,
+  "renderToRoute": "pos-edit-menu-card"
+}

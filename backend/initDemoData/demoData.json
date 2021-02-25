@@ -17,7 +17,106 @@
       "onlineOrderSorting": "time",
       "printerGeneralSetting": {
         "entireReceipt": 0
-      }
+      },
+      "rightFunctionButtons": [
+        {
+          "rows": [
+            1,
+            1
+          ],
+          "cols": [
+            1,
+            1
+          ],
+          "backgroundColor": "#FFFFFF",
+          "text": "Refund order",
+          "buttonFunction": "openRefundSearch"
+        },
+        {
+          "rows": [
+            1,
+            1
+          ],
+          "cols": [
+            2,
+            2
+          ],
+          "backgroundColor": "#FFFFFF",
+          "text": "F2"
+        },
+        {
+          "rows": [
+            2,
+            2
+          ],
+          "cols": [
+            1,
+            1
+          ],
+          "backgroundColor": "#FFFFFF",
+          "text": "F3"
+        },
+        {
+          "rows": [
+            2,
+            2
+          ],
+          "cols": [
+            2,
+            2
+          ],
+          "backgroundColor": "#FFFFFF",
+          "text": "F4"
+        },
+        {
+          "rows": [
+            3,
+            3
+          ],
+          "cols": [
+            1,
+            1
+          ],
+          "backgroundColor": "#FFFFFF",
+          "text": "F5"
+        },
+        {
+          "rows": [
+            3,
+            3
+          ],
+          "cols": [
+            2,
+            2
+          ],
+          "backgroundColor": "#FFFFFF",
+          "text": "F6"
+        },
+        {
+          "rows": [
+            4,
+            4
+          ],
+          "cols": [
+            1,
+            1
+          ],
+          "backgroundColor": "#FFFFFF",
+          "text": "F7"
+        },
+        {
+          "rows": [
+            4,
+            4
+          ],
+          "cols": [
+            2,
+            2
+          ],
+          "backgroundColor": "#FFFFFF",
+          "text": "F8"
+        }
+      ]
     }
   ],
   "Terminal": [
@@ -38,32 +137,172 @@
     {
       "_id": "5df6f31ba037304c8b0df66c",
       "name": "Drink",
-      "position": 1
+      "position": 1,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5df6f5ee7854273fa4fd98a4",
       "name": "Electronic",
-      "position": 2
+      "position": 2,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5df6f5e27854273fa4fd98a1",
       "name": "Material",
-      "position": 3
+      "position": 3,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5df6f5cd7854273fa4fd989b",
       "name": "Sport",
-      "position": 4
+      "position": 4,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5df6f5dd7854273fa4fd989e",
       "name": "Wine",
-      "position": 5
+      "position": 5,
+      "appType": "POS_RESTAURANT"
+    },
+    {
+      "_id": "6023518f790afb794efbabc5",
+      "name": "Favorite",
+      "icon": "star",
+      "iconColor": "#FFCB3A",
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6023518f790afb794efbabc0",
+      "name": "Sport",
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6023518f790afb794efbabc6",
+      "name": "Football",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc0"
+    },
+    {
+      "_id": "6023518f790afb794efbabc7",
+      "name": "Baseball",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc0"
+    },
+    {
+      "_id": "6023518f790afb794efbabc8",
+      "name": "Basketball",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc0"
+    },
+    {
+      "_id": "6023518f790afb794efbabc1",
+      "name": "Food",
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6023518f790afb794efbabc9",
+      "name": "Burger",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc1"
+    },
+    {
+      "_id": "6023518f790afb794efbabca",
+      "name": "Rice",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc1"
+    },
+    {
+      "_id": "6023518f790afb794efbabcb",
+      "name": "Noodle",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc1"
+    },
+    {
+      "_id": "6023518f790afb794efbabc2",
+      "name": "Drink",
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6023518f790afb794efbabcc",
+      "name": "Alcohol",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc2"
+    },
+    {
+      "_id": "6023518f790afb794efbabcd",
+      "name": "Non-alcoholic",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc2"
+    },
+    {
+      "_id": "6023518f790afb794efbabce",
+      "name": "Gift",
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6023518f790afb794efbabc3",
+      "name": "Motorbike",
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6023518f790afb794efbabcf",
+      "name": "Standard",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc3"
+    },
+    {
+      "_id": "6023518f790afb794efbabd0",
+      "name": "Cruiser",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc3"
+    },
+    {
+      "_id": "6023518f790afb794efbabd1",
+      "name": "Sport",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc3"
+    },
+    {
+      "_id": "6023518f790afb794efbabd2",
+      "name": "Scooter",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc3"
+    },
+    {
+      "_id": "6023518f790afb794efbabc4",
+      "name": "Clothes",
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6023518f790afb794efbabd3",
+      "name": "Shirt",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc4"
+    },
+    {
+      "_id": "6023518f790afb794efbabd4",
+      "name": "Dress",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc4"
+    },
+    {
+      "_id": "6023518f790afb794efbabd5",
+      "name": "Jeans",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc4"
+    },
+    {
+      "_id": "6023518f790afb794efbabd6",
+      "name": "Trousers",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc4"
     }
   ],
   "Product": [
     {
-      "category": "5df6f31ba037304c8b0df66c",
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Cola",
       "price": 98,
       "tax": 19,
@@ -75,11 +314,14 @@
         }
       ],
       "id": 1,
+      "appType": "POS_RESTAURANT",
       "groupPrinter": "5e7864b186e3ec0997b5e48e",
       "groupPrinter2": "5e7864c486e3ec0997b5e492"
     },
     {
-      "category": "5df6f31ba037304c8b0df66c",
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Pepsi",
       "price": 35,
       "tax": 0,
@@ -91,12 +333,15 @@
         }
       ],
       "id": 2,
+      "appType": "POS_RESTAURANT",
       "groupPrinter": "5e7864b186e3ec0997b5e48e",
       "groupPrinter2": "5e7864c486e3ec0997b5e492"
     },
     {
       "_id": "5e784d7786e3ec0997b5e341",
-      "category": "5df6f31ba037304c8b0df66c",
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Water",
       "price": 67,
       "tax": 7,
@@ -109,11 +354,14 @@
       ],
       "id": "3",
       "isNoPrint": true,
+      "appType": "POS_RESTAURANT",
       "groupPrinter": "5e7864b186e3ec0997b5e48e"
     },
     {
       "_id": "5e784d7786e3ec0997b5e343",
-      "category": "5df6f31ba037304c8b0df66c",
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Soda",
       "price": 20,
       "tax": 19,
@@ -128,11 +376,14 @@
       "attributes": [],
       "groupPrinter": "5e7864b186e3ec0997b5e48e",
       "tax2": 7,
-      "option": {}
+      "option": {},
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e345",
-      "category": "5df6f31ba037304c8b0df66c",
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Green Tea",
       "price": 39,
       "tax": 7,
@@ -144,11 +395,14 @@
         }
       ],
       "id": "5",
-      "groupPrinter": "5e7864c486e3ec0997b5e492"
+      "groupPrinter": "5e7864c486e3ec0997b5e492",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e347",
-      "category": "5df6f31ba037304c8b0df66c",
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Black Tea",
       "price": 1,
       "tax": 0,
@@ -160,11 +414,14 @@
         }
       ],
       "id": "6",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e349",
-      "category": "5df6f31ba037304c8b0df66c",
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Coffee",
       "price": 64,
       "tax": 19,
@@ -176,11 +433,14 @@
         }
       ],
       "id": "7",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e34b",
-      "category": "5df6f31ba037304c8b0df66c",
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Lemonade",
       "price": 48,
       "tax": 0,
@@ -192,11 +452,14 @@
         }
       ],
       "id": "8",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e34d",
-      "category": "5df6f31ba037304c8b0df66c",
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Milkshake",
       "price": 12,
       "tax": 0,
@@ -208,10 +471,13 @@
         }
       ],
       "id": "9",
-      "groupPrinter": "5e7864c486e3ec0997b5e492"
+      "groupPrinter": "5e7864c486e3ec0997b5e492",
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f31ba037304c8b0df66c",
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Milk",
       "price": 76,
       "tax": 19,
@@ -222,11 +488,14 @@
           "device": "pos"
         }
       ],
-      "id": 10
+      "id": 10,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e351",
-      "category": "5df6f31ba037304c8b0df66c",
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Juice",
       "price": 80,
       "tax": 0,
@@ -238,10 +507,13 @@
         }
       ],
       "id": "11",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5cd7854273fa4fd989b",
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Soccer ball",
       "price": 3,
       "tax": 0,
@@ -252,10 +524,13 @@
           "device": "pos"
         }
       ],
-      "id": 12
+      "id": 12,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5cd7854273fa4fd989b",
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Tennis ball",
       "price": 32,
       "tax": 0,
@@ -266,10 +541,13 @@
           "device": "pos"
         }
       ],
-      "id": 13
+      "id": 13,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5cd7854273fa4fd989b",
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Net",
       "price": 89,
       "tax": 0,
@@ -280,10 +558,13 @@
           "device": "pos"
         }
       ],
-      "id": 14
+      "id": 14,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5cd7854273fa4fd989b",
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Gloves",
       "price": 22,
       "tax": 0,
@@ -294,10 +575,13 @@
           "device": "pos"
         }
       ],
-      "id": 15
+      "id": 15,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5cd7854273fa4fd989b",
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Helmet",
       "price": 73,
       "tax": 0,
@@ -308,10 +592,13 @@
           "device": "pos"
         }
       ],
-      "id": 16
+      "id": 16,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5cd7854273fa4fd989b",
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Running Shoes",
       "price": 76,
       "tax": 19,
@@ -322,10 +609,13 @@
           "device": "pos"
         }
       ],
-      "id": 17
+      "id": 17,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5cd7854273fa4fd989b",
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Racquet",
       "price": 4,
       "tax": 7,
@@ -336,10 +626,13 @@
           "device": "pos"
         }
       ],
-      "id": 18
+      "id": 18,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5cd7854273fa4fd989b",
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Bat",
       "price": 32,
       "tax": 7,
@@ -350,10 +643,13 @@
           "device": "pos"
         }
       ],
-      "id": 19
+      "id": 19,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5cd7854273fa4fd989b",
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Stick",
       "price": 3,
       "tax": 19,
@@ -364,10 +660,13 @@
           "device": "pos"
         }
       ],
-      "id": 20
+      "id": 20,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5cd7854273fa4fd989b",
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Club",
       "price": 42,
       "tax": 19,
@@ -378,10 +677,13 @@
           "device": "pos"
         }
       ],
-      "id": 21
+      "id": 21,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5e27854273fa4fd98a1",
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Wood",
       "price": 84,
       "tax": 19,
@@ -392,10 +694,13 @@
           "device": "pos"
         }
       ],
-      "id": 22
+      "id": 22,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5e27854273fa4fd98a1",
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Metal",
       "price": 87,
       "tax": 7,
@@ -406,10 +711,13 @@
           "device": "pos"
         }
       ],
-      "id": 23
+      "id": 23,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5e27854273fa4fd98a1",
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Glass",
       "price": 37,
       "tax": 19,
@@ -420,10 +728,13 @@
           "device": "pos"
         }
       ],
-      "id": 24
+      "id": 24,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5e27854273fa4fd98a1",
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Cement",
       "price": 58,
       "tax": 7,
@@ -434,10 +745,13 @@
           "device": "pos"
         }
       ],
-      "id": 25
+      "id": 25,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5e27854273fa4fd98a1",
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Paper",
       "price": 41,
       "tax": 7,
@@ -448,10 +762,13 @@
           "device": "pos"
         }
       ],
-      "id": 26
+      "id": 26,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5e27854273fa4fd98a1",
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Plastic",
       "price": 78,
       "tax": 0,
@@ -462,10 +779,13 @@
           "device": "pos"
         }
       ],
-      "id": 27
+      "id": 27,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5e27854273fa4fd98a1",
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Nilon",
       "price": 70,
       "tax": 0,
@@ -476,10 +796,13 @@
           "device": "pos"
         }
       ],
-      "id": 28
+      "id": 28,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5e27854273fa4fd98a1",
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Cotton",
       "price": 73,
       "tax": 7,
@@ -490,10 +813,13 @@
           "device": "pos"
         }
       ],
-      "id": 29
+      "id": 29,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5e27854273fa4fd98a1",
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Bronze",
       "price": 24,
       "tax": 19,
@@ -504,10 +830,13 @@
           "device": "pos"
         }
       ],
-      "id": 30
+      "id": 30,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5e27854273fa4fd98a1",
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Iron",
       "price": 9,
       "tax": 0,
@@ -518,10 +847,13 @@
           "device": "pos"
         }
       ],
-      "id": 31
+      "id": 31,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5e27854273fa4fd98a1",
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Silver",
       "price": 13,
       "tax": 0,
@@ -532,10 +864,13 @@
           "device": "pos"
         }
       ],
-      "id": 32
+      "id": 32,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5e27854273fa4fd98a1",
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Gold",
       "price": 2,
       "tax": 19,
@@ -546,10 +881,13 @@
           "device": "pos"
         }
       ],
-      "id": 33
+      "id": 33,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5ee7854273fa4fd98a4",
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Laptop",
       "price": 29,
       "tax": 0,
@@ -560,10 +898,13 @@
           "device": "pos"
         }
       ],
-      "id": 34
+      "id": 34,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5ee7854273fa4fd98a4",
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Camera",
       "price": 57,
       "tax": 19,
@@ -574,10 +915,13 @@
           "device": "pos"
         }
       ],
-      "id": 35
+      "id": 35,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5ee7854273fa4fd98a4",
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Refrigerator",
       "price": 47,
       "tax": 0,
@@ -588,10 +932,13 @@
           "device": "pos"
         }
       ],
-      "id": 36
+      "id": 36,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5ee7854273fa4fd98a4",
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Oven",
       "price": 10,
       "tax": 0,
@@ -602,10 +949,13 @@
           "device": "pos"
         }
       ],
-      "id": 37
+      "id": 37,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5ee7854273fa4fd98a4",
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Television",
       "price": 91,
       "tax": 0,
@@ -616,10 +966,13 @@
           "device": "pos"
         }
       ],
-      "id": 38
+      "id": 38,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5ee7854273fa4fd98a4",
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Radio",
       "price": 68,
       "tax": 7,
@@ -630,10 +983,13 @@
           "device": "pos"
         }
       ],
-      "id": 39
+      "id": 39,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5ee7854273fa4fd98a4",
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "MP3 player",
       "price": 6,
       "tax": 7,
@@ -644,10 +1000,13 @@
           "device": "pos"
         }
       ],
-      "id": 40
+      "id": 40,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5ee7854273fa4fd98a4",
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Fan",
       "price": 41,
       "tax": 0,
@@ -658,10 +1017,13 @@
           "device": "pos"
         }
       ],
-      "id": 41
+      "id": 41,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5ee7854273fa4fd98a4",
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Mobile phone",
       "price": 2,
       "tax": 0,
@@ -672,10 +1034,13 @@
           "device": "pos"
         }
       ],
-      "id": 42
+      "id": 42,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5ee7854273fa4fd98a4",
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Projector",
       "price": 75,
       "tax": 7,
@@ -686,10 +1051,13 @@
           "device": "pos"
         }
       ],
-      "id": 43
+      "id": 43,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5ee7854273fa4fd98a4",
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Monitor",
       "price": 21,
       "tax": 0,
@@ -700,10 +1068,13 @@
           "device": "pos"
         }
       ],
-      "id": 44
+      "id": 44,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5ee7854273fa4fd98a4",
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Lamp",
       "price": 33,
       "tax": 19,
@@ -714,11 +1085,14 @@
           "device": "pos"
         }
       ],
-      "id": 45
+      "id": 45,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e397",
-      "category": "5df6f5dd7854273fa4fd989e",
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Brandy",
       "price": 95,
       "tax": 19,
@@ -731,11 +1105,14 @@
       ],
       "id": "46",
       "isNoPrint": true,
-      "tax2": 19
+      "tax2": 19,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e399",
-      "category": "5df6f5dd7854273fa4fd989e",
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Baijiu",
       "price": 12,
       "tax": 19,
@@ -749,11 +1126,14 @@
       "id": "47",
       "groupPrinter": "5e7864c486e3ec0997b5e492",
       "tax2": 7,
-      "option": {}
+      "option": {},
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e39b",
-      "category": "5df6f5dd7854273fa4fd989e",
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Whiskey",
       "price": 40,
       "tax": 19,
@@ -768,10 +1148,13 @@
       "id": "48",
       "groupPrinter": "5e7864b186e3ec0997b5e48e",
       "tax2": 7,
-      "option": {}
+      "option": {},
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": "5df6f5dd7854273fa4fd989e",
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Vermouth",
       "price": 18,
       "tax": 7,
@@ -782,11 +1165,14 @@
           "device": "pos"
         }
       ],
-      "id": 49
+      "id": 49,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e39f",
-      "category": "5df6f5dd7854273fa4fd989e",
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Mezcal",
       "price": 66,
       "tax": 19,
@@ -799,11 +1185,14 @@
       ],
       "id": "50",
       "groupPrinter": "5e7864c486e3ec0997b5e492",
-      "groupPrinter2": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter2": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e3a1",
-      "category": "5df6f5dd7854273fa4fd989e",
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Pisco",
       "price": 96,
       "tax": 19,
@@ -815,11 +1204,14 @@
         }
       ],
       "id": "51",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e3a3",
-      "category": "5df6f5dd7854273fa4fd989e",
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Gin",
       "price": 27,
       "tax": 19,
@@ -832,11 +1224,14 @@
         }
       ],
       "id": "52",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e3a5",
-      "category": "5df6f5dd7854273fa4fd989e",
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Tequila",
       "price": 43,
       "tax": 0,
@@ -849,11 +1244,14 @@
         }
       ],
       "id": "53",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e3a7",
-      "category": "5df6f5dd7854273fa4fd989e",
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Bourbon",
       "price": 83,
       "tax": 7,
@@ -864,11 +1262,14 @@
           "device": "pos"
         }
       ],
-      "id": "54"
+      "id": "54",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e3a9",
-      "category": "5df6f5dd7854273fa4fd989e",
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Vodka",
       "price": 63,
       "tax": 0,
@@ -880,7 +1281,8 @@
         }
       ],
       "id": "55",
-      "isNoPrint": true
+      "isNoPrint": true,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e79d04e5028531d08009cb5",
@@ -888,7 +1290,8 @@
       "name": "Pudding",
       "price": 1,
       "isModifier": true,
-      "id": "101"
+      "id": "101",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e79cfc75028531d08009ca5",
@@ -897,7 +1300,8 @@
       "name": "Olive",
       "price": 1,
       "id": "100",
-      "option": {}
+      "option": {},
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e79d0205028531d08009cab",
@@ -905,7 +1309,2103 @@
       "name": "Ice",
       "price": 0,
       "id": "99",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
+    },
+    {
+      "_id": "60249c54f2df408d87281db2",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 1",
+      "price": 88,
+      "costPrice": 87,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#AF2AF8",
+          "order": 1,
+          "device": "pos"
+        }
+      ],
+      "id": 1,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281db3",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 2",
+      "price": 26,
+      "costPrice": 25,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#A08F54",
+          "order": 2,
+          "device": "pos"
+        }
+      ],
+      "id": 2,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281db4",
+      "category": [
+        "6023518f790afb794efbabc0",
+        "6023518f790afb794efbabc6"
+      ],
+      "name": "Sport Item 3",
+      "price": 86,
+      "costPrice": 85,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#F0920E",
+          "order": 3,
+          "device": "pos"
+        }
+      ],
+      "id": 3,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281db5",
+      "category": [
+        "6023518f790afb794efbabc0",
+        "6023518f790afb794efbabc6"
+      ],
+      "name": "Sport Item 4",
+      "price": 45,
+      "costPrice": 44,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#37C8EA",
+          "order": 4,
+          "device": "pos"
+        }
+      ],
+      "id": 4,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281db6",
+      "category": [
+        "6023518f790afb794efbabc0",
+        "6023518f790afb794efbabc6"
+      ],
+      "name": "Sport Item 5",
+      "price": 27,
+      "costPrice": 26,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#3D34E9",
+          "order": 5,
+          "device": "pos"
+        }
+      ],
+      "id": 5,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281db7",
+      "category": [
+        "6023518f790afb794efbabc0",
+        "6023518f790afb794efbabc6"
+      ],
+      "name": "Sport Item 6",
+      "price": 97,
+      "costPrice": 96,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#3D8BC0",
+          "order": 6,
+          "device": "pos"
+        }
+      ],
+      "id": 6,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281db8",
+      "category": [
+        "6023518f790afb794efbabc0",
+        "6023518f790afb794efbabc6"
+      ],
+      "name": "Sport Item 7",
+      "price": 49,
+      "costPrice": 48,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#DBFE91",
+          "order": 7,
+          "device": "pos"
+        }
+      ],
+      "id": 7,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281db9",
+      "category": [
+        "6023518f790afb794efbabc0",
+        "6023518f790afb794efbabc7"
+      ],
+      "name": "Sport Item 8",
+      "price": 81,
+      "costPrice": 80,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#8E81A1",
+          "order": 8,
+          "device": "pos"
+        }
+      ],
+      "id": 8,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dba",
+      "category": [
+        "6023518f790afb794efbabc0",
+        "6023518f790afb794efbabc7"
+      ],
+      "name": "Sport Item 9",
+      "price": 33,
+      "costPrice": 32,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#ECB28E",
+          "order": 9,
+          "device": "pos"
+        }
+      ],
+      "id": 9,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dbb",
+      "category": [
+        "6023518f790afb794efbabc0",
+        "6023518f790afb794efbabc7"
+      ],
+      "name": "Sport Item 10",
+      "price": 6,
+      "costPrice": 5,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#4304FE",
+          "order": 10,
+          "device": "pos"
+        }
+      ],
+      "id": 10,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dbc",
+      "category": [
+        "6023518f790afb794efbabc0",
+        "6023518f790afb794efbabc7"
+      ],
+      "name": "Sport Item 11",
+      "price": 12,
+      "costPrice": 11,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#913036",
+          "order": 11,
+          "device": "pos"
+        }
+      ],
+      "id": 11,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dbd",
+      "category": [
+        "6023518f790afb794efbabc0",
+        "6023518f790afb794efbabc7"
+      ],
+      "name": "Sport Item 12",
+      "price": 33,
+      "costPrice": 32,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#CF871A",
+          "order": 12,
+          "device": "pos"
+        }
+      ],
+      "id": 12,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dbe",
+      "category": [
+        "6023518f790afb794efbabc0",
+        "6023518f790afb794efbabc8"
+      ],
+      "name": "Sport Item 13",
+      "price": 40,
+      "costPrice": 39,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#4D4ABC",
+          "order": 13,
+          "device": "pos"
+        }
+      ],
+      "id": 13,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dbf",
+      "category": [
+        "6023518f790afb794efbabc0",
+        "6023518f790afb794efbabc8"
+      ],
+      "name": "Sport Item 14",
+      "price": 100,
+      "costPrice": 99,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#EA37AF",
+          "order": 14,
+          "device": "pos"
+        }
+      ],
+      "id": 14,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dc0",
+      "category": [
+        "6023518f790afb794efbabc0",
+        "6023518f790afb794efbabc8"
+      ],
+      "name": "Sport Item 15",
+      "price": 33,
+      "costPrice": 32,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#DDBE92",
+          "order": 15,
+          "device": "pos"
+        }
+      ],
+      "id": 15,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dc1",
+      "category": [
+        "6023518f790afb794efbabc0",
+        "6023518f790afb794efbabc8"
+      ],
+      "name": "Sport Item 16",
+      "price": 79,
+      "costPrice": 78,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#46A36B",
+          "order": 16,
+          "device": "pos"
+        }
+      ],
+      "id": 16,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dc2",
+      "category": [
+        "6023518f790afb794efbabc0",
+        "6023518f790afb794efbabc8"
+      ],
+      "name": "Sport Item 17",
+      "price": 93,
+      "costPrice": 92,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#F484BB",
+          "order": 17,
+          "device": "pos"
+        }
+      ],
+      "id": 17,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dc3",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 18",
+      "price": 16,
+      "costPrice": 15,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#90E8D5",
+          "order": 18,
+          "device": "pos"
+        }
+      ],
+      "id": 18,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dc4",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 19",
+      "price": 91,
+      "costPrice": 90,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#95EEA0",
+          "order": 19,
+          "device": "pos"
+        }
+      ],
+      "id": 19,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dc5",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 20",
+      "price": 49,
+      "costPrice": 48,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#54C235",
+          "order": 20,
+          "device": "pos"
+        }
+      ],
+      "id": 20,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dc6",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 21",
+      "price": 58,
+      "costPrice": 57,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#D3B132",
+          "order": 21,
+          "device": "pos"
+        }
+      ],
+      "id": 21,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dc7",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 22",
+      "price": 68,
+      "costPrice": 67,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#7E3657",
+          "order": 22,
+          "device": "pos"
+        }
+      ],
+      "id": 22,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dc8",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 23",
+      "price": 98,
+      "costPrice": 97,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#FB5F6E",
+          "order": 23,
+          "device": "pos"
+        }
+      ],
+      "id": 23,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dc9",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 24",
+      "price": 14,
+      "costPrice": 13,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#45CCD0",
+          "order": 24,
+          "device": "pos"
+        }
+      ],
+      "id": 24,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dca",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 25",
+      "price": 33,
+      "costPrice": 32,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#150BB0",
+          "order": 25,
+          "device": "pos"
+        }
+      ],
+      "id": 25,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dcb",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 26",
+      "price": 2,
+      "costPrice": 1,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#FCC836",
+          "order": 26,
+          "device": "pos"
+        }
+      ],
+      "id": 26,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dcc",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 27",
+      "price": 33,
+      "costPrice": 32,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#878237",
+          "order": 27,
+          "device": "pos"
+        }
+      ],
+      "id": 27,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dcd",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 28",
+      "price": 66,
+      "costPrice": 65,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#69CBA1",
+          "order": 28,
+          "device": "pos"
+        }
+      ],
+      "id": 28,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dce",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 29",
+      "price": 35,
+      "costPrice": 34,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#47D6FB",
+          "order": 29,
+          "device": "pos"
+        }
+      ],
+      "id": 29,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dcf",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 30",
+      "price": 65,
+      "costPrice": 64,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#29A954",
+          "order": 30,
+          "device": "pos"
+        }
+      ],
+      "id": 30,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dd0",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 31",
+      "price": 28,
+      "costPrice": 27,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#31EDA5",
+          "order": 31,
+          "device": "pos"
+        }
+      ],
+      "id": 31,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dd1",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 32",
+      "price": 25,
+      "costPrice": 24,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#D46C6D",
+          "order": 32,
+          "device": "pos"
+        }
+      ],
+      "id": 32,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dd2",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 33",
+      "price": 37,
+      "costPrice": 36,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#7A29BB",
+          "order": 33,
+          "device": "pos"
+        }
+      ],
+      "id": 33,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dd3",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 34",
+      "price": 101,
+      "costPrice": 100,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#46D633",
+          "order": 34,
+          "device": "pos"
+        }
+      ],
+      "id": 34,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dd4",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 35",
+      "price": 5,
+      "costPrice": 4,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#CA72B9",
+          "order": 35,
+          "device": "pos"
+        }
+      ],
+      "id": 35,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dd5",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 36",
+      "price": 84,
+      "costPrice": 83,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#4C6654",
+          "order": 36,
+          "device": "pos"
+        }
+      ],
+      "id": 36,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dd6",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 37",
+      "price": 61,
+      "costPrice": 60,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#351992",
+          "order": 37,
+          "device": "pos"
+        }
+      ],
+      "id": 37,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dd7",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 38",
+      "price": 50,
+      "costPrice": 49,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#1C4AF4",
+          "order": 38,
+          "device": "pos"
+        }
+      ],
+      "id": 38,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dd8",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 39",
+      "price": 38,
+      "costPrice": 37,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#3B5243",
+          "order": 39,
+          "device": "pos"
+        }
+      ],
+      "id": 39,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "60249c54f2df408d87281dd9",
+      "category": [
+        "6023518f790afb794efbabc0"
+      ],
+      "name": "Sport Item 40",
+      "price": 60,
+      "costPrice": 59,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#F6B769",
+          "order": 40,
+          "device": "pos"
+        }
+      ],
+      "id": 40,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b85",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 41",
+      "price": 7,
+      "costPrice": 6,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#ADD30",
+          "order": 1,
+          "device": "pos"
+        }
+      ],
+      "id": 41,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b86",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 42",
+      "price": 58,
+      "costPrice": 57,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#805CB6",
+          "order": 2,
+          "device": "pos"
+        }
+      ],
+      "id": 42,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b87",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 43",
+      "price": 65,
+      "costPrice": 64,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#89598B",
+          "order": 3,
+          "device": "pos"
+        }
+      ],
+      "id": 43,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b88",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 44",
+      "price": 40,
+      "costPrice": 39,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#1E5A12",
+          "order": 4,
+          "device": "pos"
+        }
+      ],
+      "id": 44,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b89",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 45",
+      "price": 82,
+      "costPrice": 81,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#F4013C",
+          "order": 5,
+          "device": "pos"
+        }
+      ],
+      "id": 45,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b8a",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 46",
+      "price": 38,
+      "costPrice": 37,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#62E79",
+          "order": 6,
+          "device": "pos"
+        }
+      ],
+      "id": 46,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b8b",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 47",
+      "price": 75,
+      "costPrice": 74,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#2B3CCB",
+          "order": 7,
+          "device": "pos"
+        }
+      ],
+      "id": 47,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b8c",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 48",
+      "price": 48,
+      "costPrice": 47,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#9CC779",
+          "order": 8,
+          "device": "pos"
+        }
+      ],
+      "id": 48,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b8d",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 49",
+      "price": 51,
+      "costPrice": 50,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#8AC0C4",
+          "order": 9,
+          "device": "pos"
+        }
+      ],
+      "id": 49,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b8e",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 50",
+      "price": 59,
+      "costPrice": 58,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#8C53CD",
+          "order": 10,
+          "device": "pos"
+        }
+      ],
+      "id": 50,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b8f",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 51",
+      "price": 64,
+      "costPrice": 63,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#C67C33",
+          "order": 11,
+          "device": "pos"
+        }
+      ],
+      "id": 51,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b90",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 52",
+      "price": 63,
+      "costPrice": 62,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#32E467",
+          "order": 12,
+          "device": "pos"
+        }
+      ],
+      "id": 52,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b91",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 53",
+      "price": 15,
+      "costPrice": 14,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#60C094",
+          "order": 13,
+          "device": "pos"
+        }
+      ],
+      "id": 53,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b92",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 54",
+      "price": 57,
+      "costPrice": 56,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#F618DE",
+          "order": 14,
+          "device": "pos"
+        }
+      ],
+      "id": 54,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b93",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 55",
+      "price": 47,
+      "costPrice": 46,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#AA04A1",
+          "order": 15,
+          "device": "pos"
+        }
+      ],
+      "id": 55,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b94",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 56",
+      "price": 73,
+      "costPrice": 72,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#2F2FFF",
+          "order": 16,
+          "device": "pos"
+        }
+      ],
+      "id": 56,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b95",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 57",
+      "price": 92,
+      "costPrice": 91,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#D1E54",
+          "order": 17,
+          "device": "pos"
+        }
+      ],
+      "id": 57,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b96",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 58",
+      "price": 81,
+      "costPrice": 80,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#DB8333",
+          "order": 18,
+          "device": "pos"
+        }
+      ],
+      "id": 58,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b97",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 59",
+      "price": 13,
+      "costPrice": 12,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#892771",
+          "order": 19,
+          "device": "pos"
+        }
+      ],
+      "id": 59,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b98",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 60",
+      "price": 42,
+      "costPrice": 41,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#E58418",
+          "order": 20,
+          "device": "pos"
+        }
+      ],
+      "id": 60,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b99",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 61",
+      "price": 37,
+      "costPrice": 36,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#1B86D1",
+          "order": 21,
+          "device": "pos"
+        }
+      ],
+      "id": 61,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b9a",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 62",
+      "price": 5,
+      "costPrice": 4,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#B8FA5A",
+          "order": 22,
+          "device": "pos"
+        }
+      ],
+      "id": 62,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b9b",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 63",
+      "price": 6,
+      "costPrice": 5,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#7DB4FD",
+          "order": 23,
+          "device": "pos"
+        }
+      ],
+      "id": 63,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b9c",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 64",
+      "price": 98,
+      "costPrice": 97,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#9BDA24",
+          "order": 24,
+          "device": "pos"
+        }
+      ],
+      "id": 64,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b9d",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 65",
+      "price": 83,
+      "costPrice": 82,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#1D4BBE",
+          "order": 25,
+          "device": "pos"
+        }
+      ],
+      "id": 65,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b9e",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 66",
+      "price": 25,
+      "costPrice": 24,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#826D74",
+          "order": 26,
+          "device": "pos"
+        }
+      ],
+      "id": 66,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2b9f",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 67",
+      "price": 73,
+      "costPrice": 72,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#1E9710",
+          "order": 27,
+          "device": "pos"
+        }
+      ],
+      "id": 67,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2ba0",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 68",
+      "price": 85,
+      "costPrice": 84,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#1486B4",
+          "order": 28,
+          "device": "pos"
+        }
+      ],
+      "id": 68,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2ba1",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 69",
+      "price": 76,
+      "costPrice": 75,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#1CC3B9",
+          "order": 29,
+          "device": "pos"
+        }
+      ],
+      "id": 69,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2ba2",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 70",
+      "price": 68,
+      "costPrice": 67,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#260C3B",
+          "order": 30,
+          "device": "pos"
+        }
+      ],
+      "id": 70,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2ba3",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 71",
+      "price": 91,
+      "costPrice": 90,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#35D2C6",
+          "order": 31,
+          "device": "pos"
+        }
+      ],
+      "id": 71,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2ba4",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 72",
+      "price": 13,
+      "costPrice": 12,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#823573",
+          "order": 32,
+          "device": "pos"
+        }
+      ],
+      "id": 72,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2ba5",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 73",
+      "price": 101,
+      "costPrice": 100,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#8E2837",
+          "order": 33,
+          "device": "pos"
+        }
+      ],
+      "id": 73,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2ba6",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 74",
+      "price": 73,
+      "costPrice": 72,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#DEAD03",
+          "order": 34,
+          "device": "pos"
+        }
+      ],
+      "id": 74,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2ba7",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 75",
+      "price": 3,
+      "costPrice": 2,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#1DDFFF",
+          "order": 35,
+          "device": "pos"
+        }
+      ],
+      "id": 75,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2ba8",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 76",
+      "price": 18,
+      "costPrice": 17,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#D01520",
+          "order": 36,
+          "device": "pos"
+        }
+      ],
+      "id": 76,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2ba9",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 77",
+      "price": 79,
+      "costPrice": 78,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#5E3B04",
+          "order": 37,
+          "device": "pos"
+        }
+      ],
+      "id": 77,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2baa",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 78",
+      "price": 5,
+      "costPrice": 4,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#7EDC3B",
+          "order": 38,
+          "device": "pos"
+        }
+      ],
+      "id": 78,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2bab",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 79",
+      "price": 92,
+      "costPrice": 91,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#D5821B",
+          "order": 39,
+          "device": "pos"
+        }
+      ],
+      "id": 79,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": false,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
+    },
+    {
+      "_id": "6024a58e83c07f32755a2bac",
+      "category": [
+        "6023518f790afb794efbabc1"
+      ],
+      "name": "Food Item 80",
+      "price": 31,
+      "costPrice": 30,
+      "tax": 19,
+      "layouts": [
+        {
+          "color": "#E6ECC7",
+          "order": 40,
+          "device": "pos"
+        }
+      ],
+      "id": 80,
+      "appType": "POS_RETAIL",
+      "option": {
+        "favorite": true,
+        "nonRefundable": false,
+        "active": true,
+        "showOnOrderScreen": true,
+        "manualPrice": false
+      }
     }
   ],
   "OrderLayout": [
@@ -1127,7 +3627,9 @@
       "type": "kitchen",
       "printers": [
         {
-          "hardwares": ["Terminal 1"],
+          "hardwares": [
+            "Terminal 1"
+          ],
           "includes": [],
           "_id": "5e81774685fb2d03dda95cd0",
           "printerType": "ip",

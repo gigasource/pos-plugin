@@ -54,7 +54,7 @@ module.exports = async function (cms) {
 			}
 			await orm.emit('setUpCloudSocket', _masterIp, _masterClientId, cloudSocket)
 		}
-		if (masterIp === localIp()) {
+		if (masterIp && masterIp === localIp()) {
 			setMaster(true)
 		}
 		if (!masterIp) return // cloud is master

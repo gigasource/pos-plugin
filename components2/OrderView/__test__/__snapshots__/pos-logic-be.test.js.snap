@@ -1,5 +1,238 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`pos-logic Case 17: refund order 1`] = `
+Object {
+  "_id": "ObjectID",
+  "appType": "POS_RESTAURANT",
+  "cancellationItems": Array [],
+  "cashback": 0,
+  "items": Array [
+    Object {
+      "_id": "ObjectID",
+      "course": 1,
+      "groupPrinter": "",
+      "id": 1,
+      "name": "Cola",
+      "price": 98,
+      "quantity": 1,
+      "tax": 19,
+      "taxes": Array [
+        19,
+        null,
+      ],
+      "vSum": 98,
+      "vTakeAway": false,
+      "vTaxSum": Object {
+        "19": Object {
+          "gross": 98,
+          "net": 82.35,
+          "tax": 15.65,
+        },
+      },
+    },
+    Object {
+      "_id": "ObjectID",
+      "course": 1,
+      "groupPrinter": "",
+      "id": 2,
+      "name": "Pepsi",
+      "price": 35,
+      "quantity": 1,
+      "tax": 0,
+      "taxes": Array [
+        0,
+        null,
+      ],
+      "vSum": 35,
+      "vTakeAway": false,
+      "vTaxSum": Object {
+        "0": Object {
+          "gross": 35,
+          "net": 35,
+          "tax": 0,
+        },
+      },
+    },
+  ],
+  "payment": Array [],
+  "status": "inProgress",
+  "table": "10",
+  "takeAway": false,
+  "tip": 0,
+  "user": Array [],
+  "vDate": "2020-12-31T17:00:00.000Z",
+  "vSum": 133,
+  "vTaxSum": Object {
+    "0": Object {
+      "gross": 35,
+      "net": 35,
+      "tax": 0,
+    },
+    "19": Object {
+      "gross": 98,
+      "net": 82.35,
+      "tax": 15.65,
+    },
+  },
+}
+`;
+
+exports[`pos-logic Case 17: refund order 2`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
+    "cancellationItems": Array [],
+    "cashback": 0,
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "",
+        "id": 1,
+        "name": "Cola",
+        "price": 98,
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          null,
+        ],
+        "vSum": 98,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 98,
+            "net": 82.35,
+            "tax": 15.65,
+          },
+        },
+      },
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "",
+        "id": 2,
+        "name": "Pepsi",
+        "price": 35,
+        "quantity": 1,
+        "tax": 0,
+        "taxes": Array [
+          0,
+          null,
+        ],
+        "vSum": 35,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "0": Object {
+            "gross": 35,
+            "net": 35,
+            "tax": 0,
+          },
+        },
+      },
+    ],
+    "payment": Array [],
+    "status": "inProgress",
+    "table": "10",
+    "takeAway": false,
+    "tip": 0,
+    "user": Array [],
+    "vDate": "2020-12-31T17:00:00.000Z",
+    "vSum": 133,
+    "vTaxSum": Object {
+      "0": Object {
+        "gross": 35,
+        "net": 35,
+        "tax": 0,
+      },
+      "19": Object {
+        "gross": 98,
+        "net": 82.35,
+        "tax": 15.65,
+      },
+    },
+  },
+  Object {
+    "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
+    "cancellationItems": Array [],
+    "cashback": 0,
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "",
+        "id": 1,
+        "name": "Cola",
+        "originalQuantity": 0,
+        "price": 98,
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          null,
+        ],
+        "vSum": 98,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 98,
+            "net": 82.35,
+            "tax": 15.65,
+          },
+        },
+      },
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "",
+        "id": 2,
+        "name": "Pepsi",
+        "originalQuantity": 0,
+        "price": 35,
+        "quantity": 0,
+        "tax": 0,
+        "taxes": Array [
+          0,
+          null,
+        ],
+        "vSum": 0,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "0": Object {
+            "gross": 0,
+            "net": 0,
+            "tax": 0,
+          },
+        },
+      },
+    ],
+    "originalOrderId": "ObjectID",
+    "payment": Array [],
+    "status": "refund",
+    "table": "10",
+    "takeAway": false,
+    "tip": 0,
+    "user": Array [],
+    "vDate": "2020-12-31T17:00:00.000Z",
+    "vSum": 98,
+    "vTaxSum": Object {
+      "0": Object {
+        "gross": 0,
+        "net": 0,
+        "tax": 0,
+      },
+      "19": Object {
+        "gross": 98,
+        "net": 82.35,
+        "tax": 15.65,
+      },
+    },
+  },
+]
+`;
+
 exports[`pos-logic case 2a: create Order + addProduct 1`] = `
 Array [
   Object {
@@ -3298,4 +3531,96 @@ Array [
     },
   },
 ]
+`;
+
+exports[`pos-logic case 17a: refund order 1`] = `
+Object {
+  "_id": "ObjectID",
+  "cancellationItems": Array [],
+  "cashback": 0,
+  "items": Array [
+    Object {
+      "_id": "ObjectID",
+      "category": "ObjectID",
+      "course": 1,
+      "id": 1,
+      "layouts": Array [
+        Object {
+          "color": "#FBE4EC",
+          "device": "pos",
+          "order": 0,
+        },
+      ],
+      "maxQuantity": 5,
+      "name": "Cola",
+      "option": Object {
+        "favorite": true,
+      },
+      "originalQuantity": 0,
+      "price": 98,
+      "quantity": 0,
+      "tax": 19,
+      "vSum": 0,
+      "vTakeAway": false,
+      "vTaxSum": Object {
+        "19": Object {
+          "gross": 0,
+          "net": 0,
+          "tax": 0,
+        },
+      },
+    },
+    Object {
+      "_id": "ObjectID",
+      "category": "ObjectID",
+      "course": 1,
+      "id": 2,
+      "layouts": Array [
+        Object {
+          "color": "#FBE4EC",
+          "device": "pos",
+          "order": 1,
+        },
+      ],
+      "maxQuantity": 10,
+      "name": "Pepsi",
+      "option": Object {
+        "favorite": true,
+      },
+      "originalQuantity": 0,
+      "price": 35,
+      "quantity": 0,
+      "tax": 0,
+      "vSum": 0,
+      "vTakeAway": false,
+      "vTaxSum": Object {
+        "0": Object {
+          "gross": 0,
+          "net": 0,
+          "tax": 0,
+        },
+      },
+    },
+  ],
+  "originalOrderId": "ObjectID",
+  "payment": Array [],
+  "status": "refund",
+  "takeAway": false,
+  "tip": 0,
+  "user": Array [],
+  "vDate": "2020-12-31T17:00:00.000Z",
+  "vSum": 0,
+  "vTaxSum": Object {
+    "0": Object {
+      "gross": 0,
+      "net": 0,
+      "tax": 0,
+    },
+    "19": Object {
+      "gross": 0,
+      "net": 0,
+      "tax": 0,
+    },
+  },
+}
 `;

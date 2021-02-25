@@ -25,7 +25,7 @@ export function renderOLSetting() {
     <div class="row-flex align-items-center">
       <span class="mr-1">Product font size:</span>
       <g-icon onClick={() => changeSize(-0.5)}>remove_circle</g-icon>
-      <span>{{fontSize}}</span>
+      <span>{fontSize.value}</span>
       <g-icon onClick={() => changeSize(0.5)}>add_circle</g-icon>
     </div>
     <g-btn-bs small style="margin-left: 0" class="elevation-1" onClick={() => changeCategory()}>

@@ -9,7 +9,6 @@ import {
 import _ from 'lodash'
 import {
   inventories,
-  inventoryCategories,
   filter
 } from "../inventory-logic-ui";
 import {

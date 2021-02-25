@@ -1,0 +1,18 @@
+{
+  "events": [],
+  "_id": "5e83fe0f8a590d0eb3f5a851",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "CustomerOrder",
+      "binding": [],
+      "slotScopeBinding": []
+    }
+  ],
+  "name": "posCustomerOrder",
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "pos-customer-order"
+}

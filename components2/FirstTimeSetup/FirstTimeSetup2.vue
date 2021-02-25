@@ -73,19 +73,19 @@ export default {
     }
 
 // computed
-    const disableSendBtn = computed(() => signInRequest.value && signInRequest.value.status === 'pending')
-    const deniedRequest = computed(() => signInRequest.value && signInRequest.value.status === 'notApproved')
+     const disableSendBtn = computed(() => signInRequest.value && signInRequest.value.status === 'pending')
+     const deniedRequest = computed(() => signInRequest.value && signInRequest.value.status === 'notApproved')
 
 // methods
-    function changeCode(code) {
+     function changeCode(code) {
       code.value = code
     }
 
-    function start() {
+     function start() {
       router.push({ path: '/pos-login' })
     }
 
-    function connect() {
+     function connect() {
       pairing.value = true
 
       cms.socket.emit('registerOnlineOrderDevice', code.value, (error, deviceId, isFirstDevice) => {
@@ -104,7 +104,7 @@ export default {
       })
     }
 
-    function secretClick() {
+     function secretClick() {
       if (clickCount.value === 9) {
         showCustomUrlDialog.value = true
       } else {
@@ -112,15 +112,15 @@ export default {
       }
     }
 
-    function updateServerUrl(url) {
+     function updateServerUrl(url) {
       console.error('PosStore:updateServerUrl was not injected')
     }
 
-    async function getServerUrl(cb) {
+     async function getServerUrl(cb) {
       console.error('PosStore:getServerUrl was not injected')
     }
 
-    function searchPlace(text) {
+     function searchPlace(text) {
       if (!text || text.length < 4) {
         placesSearchResult.value = []
         return
@@ -136,7 +136,7 @@ export default {
       })
     }
 
-    function getPlaceDetail() {
+     function getPlaceDetail() {
       if (placesSearchResult.value.find(item => item.value === placeId.value)) {
         return new Promise(resolve => {
           cms.socket.emit('getPlaceDetail', placeId.value, token.value, data => {
@@ -146,12 +146,12 @@ export default {
       }
     }
 
-    async function getRequest() {
+     async function getRequest() {
       const { signInRequest } = await cms.getModel('PosSetting').findOne()
       if (signInRequest) signInRequest.value = signInRequest
     }
 
-    async function sendRequest() {
+     async function sendRequest() {
       sending.value = true
       const details = await getPlaceDetail()
 
@@ -170,7 +170,7 @@ export default {
       })
     }
 
-    async function enterPress() {
+     async function enterPress() {
       if (tab.value.title === 'Address') {
         await sendRequest()
       } else if (tab.value.title === 'Pairing Code') {
@@ -178,19 +178,19 @@ export default {
       }
     }
 
-    function openDialogDemo() {
+     function openDialogDemo() {
       demoMode.value = 'demo'
       dialog.value.demo = true
     }
 
 
-    function openImportDataDialog() {
+     function openImportDataDialog() {
       // import data dialog
       demoMode.value = 'paired'
       dialog.value.demo = true
     }
 
-    function selectDemoData(store) {
+     function selectDemoData(store) {
       toggleOverlay()
       const paired = demoMode.value === 'paired';
       cms.socket.emit('set-demo-store', store, paired, () => {
@@ -203,7 +203,7 @@ export default {
       })
     }
 
-    function skipPairing() {
+     function skipPairing() {
       console.error('PosStore:skipPairing was not injected')
     }
 

@@ -1,0 +1,184 @@
+{
+  "events": [],
+  "_id": "5e019b6c49b6aa0421cce6bf",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "GGridLayout",
+      "content": {
+        "props": {
+          "layout": {
+            "name": "app",
+            "top": -1,
+            "left": -1,
+            "width": 0,
+            "height": 0,
+            "margin": "",
+            "padding": "",
+            "bgColor": "hsl(35, 100%, 50%, 50%)",
+            "alignSelf": "",
+            "justifySelf": "",
+            "wrapInDiv": false,
+            "displayFlex": false,
+            "flexDirection": "row",
+            "flexWrap": false,
+            "flexJustifyContent": "",
+            "flexAlignItems": "",
+            "flexAlignContent": "",
+            "flexOrder": "",
+            "flexGrow": "",
+            "flexShrink": "",
+            "flexBasis": "",
+            "flexAlignSelf": "",
+            "alignItems": "",
+            "alignContent": "",
+            "justifyItems": "",
+            "justifyContent": "",
+            "columns": [
+              "75%",
+              "25%"
+            ],
+            "rows": [
+              "1fr",
+              "64px"
+            ],
+            "columnGap": 0,
+            "rowGap": 0,
+            "subAreas": [
+              {
+                "name": "toolbar",
+                "top": 2,
+                "left": 1,
+                "width": 2,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(344, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              },
+              {
+                "name": "report",
+                "top": 1,
+                "left": 2,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(24, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              },
+              {
+                "name": "calendar",
+                "top": 1,
+                "left": 1,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(275, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              }
+            ]
+          },
+          "style": {
+            "height": " 100%"
+          }
+        }
+      },
+      "binding": [],
+      "slotScopeBinding": [],
+      "items": [
+        {
+          "choice": "view",
+          "component": "PosEndOfDayDetails",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "report",
+          "url": "plugins/pos-plugin/components/Settings/components/PosEndOfDayDetails.vue",
+          "path": "components/Settings/components/PosEndOfDayDetails.vue",
+          "pluginName": "pos-plugin",
+          "content": {
+            "props": {
+              "style": {
+                "zIndex": 1
+              }
+            }
+          }
+        },
+        {
+          "choice": "view",
+          "component": "PosEndOfDayToolbar",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "toolbar",
+          "url": "plugins/pos-plugin/components/Settings/components/PosEndOfDayToolbar.vue",
+          "path": "components/Settings/components/PosEndOfDayToolbar.vue",
+          "pluginName": "pos-plugin"
+        },
+        {
+          "choice": "view",
+          "component": "PosEndOfDayMain",
+          "content": {
+            "props": {
+              "style": {
+                "backgroundColor": "#eee"
+              }
+            }
+          },
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "calendar",
+          "url": "plugins/pos-plugin/components/Settings/components/PosEndOfDayMain.vue",
+          "path": "components/Settings/components/PosEndOfDayMain.vue",
+          "pluginName": "pos-plugin"
+        }
+      ]
+    }
+  ],
+  "name": "posEndOfDayReport",
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "pos-eod-report",
+  "registerAsVueComponent": true
+}

@@ -1,0 +1,492 @@
+{
+  "events": [],
+  "_id": "5e71e4ae91c0240483d1659a",
+  "data": {
+    "_code_": "module.exports = {\n  data: {\n    view: null\n  }\n}",
+    "_code_type_": "commonJs"
+  },
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "GGridLayout",
+      "content": {
+        "props": {
+          "layout": {
+            "name": "app",
+            "top": -1,
+            "left": -1,
+            "width": 0,
+            "height": 0,
+            "margin": "",
+            "padding": "",
+            "bgColor": "hsl(80, 100%, 50%, 50%)",
+            "alignSelf": "",
+            "justifySelf": "",
+            "wrapInDiv": false,
+            "displayFlex": false,
+            "flexDirection": "row",
+            "flexWrap": false,
+            "flexJustifyContent": "",
+            "flexAlignItems": "",
+            "flexAlignContent": "",
+            "flexOrder": "",
+            "flexGrow": "",
+            "flexShrink": "",
+            "flexBasis": "",
+            "flexAlignSelf": "",
+            "alignItems": "",
+            "alignContent": "",
+            "justifyItems": "",
+            "justifyContent": "",
+            "columns": [
+              "auto",
+              "1fr"
+            ],
+            "rows": [
+              "100%"
+            ],
+            "columnGap": 0,
+            "rowGap": 0,
+            "subAreas": [
+              {
+                "name": "sidebar",
+                "top": 1,
+                "left": 1,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(293, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              },
+              {
+                "name": "content",
+                "top": 1,
+                "left": 2,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(331, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              }
+            ]
+          },
+          "style": {
+            "_code_": "module.exports = {\n  height: '100%'\n}",
+            "_code_type_": "commonJs"
+          }
+        }
+      },
+      "binding": [],
+      "slotScopeBinding": [],
+      "items": [
+        {
+          "choice": "view",
+          "component": "PosDashboardSidebar",
+          "binding": [
+            {
+              "type": ".sync",
+              "root": "data.view",
+              "local": "view"
+            }
+          ],
+          "slotScopeBinding": [],
+          "slot": "sidebar",
+          "url": "plugins/pos-plugin/components/Dashboard/PosDashboardSidebar.vue",
+          "path": "components/Dashboard/PosDashboardSidebar.vue",
+          "pluginName": "pos-plugin",
+          "items": [],
+          "content": {
+            "props": {
+              "afterMountFn": {
+                "_code_": "module.exports = function () {\n  const pathArr = this.defaultPath.split('.');\n  pathArr.shift();\n  const item = _.get(this.items, pathArr.map(i => i === 'item' ? 'items' : i).join('.'))\n  item.onClick.bind(this)()\n}",
+                "_code_type_": "commonJs"
+              },
+              "items": []
+            },
+            "preprocess": []
+          },
+          "inject": [
+            {
+              "service": "PosStore:computedDashboardSidebar",
+              "local": "items",
+              "type": "prop"
+            },
+            {
+              "service": "PosStore:defaultSidebarPath",
+              "local": "defaultPath",
+              "type": "prop"
+            }
+          ]
+        },
+        {
+          "choice": "view",
+          "binding": [
+            {
+              "type": ".sync",
+              "root": "data.view",
+              "local": "view"
+            }
+          ],
+          "slotScopeBinding": [],
+          "slot": "content",
+          "component": "ContentRender",
+          "url": "plugins/pos-plugin/components/common/ContentRender.vue",
+          "path": "components/common/ContentRender.vue",
+          "pluginName": "pos-plugin",
+          "items": [
+            {
+              "choice": "view",
+              "component": "PosOrderManualTable",
+              "binding": [],
+              "slotScopeBinding": [],
+              "slot": "ManualTable",
+              "url": "plugins/pos-plugin/components/Order/PosOrderManualTable.vue",
+              "path": "components/Order/PosOrderManualTable.vue",
+              "pluginName": "pos-plugin",
+              "inject": [
+                {
+                  "service": "PosStore:isMobile",
+                  "local": "isMobile",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:activeOrders",
+                  "local": "activeOrders",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:setInitOrderProps",
+                  "local": "setInitOrderProps",
+                  "type": "event"
+                }
+              ]
+            },
+            {
+              "choice": "view",
+              "component": "PosDashboardFunction",
+              "binding": [
+                {
+                  "type": ".sync",
+                  "root": "data.view",
+                  "local": "view"
+                }
+              ],
+              "slotScopeBinding": [],
+              "slot": "Functions",
+              "url": "plugins/pos-plugin/components/Dashboard/PosDashboardFunction.vue",
+              "path": "components/Dashboard/PosDashboardFunction.vue",
+              "pluginName": "pos-plugin",
+              "inject": [
+                {
+                  "service": "PosStore:enabledFeatures",
+                  "local": "enabledFeatures",
+                  "type": "prop"
+                },
+                {
+                  "service": "PosStore:user",
+                  "local": "user",
+                  "type": "prop"
+                }
+              ]
+            },
+            {
+              "choice": "view",
+              "component": "RestaurantRoom",
+              "binding": [],
+              "slotScopeBinding": [
+                {
+                  "type": "prop",
+                  "slotScope": "id",
+                  "local": "id"
+                }
+              ],
+              "isScopedSlot": true,
+              "slot": "Restaurant",
+              "url": "plugins/pos-plugin/components/Restaurant/RestaurantRoom.vue",
+              "path": "components/Restaurant/RestaurantRoom.vue",
+              "pluginName": "pos-plugin",
+              "inject": [
+                {
+                  "service": "OrderStore:currentOrder",
+                  "local": "currentOrder",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:resetOrderData",
+                  "local": "resetOrderData",
+                  "type": "event"
+                },
+                {
+                  "service": "OrderStore:activeOrders",
+                  "local": "activeOrders",
+                  "type": "prop"
+                },
+                {
+                  "service": "PosStore:user",
+                  "local": "user",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:setInitOrderProps",
+                  "local": "setInitOrderProps",
+                  "type": "event"
+                },
+                {
+                  "service": "OrderStore:changeTable",
+                  "local": "changeTable",
+                  "type": "event"
+                }
+              ]
+            },
+            {
+              "choice": "view",
+              "component": "OnlineOrderMain",
+              "binding": [],
+              "slotScopeBinding": [],
+              "slot": "Dashboard",
+              "url": "plugins/pos-plugin/components/OnlineOrder/OnlineOrderMain.vue",
+              "path": "components/OnlineOrder/OnlineOrderMain.vue",
+              "pluginName": "pos-plugin",
+              "inject": [
+                {
+                  "service": "OrderStore:pendingOrders",
+                  "local": "pendingOrders",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:kitchenOrders",
+                  "local": "kitchenOrders",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:updateOnlineOrders",
+                  "local": "updateOnlineOrders",
+                  "type": "event"
+                },
+                {
+                  "service": "OrderStore:declineOrder",
+                  "local": "declineOrder",
+                  "type": "event"
+                },
+                {
+                  "service": "OrderStore:acceptPendingOrder",
+                  "local": "acceptPendingOrder",
+                  "type": "event"
+                },
+                {
+                  "service": "OrderStore:completeOrder",
+                  "local": "completeOrder",
+                  "type": "event"
+                },
+                {
+                  "service": "SettingsStore:defaultPrepareTime",
+                  "local": "defaultPrepareTime",
+                  "type": "prop"
+                },
+                {
+                  "service": "SettingsStore:onlineOrderSorting",
+                  "local": "onlineOrderSorting",
+                  "type": "prop"
+                },
+                {
+                  "service": "PosStore:getPendingOnlineOrderCounter",
+                  "local": "getPendingOnlineOrderCounter",
+                  "type": "event"
+                }
+              ]
+            },
+            {
+              "choice": "view",
+              "component": "OnlineOrderList",
+              "binding": [],
+              "slotScopeBinding": [
+                {
+                  "type": "prop",
+                  "slotScope": "status",
+                  "local": "status"
+                }
+              ],
+              "slot": "Order",
+              "url": "plugins/pos-plugin/components/OnlineOrder/OnlineOrderList.vue",
+              "path": "components/OnlineOrder/OnlineOrderList.vue",
+              "pluginName": "pos-plugin",
+              "inject": [
+                {
+                  "service": "OrderStore:getOnlineOrdersWithStatus",
+                  "local": "getOnlineOrdersWithStatus",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:onlineOrders",
+                  "local": "onlineOrders",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:isRefundable",
+                  "local": "isRefundable",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:isRefundFailed",
+                  "local": "isRefundFailed",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:refundOrder",
+                  "local": "refundOrder",
+                  "type": "event"
+                },
+                {
+                  "service": "OrderStore:isRefunded",
+                  "local": "isRefunded",
+                  "type": "prop"
+                },
+                {
+                  "service": "PosStore:user",
+                  "local": "user",
+                  "type": "prop"
+                },
+                {
+                  "service": "PosStore:storeLocale",
+                  "local": "storeLocale",
+                  "type": "prop"
+                }
+              ],
+              "isScopedSlot": true
+            },
+            {
+              "choice": "view",
+              "component": "OnlineOrderServices",
+              "binding": [],
+              "slotScopeBinding": [],
+              "slot": "Services",
+              "inject": [
+                {
+                  "service": "SettingsStore:getOnlineDeviceServices",
+                  "local": "getOnlineDeviceServices",
+                  "type": "event"
+                },
+                {
+                  "service": "SettingsStore:updateOnlineDeviceServices",
+                  "local": "updateOnlineDeviceServices",
+                  "type": "event"
+                },
+                {
+                  "service": "PosStore:showErrorSnackbar",
+                  "local": "showErrorSnackbar",
+                  "type": "event"
+                },
+                {
+                  "service": "PosStore:showInfoSnackbar",
+                  "local": "showInfoSnackbar",
+                  "type": "event"
+                }
+              ],
+              "url": "plugins/pos-plugin/components/OnlineOrder/OnlineOrderServices.vue",
+              "path": "components/OnlineOrder/OnlineOrderServices.vue",
+              "pluginName": "pos-plugin"
+            },
+            {
+              "choice": "view",
+              "component": "ReservationsList",
+              "binding": [],
+              "slotScopeBinding": [
+                {}
+              ],
+              "slot": "Reservation",
+              "url": "plugins/pos-plugin/components/Reservation/ReservationsList.vue",
+              "path": "components/Reservation/ReservationsList.vue",
+              "pluginName": "pos-plugin",
+              "inject": [
+                {
+                  "service": "OrderStore:reservations",
+                  "local": "reservations",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:getReservations",
+                  "local": "getReservations",
+                  "type": "event"
+                },
+                {
+                  "service": "OrderStore:updateReservation",
+                  "local": "updateReservation",
+                  "type": "event"
+                },
+                {
+                  "service": "SettingsStore:reservationSetting",
+                  "local": "reservationSetting",
+                  "type": "prop"
+                },
+                {
+                  "service": "SettingsStore:getReservationSetting",
+                  "local": "getReservationSetting",
+                  "type": "event"
+                },
+                {
+                  "service": "OrderStore:removeReservation",
+                  "local": "removeReservation",
+                  "type": "event"
+                },
+                {
+                  "service": "OrderStore:completeReservation",
+                  "local": "completeReservation",
+                  "type": "event"
+                },
+                {
+                  "service": "PosStore:getPendingReservationsLength",
+                  "local": "getPendingReservationsLength",
+                  "type": "event"
+                }
+              ]
+            },
+            {
+              "choice": "view",
+              "component": "VirtualPrinterView",
+              "binding": [],
+              "slotScopeBinding": [],
+              "slot": "VirtualPrinter",
+              "url": "plugins/pos-plugin/components/VirtualPrinter/VirtualPrinterView.vue",
+              "path": "components/VirtualPrinter/VirtualPrinterView.vue",
+              "pluginName": "pos-plugin"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "name": "posDashboard",
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "pos-dashboard"
+}

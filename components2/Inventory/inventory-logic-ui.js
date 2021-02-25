@@ -1,18 +1,63 @@
 import { ref, computed, watchEffect, watch } from 'vue'
-export const inventories = ref([])
-export const inventoryCategories = ref([])
+import _ from 'lodash'
+import {
+  products,
+  categories
+} from '../Product/product-logic';
 
-/**
- * If category.available is true, then this category can be deleted
- */
-watchEffect(() => {
-  inventoryCategories.value.forEach(category => {
-    const inventoryWithCategory = inventories.value.find(inventory => {
-      return inventory.category._id.toString() === category._id.toString()
+export const inventories = ref([])
+export const hooks = new (require('schemahandler/hooks/hooks'))();
+export const detailInventories = computed(() => {
+  return inventories.value.map(inventory => {
+    const product = products.value.find(product => product._id.toString() === inventory.productId.toString())
+    const a = products.value
+    if (!product) return inventory
+    inventory.product = _.cloneDeep(product)
+    inventory.product.category = inventory.product.category.map(categoryId => {
+      return _.cloneDeep(categories.value.find(category => categoryId.toString() === category._id.toString()))
     })
-    category.available = !inventoryWithCategory
+    return inventory
   })
 })
+
+//<editor-fold desc="Handle hook">
+/**
+ * Check before update item
+ * -  Control number of item and never let them negative
+ * -  Inventories must be an array and items in inventories must include _id and quantity
+ * -  If inventory item is combo, get the sum of the item in that combo to calculate final change
+ */
+hooks.on('before:removeFromInventory', function (removedInventoryItems) {
+  const groupItems = _.groupBy(
+    removedInventoryItems.reduce((result, item) => {
+      const inventory = inventories.value.find(inventory => inventory._id.toString() === item._id.toString())
+      if (inventory.hasComboIngredient) {
+        result.push(...inventory.comboIngredient.map(comboItem => {
+          return {
+            _id: comboItem._id,
+            quantity: comboItem.quantity * item.quantity
+          }
+        }))
+      }
+      result.push(item)
+      return result
+    }, []),
+    item => item._id
+  )
+  removedInventoryItems = []
+  Object.keys(groupItems).forEach(itemId => {
+    const inventory = inventories.value.find(inventory => inventory._id.toString() === itemId.toString())
+    const totalQuantity = _.sumBy(groupItems[itemId], item => item.quantity)
+    removedInventoryItems.push({
+      _id: itemId,
+      quantity: totalQuantity,
+      outOfStock: inventory.stock < totalQuantity
+    })
+  })
+  return this.value = removedInventoryItems
+})
+
+//</editor-fold>
 /**
  * @name: {string} name of item need to filter
  * @id: {string} id of item need to filter
@@ -30,10 +75,10 @@ watchEffect(() => {
 export const filter = ref({})
 
 export const filteredInventory = computed(() => {
-  return inventories.value.filter(item => {
-    if ((filter.value.name && item.name !== filter.value.name)
+  return detailInventories.value.filter(item => {
+    if ((filter.value.name && item.product.name !== filter.value.name)
         || (filter.value.id && item.id !== filter.value.id)
-        || (filter.value.category && item.category.name !== filter.value.category.name)
+        || (filter.value.category && !item.product.category.find(category => category.name === filter.value.category.name))
         || (filter.value.stock && (item.stock < filter.value.stock[0] || item.stock > filter.value.stock[1])))
       return false
     return true
@@ -82,8 +127,8 @@ window.dbg = {
   ...(window.dbg || {}),
   inventory: {
     inventories,
-    inventoryCategories,
-    filter
+    filter,
+    filteredInventory
   }
 }
 

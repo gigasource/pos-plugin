@@ -1,0 +1,22 @@
+{
+  "events": [],
+  "_id": "5ddbc42674cd9262ec4d6325",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "PosFnButtonView",
+      "binding": [],
+      "slotScopeBinding": [],
+      "url": "plugins/pos-plugin/components/FnButton/PosFnButtonView.vue",
+      "path": "components/FnButton/PosFnButtonView.vue",
+      "pluginName": "pos-plugin"
+    }
+  ],
+  "name": "posFnButton",
+  "props": {
+    "fields": []
+  },
+  "renderInIframe": true,
+  "renderToRoute": "pos-fn-button"
+}

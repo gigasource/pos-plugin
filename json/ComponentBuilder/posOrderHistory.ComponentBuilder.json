@@ -1,0 +1,574 @@
+{
+  "events": [],
+  "_id": "5ddba2ae9be9ab0ed00958a4",
+  "items": [
+    {
+      "choice": "view",
+      "component": "GGridLayout",
+      "content": {
+        "props": {
+          "layout": {
+            "name": "app",
+            "top": -1,
+            "left": -1,
+            "width": 0,
+            "height": 0,
+            "margin": "",
+            "padding": "",
+            "bgColor": "hsl(108, 100%, 50%, 50%)",
+            "alignSelf": "",
+            "justifySelf": "",
+            "wrapInDiv": false,
+            "displayFlex": false,
+            "flexDirection": "row",
+            "flexWrap": false,
+            "flexJustifyContent": "",
+            "flexAlignItems": "",
+            "flexAlignContent": "",
+            "flexOrder": "",
+            "flexGrow": "",
+            "flexShrink": "",
+            "flexBasis": "",
+            "flexAlignSelf": "",
+            "alignItems": "",
+            "alignContent": "",
+            "justifyItems": "",
+            "justifyContent": "",
+            "columns": [
+              "75%",
+              "25%"
+            ],
+            "rows": [
+              "calc(100% - 64px)",
+              "64px"
+            ],
+            "columnGap": 0,
+            "rowGap": 0,
+            "subAreas": [
+              {
+                "name": "table",
+                "top": 1,
+                "left": 1,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(233, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              },
+              {
+                "name": "footer",
+                "top": 2,
+                "left": 1,
+                "width": 2,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(84, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              },
+              {
+                "name": "order",
+                "top": 1,
+                "left": 2,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(297, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              }
+            ]
+          },
+          "style": {
+            "height": "100%"
+          }
+        }
+      },
+      "binding": [],
+      "slotScopeBinding": [],
+      "items": [
+        {
+          "choice": "view",
+          "component": "OrderHistoryDetail",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "order",
+          "url": "plugins/pos-plugin/components/OrderHistory/OrderHistoryDetail.vue",
+          "path": "components/OrderHistory/OrderHistoryDetail.vue",
+          "pluginName": "pos-plugin"
+        },
+        {
+          "choice": "view",
+          "component": "GToolbar",
+          "content": {
+            "props": {
+              "color": "#eeeeee",
+              "elevation": 0,
+              "style": {
+                "box-shadow": "0 -1px 8px rgba(0, 0, 0, 0.122432)"
+              }
+            }
+          },
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "footer",
+          "items": [
+            {
+              "choice": "view",
+              "component": "GBtn",
+              "content": {
+                "props": {
+                  "background-color": "white",
+                  "text-color": "#1d1d26",
+                  "uppercase": null
+                },
+                "events": {
+                  "click": {
+                    "_code_": "module.exports = function() {\n  this.$router.push({path: '/pos-dashboard'})\n}",
+                    "_code_type_": "commonJs"
+                  }
+                }
+              },
+              "binding": [],
+              "slotScopeBinding": [],
+              "items": [
+                {
+                  "choice": "view",
+                  "component": "GIcon",
+                  "content": {
+                    "props": {
+                      "html": "icon-back",
+                      "svg": true
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": []
+                },
+                {
+                  "choice": "view",
+                  "component": "VTag",
+                  "content": {
+                    "props": {
+                      "tag": "span",
+                      "class": [
+                        "ml-2"
+                      ],
+                      "html": {
+                        "_code_": "\n        module.exports = function() {\n          return $t('ui.back')\n        }\n        ",
+                        "_code_type_": "commonJs",
+                        "_metadata_": {
+                          "text": "ui.back"
+                        }
+                      }
+                    },
+                    "preprocess": [
+                      "html"
+                    ]
+                  },
+                  "binding": [],
+                  "slotScopeBinding": []
+                }
+              ]
+            },
+            {
+              "choice": "view",
+              "component": "GSpacer",
+              "binding": [],
+              "slotScopeBinding": []
+            },
+            {
+              "choice": "view",
+              "component": "GBtn",
+              "content": {
+                "props": {
+                  "background-color": "white",
+                  "text-color": "#1d1d26",
+                  "uppercase": null,
+                  "style": {
+                    "_code_": "module.exports = {\n  marginRight: '16px'\n}",
+                    "_code_type_": "commonJs"
+                  }
+                },
+                "events": {
+                  "click": {
+                    "_code_": "module.exports = function () {\n  const order = this.$getService('OrderStore:orderHistoryCurrentOrder');\n  this.$getService('dialogConfirmDeleteOrderHistory:open')('Order No.', order.id);\n}",
+                    "_code_type_": "commonJs"
+                  }
+                },
+                "preprocess": [
+                  "html"
+                ]
+              },
+              "binding": [],
+              "slotScopeBinding": [],
+              "items": [
+                {
+                  "choice": "view",
+                  "component": "GIcon",
+                  "content": {
+                    "props": {
+                      "html": "icon-remove-square",
+                      "svg": true
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": []
+                },
+                {
+                  "choice": "view",
+                  "component": "VTag",
+                  "content": {
+                    "props": {
+                      "tag": "span",
+                      "class": [
+                        "ml-2"
+                      ],
+                      "html": {
+                        "_code_": "\n        module.exports = function() {\n          return $t('orderHistory.deleteOrder')\n        }\n        ",
+                        "_code_type_": "commonJs",
+                        "_metadata_": {
+                          "text": "orderHistory.deleteOrder"
+                        }
+                      }
+                    },
+                    "preprocess": [
+                      "html"
+                    ]
+                  },
+                  "binding": [],
+                  "slotScopeBinding": []
+                }
+              ],
+              "key": "undefined_copy"
+            },
+            {
+              "choice": "view",
+              "component": "GBtn",
+              "content": {
+                "props": {
+                  "background-color": "blue accent 3",
+                  "text-color": "white",
+                  "uppercase": null
+                },
+                "events": {
+                  "click": {
+                    "_code_": "module.exports = async function() {\n  const order = this.$getService('OrderStore:orderHistoryCurrentOrder')\n  order && await this.$getService('OrderStore:printOrderReport')(order)\n}",
+                    "_code_type_": "commonJs"
+                  }
+                },
+                "preprocess": [
+                  "html"
+                ]
+              },
+              "binding": [],
+              "slotScopeBinding": [],
+              "items": [
+                {
+                  "choice": "view",
+                  "component": "GIcon",
+                  "content": {
+                    "props": {
+                      "html": "icon-print2",
+                      "svg": true
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": []
+                },
+                {
+                  "choice": "view",
+                  "component": "VTag",
+                  "content": {
+                    "props": {
+                      "tag": "span",
+                      "class": [
+                        "ml-2"
+                      ],
+                      "html": {
+                        "_code_": "\n        module.exports = function() {\n          return $t('ui.print')\n        }\n        ",
+                        "_code_type_": "commonJs",
+                        "_metadata_": {
+                          "text": "ui.print"
+                        }
+                      }
+                    },
+                    "preprocess": [
+                      "html"
+                    ]
+                  },
+                  "binding": [],
+                  "slotScopeBinding": []
+                }
+              ],
+              "key": "undefined_copy_copy"
+            }
+          ]
+        },
+        {
+          "choice": "view",
+          "component": "OrderHistoryTable",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "table",
+          "url": "plugins/pos-plugin/components/OrderHistory/OrderHistoryTable.vue",
+          "path": "components/OrderHistory/OrderHistoryTable.vue",
+          "pluginName": "pos-plugin"
+        }
+      ]
+    },
+    {
+      "choice": "view",
+      "component": "dialogDateTimePicker",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "orderHistoryDateTimePicker",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "url": "plugins/pos-plugin/components/OrderHistory/dialogDateTimePicker.vue",
+      "path": "components/OrderHistory/dialogDateTimePicker.vue",
+      "pluginName": "pos-plugin"
+    },
+    {
+      "choice": "view",
+      "component": "dialogNumberFilter",
+      "content": {
+        "props": {
+          "rules": [],
+          "label": {
+            "_code_": "\n        module.exports = function() {\n          return $t('orderHistory.orderNo')\n        }\n        ",
+            "_code_type_": "commonJs",
+            "_metadata_": {
+              "text": "orderHistory.orderNo"
+            }
+          }
+        },
+        "events": {
+          "submit": {
+            "_code_": "module.exports = async function(val) {\n  const filter = {\n    title: this.$t('orderHistrory.orderNo'),\n    text: val,\n    condition: {$where: '/.*'+val+'.*/.test(this.id)'}\n  }\n  this.$getService('OrderStore:updateOrderHistoryFilter')(filter);\n  await this.$getService('OrderStore:getOrderHistory')();\n  await this.$getService('OrderStore:getTotalOrders')();\n}",
+            "_code_type_": "commonJs"
+          }
+        },
+        "preprocess": [
+          "label"
+        ]
+      },
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "orderHistoryOrderNumberLookup",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "url": "plugins/pos-plugin/components/pos-shared-components/dialogFilter/dialogNumberFilter.vue",
+      "path": "components/pos-shared-components/dialogFilter/dialogNumberFilter.vue",
+      "pluginName": "pos-plugin"
+    },
+    {
+      "choice": "view",
+      "component": "dialogNumberFilter",
+      "content": {
+        "props": {
+          "rules": [
+            {
+              "_code_": "module.exports = function (val) {\n  const orders = root.$getService('OrderStore:orderHistoryOrders');\n  const index = orders.findIndex(o => o.bookingNumber.includes(val))\n  return index !== -1 || 'Not found'\n}",
+              "_code_type_": "commonJs"
+            }
+          ],
+          "label": {
+            "_code_": "\n        module.exports = function() {\n          return $t('orderHistory.barcode')\n        }\n        ",
+            "_code_type_": "commonJs",
+            "_metadata_": {
+              "text": "orderHistory.barcode"
+            }
+          }
+        },
+        "events": {
+          "submit": {
+            "_code_": "module.exports = async function(val) {\n  const filter = {\n    title: this.$t('orderHistory.barcode'),\n    text: val,\n    condition: {barcode: {\"$regex\": val}}\n  }\n  this.$getService('OrderStore:updateOrderHistoryFilter')(filter);\n  await this.$getService('OrderStore:getOrderHistory')();\n  await this.$getService('OrderStore:getTotalOrders')();\n}",
+            "_code_type_": "commonJs"
+          }
+        },
+        "preprocess": [
+          "label"
+        ]
+      },
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "orderHistoryBarcodeLookup",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "url": "plugins/pos-plugin/components/pos-shared-components/dialogFilter/dialogNumberFilter.vue",
+      "path": "components/pos-shared-components/dialogFilter/dialogNumberFilter.vue",
+      "pluginName": "pos-plugin",
+      "key": "undefined_copy"
+    },
+    {
+      "choice": "view",
+      "component": "dialogTextFilter",
+      "content": {
+        "props": {
+          "label": {
+            "_code_": "\n        module.exports = function() {\n          return $t('orderHistory.staff')\n        }\n        ",
+            "_code_type_": "commonJs",
+            "_metadata_": {
+              "text": "orderHistory.staff"
+            }
+          }
+        },
+        "events": {
+          "submit": {
+            "_code_": "module.exports = async function(val) {\n  const filter = {\n    title: this.$t('orderHistory.staff'),\n    text: val,\n    condition: {'user.name': { '$regex': val, $options: 'i'}}\n  }\n  this.$getService('OrderStore:updateOrderHistoryFilter')(filter);\n  await this.$getService('OrderStore:getOrderHistory')();\n  await this.$getService('OrderStore:getTotalOrders')();\n}",
+            "_code_type_": "commonJs"
+          }
+        },
+        "preprocess": [
+          "label"
+        ]
+      },
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "orderHistoryStaffFilter",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "url": "plugins/pos-plugin/components/pos-shared-components/dialogFilter/dialogTextFilter.vue",
+      "path": "components/pos-shared-components/dialogFilter/dialogTextFilter.vue",
+      "pluginName": "pos-plugin"
+    },
+    {
+      "choice": "view",
+      "component": "dialogRangeFilter",
+      "content": {
+        "props": {
+          "max": 1000,
+          "label": {
+            "_code_": "\n        module.exports = function() {\n          return $t('orderHistory.amount')\n        }\n        ",
+            "_code_type_": "commonJs",
+            "_metadata_": {
+              "text": "orderHistory.amount"
+            }
+          }
+        },
+        "events": {
+          "submit": {
+            "_code_": "module.exports = async function(val) {\n  const filter = {\n    title: this.$t('orderHistory.amount'),\n    text: val[0] + ' - ' + val[1],\n    condition: {vSum: { '$gte': val[0], '$lte': val[1] }}\n  }\n  this.$getService('OrderStore:updateOrderHistoryFilter')(filter);\n  await this.$getService('OrderStore:getOrderHistory')();\n  await this.$getService('OrderStore:getTotalOrders')();\n}",
+            "_code_type_": "commonJs"
+          }
+        },
+        "preprocess": [
+          "label"
+        ]
+      },
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "orderHistoryAmountFilter",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "url": "plugins/pos-plugin/components/pos-shared-components/dialogFilter/dialogRangeFilter.vue",
+      "path": "components/pos-shared-components/dialogFilter/dialogRangeFilter.vue",
+      "pluginName": "pos-plugin"
+    },
+    {
+      "choice": "view",
+      "component": "dialogConfirmDelete",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "dialogConfirmDeleteOrderHistory",
+        "binding": [
+          {
+            "type": "method",
+            "serviceName": "open"
+          }
+        ]
+      },
+      "url": "plugins/pos-plugin/components/Settings/dialog/dialogConfirmDelete.vue",
+      "path": "components/Settings/dialog/dialogConfirmDelete.vue",
+      "pluginName": "pos-plugin",
+      "content": {
+        "events": {
+          "submit": {
+            "_code_": "module.exports = async function () {\n  await this.$getService('OrderStore:deleteOrder')();\n}",
+            "_code_type_": "commonJs"
+          }
+        },
+        "props": {
+          "type": ""
+        }
+      }
+    }
+  ],
+  "props": {
+    "fields": []
+  },
+  "name": "posOrderHistory",
+  "isProduction": true,
+  "renderToRoute": "pos-order-history"
+}
