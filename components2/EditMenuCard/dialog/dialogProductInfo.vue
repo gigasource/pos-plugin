@@ -6,7 +6,7 @@ export default {
   name: "dialogProductInfo",
   components: { PosTextfieldNew },
   props: {
-    value: null,
+    modelValue: null,
     focus: {
       type: String,
       default: 'id'
@@ -14,7 +14,6 @@ export default {
     product: Object,
   },
   setup(props, { emit }) {
-    debugger
     const id = ref('')
     const name = ref('')
     const price = ref('')
@@ -50,7 +49,7 @@ export default {
         }
         nextTick(() => {
           setTimeout(() => {
-            textField.onFocus()
+            // textField.onFocus()
           }, 200)
         })
       } else {
@@ -60,11 +59,11 @@ export default {
       }
     })
 
-    return (
-      <dialog-form-input v-model={internalValue} onSubmit={updateProduct} valid={isValid} v-slots={{
+    return () => (
+      <dialog-form-input v-model={internalValue.value} onSubmit={updateProduct} valid={isValid.value} v-slots={{
         input: () => <div class="row-flex justify-between flex-wrap">
-            <pos-textfield-new style="width: 48%;" ref="id" label="ID" v-model={id}/>
-            <pos-textfield-new style="width: 48%;" ref="name" label="Name" required v-model={name.value} validate-on-blur rules={[rules.required]}/>
+          <pos-textfield-new style="width: 48%;" ref="id" label="ID" v-model={id}/>
+          <pos-textfield-new style="width: 48%;" ref="name" label="Name" required v-model={name.value} validate-on-blur rules={[rules.required]}/>
           <pos-textfield-new style="width: 48%;" ref="price" label="Price" required v-model={price.value} rules={[rules.number]}/>
         </div>
       }}/>
