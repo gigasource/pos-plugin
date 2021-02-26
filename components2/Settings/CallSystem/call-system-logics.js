@@ -11,7 +11,6 @@ const CALL_SYSTEM_MODES = Object.freeze({
   MODEM_ROBOTIC: { text: 'Modem (USRobotics)', value: 'usrobotics-modem' },
   MODEM_ARTECH: { text: 'Modem (Artech)', value: 'artech-modem' },
 })
-
 export const callSystemModes = [
   CALL_SYSTEM_MODES.OFF,
   CALL_SYSTEM_MODES.FRITZBOX,
@@ -20,12 +19,23 @@ export const callSystemModes = [
   CALL_SYSTEM_MODES.MODEM_ARTECH,
 ]
 
+// status
 export const currentCallSystemMode = ref(CALL_SYSTEM_MODES.OFF)
+export const modemDeviceConnected = ref(false) // true / false
+export async function updateModemDeviceStatus(connectionStatus) {
+  if (!connectionStatus)
+    return
+  const callSystem = (await cms.getModel('PosSetting').findOne()).call;
+  if (callSystem.mode === CALL_SYSTEM_MODES.OFF.value) {
+    modemDeviceConnected.value = null;
+  } else {
+    modemDeviceConnected.value = typeof(connectionStatus) === 'string' && connectionStatus.toLowerCase() === 'connected';
+  }
+}
 
-export const callSystemStatus = ref('')
+export const callSystemStatus = ref('') // connected | ...
 export function updateConnectStatus(status) {
-  if (status)
-    callSystemStatus.value = status;
+  callSystemStatus.value = status
 }
 
 export const ipAddresses = ref({})
@@ -67,7 +77,7 @@ export async function loadData() {
   callSystem.mode = callSystem.mode || CALL_SYSTEM_MODES.OFF.value
   callSystem.ipAddresses = callSystem.ipAddresses || {};
 
-  ipAddresses.value = callSystem.ipAddresses || {}
+  ipAddresses.value = callSystem.ipAddresses
   currentCallSystemMode.value = callSystem.mode
   lastSavedConfig.value = cloneDeep(callSystem)
   updateUsbDeviceList();
@@ -90,9 +100,7 @@ export function changeIp(value) {
   ipAddresses.value[currentCallSystemMode.value] = value
 }
 
-export function updateUsbDeviceList() {
-  cms.socket.emit('list-usb-devices', currentCallSystemMode.value);
-}
+
 
 watch(() => currentCallSystemMode.value, (newValue) => {
   cms.socket.emit(csConstants.GetCallSystemStatus, updateConnectStatus);
@@ -106,20 +114,10 @@ watch(() => currentCallSystemMode.value, (newValue) => {
   ipAddresses[newValue] = ipAddresses[newValue] || defaultValue;
 }, { onTrigger: () => console.log('trigger')})
 
-// modem connection status
-export const modemDeviceConnected = ref(null)
 export function getCallSystemStatus() {
   cms.socket.emit(csConstants.GetCallSystemStatus, updateModemDeviceStatus);
 }
-export async function updateModemDeviceStatus(connectionStatus) {
-  if (!connectionStatus) return;
-  const callSystem = (await cms.getModel('PosSetting').findOne()).call;
-  if (callSystem.mode === CALL_SYSTEM_MODES.OFF.value) {
-    modemDeviceConnected.value = null;
-  } else {
-    modemDeviceConnected.value = typeof(connectionStatus) === 'string' && connectionStatus.toLowerCase() === 'connected';
-  }
-}
+
 
 // calls, missed calls
 export const calls = ref([])
@@ -159,8 +157,13 @@ export function cancelMissedCallTimeout(callId) {
 
 cms.socket.on(csConstants.UpdateCallSystemStatus, async (connectionStatus) => {
   /*OnlineOrderMain::created*/ await updateModemDeviceStatus(connectionStatus)
-  updateConnectStatus(connectionStatus)
+  /*CallSystem::created*/ updateConnectStatus(connectionStatus)
 })
+
+export function updateUsbDeviceList() {
+  cms.socket.emit('list-usb-devices', currentCallSystemMode.value);
+}
+
 cms.socket.on('list-usb-devices', (devices, mode) => {
   if (mode !== currentCallSystemMode.value)
     return
@@ -168,7 +171,7 @@ cms.socket.on('list-usb-devices', (devices, mode) => {
   usbDevices.value = devices.map(({devicePath, deviceManufacturerName, deviceProductName}) => {
     return {
       text: `${devicePath} - ${deviceProductName} - ${deviceManufacturerName}`,
-      value: devicePath,
+      value: devicePath
     }
   })
 

@@ -5,10 +5,9 @@ module.exports = async (cms) => {
   const ARTECH_MODEM_MODE_PREFIX = 'artech-';
 
   const csConstants = require('./call-system-contants')
-  const {checkModeActive, getActiveMode, emitNewCall, cancelMissedCallTimeout} = require('./utils');
-  let rnBridge;
-  let currentMode;
+  const {checkModeActive, getActiveMode, emitNewCall, cancelMissedCallTimeout, getCallConfig} = require('./utils');
 
+  let rnBridge;
   try {
     rnBridge = require('rn-bridge');
   } catch (e) {
@@ -16,6 +15,7 @@ module.exports = async (cms) => {
     rnBridge = require('../rn-bridge/rn-bridge-proxy');
   }
 
+  let currentMode;
   let selectedDevicePath;
   let connectionStatus;
   let deviceList;
@@ -41,21 +41,22 @@ module.exports = async (cms) => {
     cms.socket.emit('list-usb-devices', dList, mode);
 
     const modeIsActive = await checkModeActive(mode);
-    // only try reconnecting if device is disconnected
-    if (modeIsActive && (!connectionStatus || connectionStatus.toLowerCase() === 'disconnected')) {
-      const posSettings = await cms.getModel('PosSetting').findOne();
-      const {call: callConfig} = posSettings;
-      const {ipAddresses = {}} = callConfig;
-      const devicePathInConfig = ipAddresses[mode];
+    if (modeIsActive) {
+      // only try reconnecting if device is disconnected
+      if (!connectionStatus || connectionStatus.toLowerCase() === 'disconnected') {
+        const callConfig = await getCallConfig()
+        const {ipAddresses = {}} = callConfig;
+        const devicePathInConfig = ipAddresses[mode];
 
-      if (deviceList && deviceList.some(d => d.devicePath === devicePathInConfig)) {
-        await openDevice(devicePathInConfig);
+        if (deviceList && deviceList.some(d => d.devicePath === devicePathInConfig)) {
+          await openDevice(devicePathInConfig);
+        }
       }
-    }
 
-    if (modeIsActive && !initialized) {
-      initialized = true;
-      await setupModemDevice();
+      if (!initialized) {
+        initialized = true;
+        await setupModemDevice();
+      }
     }
   }
 
@@ -177,8 +178,7 @@ module.exports = async (cms) => {
   }
 
   async function setupModemDevice() {
-    const posSettings = await cms.getModel('PosSetting').findOne();
-    const {call: callConfig} = posSettings;
+    const callConfig = await getCallConfig()
     let {mode, ipAddresses = {}} = callConfig;
     currentMode = mode;
 
