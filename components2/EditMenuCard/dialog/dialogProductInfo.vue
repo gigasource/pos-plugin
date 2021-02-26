@@ -17,7 +17,12 @@ export default {
     const id = ref('')
     const name = ref('')
     const price = ref('')
-    const product = ref({})
+    const refComp = {
+      id: ref(null),
+      name: ref(null),
+      price: ref(null)
+    }
+    let product
     const textField = ref('')
     const rules = {
       required: val => !!val || 'Required field!',
@@ -30,41 +35,44 @@ export default {
       return typeof required === 'boolean' && typeof number === 'boolean'
     })
     const updateProduct = function () {
-      if (name.value || price.value) return
-      const change = {
-        id: id.value,
-        name: name.value,
-        price: price.value,
+      if (name.value && price.value) {
+        const change = {
+          id: id.value,
+          name: name.value,
+          price: Number(price.value),
+        }
+        emit('submit', change, product._id)
       }
-      emit('submit', change, product.value._id)
       internalValue.value = false
     }
 
-    watch(() => internalValue.value, (newVal) => {
+    watch(() => props.modelValue, async (newVal) => {
       if (newVal) {
-        if (product.value) {
-          id.value = product.value.id
-          name.value = product.value.name
-          price.value = product.value.price
+        const { focus } = props
+        product = props.product
+        if (product) {
+          id.value = product.id
+          name.value = product.name
+          price.value = product.price
         }
-        nextTick(() => {
-          setTimeout(() => {
-            // textField.onFocus()
-          }, 200)
-        })
+        if (focus) {
+          nextTick(() =>
+              setTimeout(() => refComp[focus]._rawValue.$refs.textfield.onFocus(), 200)
+          )
+        }
       } else {
-        this.id = ''
-        this.name = ''
-        this.price = ''
+        id.value = ''
+        name.value = ''
+        price.value = ''
       }
     })
 
     return () => (
       <dialog-form-input v-model={internalValue.value} onSubmit={updateProduct} valid={isValid.value} v-slots={{
         input: () => <div class="row-flex justify-between flex-wrap">
-          <pos-textfield-new style="width: 48%;" ref="id" label="ID" v-model={id}/>
-          <pos-textfield-new style="width: 48%;" ref="name" label="Name" required v-model={name.value} validate-on-blur rules={[rules.required]}/>
-          <pos-textfield-new style="width: 48%;" ref="price" label="Price" required v-model={price.value} rules={[rules.number]}/>
+          <pos-textfield-new style="width: 48%;" ref={refComp['id']} label="ID" v-model={id.value}/>
+          <pos-textfield-new style="width: 48%;" ref={refComp['name']} label="Name" required v-model={name.value} validate-on-blur rules={[rules.required]}/>
+          <pos-textfield-new style="width: 48%;" ref={refComp['price']} label="Price" required v-model={price.value} rules={[rules.number]}/>
         </div>
       }}/>
     )
