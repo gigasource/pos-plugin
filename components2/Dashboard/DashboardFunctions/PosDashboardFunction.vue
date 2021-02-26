@@ -106,6 +106,7 @@ export default {
   min-height: 100%;
   background-image: url("/plugins/pos-plugin/assets/out.png");
   padding: 24px;
+  overflow: scroll;
 
   &--up,
   &--down {
