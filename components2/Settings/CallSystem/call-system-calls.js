@@ -43,6 +43,16 @@ cms.socket.on(csConstants.NewPhoneCall, async (phoneNumber, date, callId) => {
   calls.value.unshift({customer, date, phoneNumber, callId});
 })
 
+cms.socket.on(csConstants.NewMissedPhoneCall, async (callId) => {
+  const callIndex = calls.value.findIndex(e => e.callId === callId);
+  if (callIndex > -1) {
+    const removedCall = calls.value.splice(callIndex, 1)[0];
+    const {phoneNumber, date} = removedCall;
+    const customer = await getCustomerInfo(phoneNumber);
+    missedCalls.value.unshift({customer, date});
+  }
+})
+
 async function getCustomerInfo(phone) {
   const customer = await cms.getModel('Customer').findOne({phone})
   if (!customer) {

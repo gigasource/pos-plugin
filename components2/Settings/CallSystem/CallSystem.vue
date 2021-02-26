@@ -4,7 +4,7 @@ import { CALL_SYSTEM_MODES } from '../../../components/constants';
 import {
   callSystemStatus,
   callSystemConfigChanged,
-  callSystemStatusComputed,
+  changeNotSavedWarningMessage,
   currentCallSystemMode,
   callSystemIpText,
   dialog,
@@ -54,9 +54,7 @@ export default {
         <div class="call">
           { callSystemModesRender() }
 
-          <div class="call-title mb-2">
-            {(callSystemStatus.value || callSystemConfigChanged.value) && <i style="color: red; font-size: 10px"> {callSystemStatusComputed.value} </i>}
-          </div>
+
 
           { isFritzBoxMode.value
                 ? renderFritzbox()
@@ -65,9 +63,17 @@ export default {
                   <g-list class="call-device-table" selectable mandatory elevation={0} height="200px" v-model={selectedSerialDevice.value} items={usbDevices.value}></g-list>
                 </div> }
 
-          <div class="action-buttons">
+          <div class="call-title mb-2 ta-right">
+            {<i style="color: red; font-size: 10px"> {changeNotSavedWarningMessage.value} </i>}
+          </div>
+
+          <div class="row-flex">
+            <div class="call-title mb-2">
+              {<i style="color: red; font-size: 10px"> {callSystemStatus.value} </i>}
+            </div>
+            <g-spacer/>
             { isUSRoboticOrArtechModem.value && <g-btn-bs width="80" background-color="#2979FF" onClick={getUsbDevicesForCurrentMode}>Refresh</g-btn-bs> }
-            <g-btn-bs width="80" background-color="#2979FF" onClick={switchMode}>Update</g-btn-bs>
+            <g-btn-bs disabled={!callSystemConfigChanged.value} width="80" background-color="#2979FF" onClick={switchMode}>Save</g-btn-bs>
           </div>
 
           <dialog-text-filter v-model={dialog.value.ip} label="Call System IP" defaultValue={ipAddresses.value[currentCallSystemMode.value]} onSubmit={changeIp}></dialog-text-filter>
@@ -126,11 +132,6 @@ export default {
 
   &-device-table {
     border: 1px solid #ced4d9;
-  }
-
-  .action-buttons {
-    align-self: flex-end;
-    margin-top: 12px;
   }
 }
 </style>

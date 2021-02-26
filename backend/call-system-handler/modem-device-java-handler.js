@@ -48,6 +48,7 @@ module.exports = async (cms) => {
 
   // get usb devices
   function sendGetUsbDevicesRequest(mode) {
+    console.log('sendGetUsbDevicesRequest', mode)
     rnBridge.app.sendObject(_getEventPrefix(mode) + 'list-usb-devices', {});
   }
   async function handleGetUsbDevicesResponse(data, mode /*seem like we don't need it*/ ) {
@@ -56,9 +57,9 @@ module.exports = async (cms) => {
   }
 
   // open usb device
-  async function sendOpenUsbDeviceRequest() {
+  function sendOpenUsbDeviceRequest() {
     const event = _getEventPrefix() + 'open-usb-device'
-    console.log('sendOpenUsbDeviceRequest', event)
+    console.log('sendOpenUsbDeviceRequest', event, selectedDevicePath)
     rnBridge.app.sendObject(event, {devicePath: selectedDevicePath});
     // NOTE: consider that open usb device request always success -> a.m.a the system has been init at this moment
     initialized = true
@@ -174,6 +175,8 @@ module.exports = async (cms) => {
     callSetting.ipAddresses[currentMode] = selectedDevicePath
     await cms.getModel('PosSetting').update({}, { call: callSetting })
 
+    cms.socket.emit(csConstants.SwitchModeResponse, callSetting)
+
     // try to open device
     switch (currentMode) {
       case USROBOTICS_MODEM_MODE:
@@ -188,10 +191,13 @@ module.exports = async (cms) => {
     // clientSocket.on('screen-loaded', sendGetUsbDevicesRequest);
 
     // init call-system each time app run
-    clientSocket.on(csConstants.Init, () => {
-      if (initialized)
+    clientSocket.on(csConstants.Init, async () => {
+      console.log('initCallSystem')
+      if (initialized) {
+        console.log('Call system has been init. skip.')
         return;
-      const callConfig = getCallConfig()
+      }
+      const callConfig = await getCallConfig()
       currentMode = callConfig.mode;
       selectedDevicePath = callConfig.ipAddresses[currentMode];
       sendOpenUsbDeviceRequest()

@@ -49,24 +49,18 @@ export const callSystemConfigChanged = computed(() => {
     && lastSavedConfig.value.mode === currentCallSystemMode.value
     && lastSavedConfig.value.ipAddresses[currentCallSystemMode.value] === ipAddresses.value[currentCallSystemMode.value])
 })
-export const callSystemStatusComputed = computed(() => {
-  if (!callSystemConfigChanged.value && currentCallSystemMode.value === CALL_SYSTEM_MODES.OFF.value)
-    return '';
-  if (callSystemConfigChanged.value) {
-    return ' Call system config has changed, press \'Update\' to apply new changes';
-  } else {
-    return ` (${callSystemStatus.value})`;
-  }
+export const changeNotSavedWarningMessage = computed(() => {
+  return callSystemConfigChanged.value ? ' Change was not saved, press "Save" to apply new changes' : ''
 })
 
 export async function loadData() {
+  // TODO: PosSetting data sync
   const callSystem = (await cms.getModel('PosSetting').findOne()).call
   callSystem.mode = callSystem.mode || CALL_SYSTEM_MODES.OFF.value
   callSystem.ipAddresses = callSystem.ipAddresses || {};
 
   ipAddresses.value = callSystem.ipAddresses
   currentCallSystemMode.value = callSystem.mode
-  lastSavedConfig.value = cloneDeep(callSystem)
 
   getUsbDevicesForCurrentMode()
 }
@@ -111,25 +105,25 @@ watch(() => currentCallSystemMode.value, (newValue) => {
 })
 
 export function initCallSystem() {
+  console.log('initCallSystem')
   cms.socket.emit(csConstants.Init)
 }
+
 export function switchMode() {
   cms.socket.emit(csConstants.SwitchMode, {
     mode: currentCallSystemMode.value,
     devicePath: selectedSerialDevice.value
   })
 }
+cms.socket.on(csConstants.SwitchModeResponse, call => {
+  lastSavedConfig.value = cloneDeep(call)
+})
+
 export function getUsbDevicesForCurrentMode() {
-  console.log('getUsbDevicesForCurrentMode')
+  console.log('getUsbDevicesForCurrentMode', currentCallSystemMode.value)
   if (currentCallSystemMode.value !== CALL_SYSTEM_MODES.OFF.value)
     cms.socket.emit(csConstants.GetUsbDevices, currentCallSystemMode.value)
 }
-
-cms.socket.on(csConstants.ConnectionStatusChange, payload => {
-  const { status } = payload
-  callSystemStatus.value = status
-  modemDeviceConnected.value = typeof(status) === 'string' && status.toLowerCase() === 'connected'
-})
 cms.socket.on(csConstants.GetUsbDevicesResponse, payload => {
   console.log('GetUsbDevicesResponse', payload)
   const { devices, mode } = payload
@@ -147,4 +141,10 @@ cms.socket.on(csConstants.GetUsbDevicesResponse, payload => {
   selectedSerialDevice.value = ipAddresses.value[mode]
       ? ipAddresses.value[mode]
       : (usbDevices.value.length > 0 ? usbDevices.value[0].value : '');
+})
+
+cms.socket.on(csConstants.ConnectionStatusChange, payload => {
+  const { status } = payload
+  callSystemStatus.value = status
+  modemDeviceConnected.value = typeof(status) === 'string' && status.toLowerCase() === 'connected'
 })
