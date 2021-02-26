@@ -1,7 +1,7 @@
 import {useI18n} from "vue-i18n";
 import {ref} from "vue";
 import {isIOS} from "../../AppSharedStates";
-import { calls, missedCalls } from '../../Settings/CallSystem/call-system-logics'
+import { calls, missedCalls } from '../../Settings/CallSystem/call-system-calls'
 import {
   deliveryOrderMode, favorites, openDialog, selectedCustomer, showKeyboard,
   name, phone, address, zipcode, street, house, city, selectedAddress, placeId, autocompleteAddresses,

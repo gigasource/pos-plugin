@@ -1,4 +1,10 @@
 const eventNames = {
+  Init: 'call-system--init',
+  SwitchMode: 'call-system--switch-mode',
+  GetUsbDevices: 'call-system--get-usb-devices',
+  GetUsbDevicesResponse: 'call-system--get-usb-devices-resp',
+  ConnectionStatusChange: 'call-system--connection-status-change',
+
   UpdateCallSystemStatus: 'update-call-system-status',
   GetCallSystemStatus: 'get-call-system-status',
   RefreshCallSystemConfig: 'refresh-call-system-config',

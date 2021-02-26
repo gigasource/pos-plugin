@@ -11,7 +11,6 @@ import {
   genScopeId
 } from "../utils";
 import dialogCompleteOrder from "./helpers/dialogCompleteOrder";
-import { getCallSystemStatus } from '../Settings/CallSystem/call-system-logics';
 
 export default {
   components: {dialogCompleteOrder},
@@ -19,9 +18,6 @@ export default {
     onBeforeMount(async () => {
       await loadOrders()
     })
-
-    /*onCreated*/ getCallSystemStatus()
-    onActivated(() => getCallSystemStatus())
 
     const {
       renderPendingOrders

@@ -11,8 +11,8 @@ async function checkModeActive(modeName, posSettings) {
   return mode === modeName;
 }
 
-export async function getCallConfig(posSettings) {
-  (posSettings || await cms.getModel('PosSetting').findOne()).call;
+async function getCallConfig(posSettings) {
+  return (posSettings || await cms.getModel('PosSetting').findOne()).call;
 }
 
 async function getActiveMode(posSettings) {
@@ -31,6 +31,7 @@ function emitNewCall(phoneNumber) {
 }
 
 function cancelMissedCallTimeout(callId) {
+  console.log('cancelMissedCallTimeout')
   if (!phoneCallMap[callId])
     return
   clearTimeout(phoneCallMap[callId]);
@@ -38,6 +39,7 @@ function cancelMissedCallTimeout(callId) {
 }
 
 module.exports = {
+  getCallConfig,
   checkModeActive,
   getActiveMode,
   emitNewCall,

@@ -12,9 +12,9 @@ import {
   usbDevices,
   ipAddresses,
   callSystemModes,
-  updateUsbDeviceList,
+  getUsbDevicesForCurrentMode,
   changeIp,
-  update,
+  switchMode,
   loadData
 } from './call-system-logics';
 import { genScopeId } from '../../utils';
@@ -66,8 +66,8 @@ export default {
                 </div> }
 
           <div class="action-buttons">
-            { isUSRoboticOrArtechModem.value && <g-btn-bs width="80" background-color="#2979FF" onClick={updateUsbDeviceList}>Refresh</g-btn-bs> }
-            <g-btn-bs width="80" background-color="#2979FF" onClick={update}>Update</g-btn-bs>
+            { isUSRoboticOrArtechModem.value && <g-btn-bs width="80" background-color="#2979FF" onClick={getUsbDevicesForCurrentMode}>Refresh</g-btn-bs> }
+            <g-btn-bs width="80" background-color="#2979FF" onClick={switchMode}>Update</g-btn-bs>
           </div>
 
           <dialog-text-filter v-model={dialog.value.ip} label="Call System IP" defaultValue={ipAddresses.value[currentCallSystemMode.value]} onSubmit={changeIp}></dialog-text-filter>

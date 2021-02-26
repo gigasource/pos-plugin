@@ -2,7 +2,6 @@ import { computed, ref, watch } from 'vue'
 import cloneDeep from 'lodash/cloneDeep'
 import csConstants from '../../../backend/call-system-handler/call-system-contants'
 import cms from 'cms'
-import dayjs from 'dayjs';
 
 const CALL_SYSTEM_MODES = Object.freeze({
   OFF: { text: 'Off', value: 'off' },
@@ -18,34 +17,33 @@ export const callSystemModes = [
   CALL_SYSTEM_MODES.MODEM_ROBOTIC,
   CALL_SYSTEM_MODES.MODEM_ARTECH,
 ]
-
-// status
 export const currentCallSystemMode = ref(CALL_SYSTEM_MODES.OFF)
 export const modemDeviceConnected = ref(false) // true / false
-export async function updateModemDeviceStatus(connectionStatus) {
-  if (!connectionStatus)
-    return
-  const callSystem = (await cms.getModel('PosSetting').findOne()).call;
-  if (callSystem.mode === CALL_SYSTEM_MODES.OFF.value) {
-    modemDeviceConnected.value = null;
-  } else {
-    modemDeviceConnected.value = typeof(connectionStatus) === 'string' && connectionStatus.toLowerCase() === 'connected';
-  }
-}
-
 export const callSystemStatus = ref('') // connected | ...
-export function updateConnectStatus(status) {
-  callSystemStatus.value = status
-}
 
+// allow the user to change ip address fritxbox
 export const ipAddresses = ref({})
 export const dialog = ref({
   ip: false,
 })
+export const callSystemIpText = computed(() => {
+  switch (currentCallSystemMode.value) {
+    case CALL_SYSTEM_MODES.FRITZBOX.value:
+      return 'Fritzbox local IP';
+    case CALL_SYSTEM_MODES.DEMO.value:
+      return 'Fritzbox proxy server address';
+    default:
+      return '';
+  }
+})
+
 export const lastSavedConfig = ref(null)
+
+// cache usb devices
 export const usbDevices = ref([])
 export const selectedSerialDevice = ref('')
 
+// change ??
 export const callSystemConfigChanged = computed(() => {
   return !(lastSavedConfig.value
     && lastSavedConfig.value.mode === currentCallSystemMode.value
@@ -60,19 +58,8 @@ export const callSystemStatusComputed = computed(() => {
     return ` (${callSystemStatus.value})`;
   }
 })
-export const callSystemIpText = computed(() => {
-  switch (currentCallSystemMode.value) {
-    case CALL_SYSTEM_MODES.FRITZBOX.value:
-      return 'Fritzbox local IP';
-    case CALL_SYSTEM_MODES.DEMO.value:
-      return 'Fritzbox proxy server address';
-    default:
-      return '';
-  }
-})
 
 export async function loadData() {
-  // TODO cms.getModel('PosSetting') // using watch instead
   const callSystem = (await cms.getModel('PosSetting').findOne()).call
   callSystem.mode = callSystem.mode || CALL_SYSTEM_MODES.OFF.value
   callSystem.ipAddresses = callSystem.ipAddresses || {};
@@ -80,91 +67,73 @@ export async function loadData() {
   ipAddresses.value = callSystem.ipAddresses
   currentCallSystemMode.value = callSystem.mode
   lastSavedConfig.value = cloneDeep(callSystem)
-  updateUsbDeviceList();
-}
 
+  getUsbDevicesForCurrentMode()
+}
 export async function update() {
+  console.log('update')
   const configChanged = callSystemConfigChanged.value;
   const call = {
     ipAddresses: ipAddresses.value,
     mode: currentCallSystemMode.value,
   }
-  cms.socket.emit(csConstants.GetCallSystemStatus, updateConnectStatus);
   await cms.getModel('PosSetting').findOneAndUpdate({}, { call })
   await loadData()
   if (configChanged)
     cms.socket.emit(csConstants.RefreshCallSystemConfig)
 }
-
 export function changeIp(value) {
   ipAddresses.value[currentCallSystemMode.value] = value
 }
 
-
-
 watch(() => currentCallSystemMode.value, (newValue) => {
-  cms.socket.emit(csConstants.GetCallSystemStatus, updateConnectStatus);
   let defaultValue = null;
-  if (newValue === CALL_SYSTEM_MODES.DEMO.value) defaultValue = 'https://fritzbox-proxy-10000.gigasource.io';
-  else if (newValue === CALL_SYSTEM_MODES.FRITZBOX.value) defaultValue = '192.168.178.1:1012';
-  else if (newValue === CALL_SYSTEM_MODES.OFF.value) defaultValue = null;
-  else if (newValue === CALL_SYSTEM_MODES.MODEM_ROBOTIC.value
-    || newValue === CALL_SYSTEM_MODES.MODEM_ARTECH.value) updateUsbDeviceList();
-  if (defaultValue === null) return;
+  switch(newValue) {
+    case CALL_SYSTEM_MODES.OFF.value:
+      defaultValue = null;
+      break;
+    case CALL_SYSTEM_MODES.DEMO.value:
+      defaultValue = 'https://fritzbox-proxy-10000.gigasource.io';
+      break;
+    case CALL_SYSTEM_MODES.FRITZBOX.value:
+      defaultValue = '192.168.178.1:1012';
+      break;
+    case CALL_SYSTEM_MODES.MODEM_ROBOTIC.value:
+    case CALL_SYSTEM_MODES.MODEM_ARTECH.value:
+      getUsbDevicesForCurrentMode()
+      break;
+  }
+
+  if (defaultValue === null)
+    return;
+
   ipAddresses[newValue] = ipAddresses[newValue] || defaultValue;
-}, { onTrigger: () => console.log('trigger')})
-
-export function getCallSystemStatus() {
-  cms.socket.emit(csConstants.GetCallSystemStatus, updateModemDeviceStatus);
-}
-
-
-// calls, missed calls
-export const calls = ref([])
-export const missedCalls = ref([])
-export const mockMissedCalls = [
-  /*Customer: see Customer collection*/
-  /*          see OrderStore::getCustomerInfo(phone) */
-  {
-    customer: {
-      name: 'Miss Customer 1',
-      phone: '0123456678',
-      addresses: [
-        {
-          address: 'missCust.1.addrs.address',
-          house: 'missCust.1.addrs.house',
-          street: 'missCust.1.addrs.street',
-          zipcode: 'missCust.1.addrs.zipcode',
-          city: 'missCust.1.addrs.city'
-        }
-      ]
-    }, date: dayjs() },
-  { customer: { name: 'Miss Customer 2', phone: '0123456678', addresses: [] }, date: dayjs() },
-  { customer: { name: 'Miss Customer 3', phone: '0123456678', addresses: [] }, date: dayjs() }
-]
-missedCalls.value = mockMissedCalls
-
-export function deleteCall(index, { callId }) {
-  calls.value.splice(index, 1)
-  cancelMissedCallTimeout(callId)
-}
-export function deleteMissedCall(index) {
-  missedCalls.value.splice(index, 1)
-}
-export function cancelMissedCallTimeout(callId) {
-  cms.socket.emit(csConstants.CancelMissedCallTimeout, callId);
-}
-
-cms.socket.on(csConstants.UpdateCallSystemStatus, async (connectionStatus) => {
-  /*OnlineOrderMain::created*/ await updateModemDeviceStatus(connectionStatus)
-  /*CallSystem::created*/ updateConnectStatus(connectionStatus)
 })
 
-export function updateUsbDeviceList() {
-  cms.socket.emit('list-usb-devices', currentCallSystemMode.value);
+export function initCallSystem() {
+  cms.socket.emit(csConstants.Init)
+}
+export function switchMode() {
+  cms.socket.emit(csConstants.SwitchMode, {
+    mode: currentCallSystemMode.value,
+    devicePath: selectedSerialDevice.value
+  })
+}
+export function getUsbDevicesForCurrentMode() {
+  console.log('getUsbDevicesForCurrentMode')
+  if (currentCallSystemMode.value !== CALL_SYSTEM_MODES.OFF.value)
+    cms.socket.emit(csConstants.GetUsbDevices, currentCallSystemMode.value)
 }
 
-cms.socket.on('list-usb-devices', (devices, mode) => {
+cms.socket.on(csConstants.ConnectionStatusChange, payload => {
+  const { status } = payload
+  callSystemStatus.value = status
+  modemDeviceConnected.value = typeof(status) === 'string' && status.toLowerCase() === 'connected'
+})
+cms.socket.on(csConstants.GetUsbDevicesResponse, payload => {
+  console.log('GetUsbDevicesResponse', payload)
+  const { devices, mode } = payload
+
   if (mode !== currentCallSystemMode.value)
     return
 

@@ -3,6 +3,7 @@ import {computed, ref, watch, reactive} from 'vue';
 import {mobileCheck} from "../components/logic/commonUtils";
 import cms from 'cms';
 import {getCurrentOrder, syncOrderChange} from "./OrderView/pos-logic-be";
+import { initCallSystem } from './Settings/CallSystem/call-system-logics'
 import _ from 'lodash';
 
 export const appHooks = new Hooks()
@@ -159,4 +160,5 @@ export const storeLocale = computed(() => {
       && posSettings.value.onlineDevice.store.locale) || locale.value || 'en')
 })
 
-
+// init call system in the very first moment
+initCallSystem()
