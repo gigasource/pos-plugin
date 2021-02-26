@@ -392,8 +392,8 @@ export function renderPendingOrdersFactory () {
 	function renderPendingOrdersContent() {
 		return (
 			<div class="content">
-				{(!pendingOrders.value || !pendingOrders.value.length) && renderEmptyPendingOrders()}
 				{renderPendingOrdersCalls()}
+				{(!pendingOrders.value || !pendingOrders.value.length) && renderEmptyPendingOrders()}
 				{renderAllPendingOrders()}
 			</div>
 		)
