@@ -2,6 +2,7 @@ module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
     // components 2
+    {loader: {type: 'route'}, filePath: 'components2/PosCustomer/PosCustomer.vue', name: 'posCustomer', path: '/pos-customer' },
     {loader: {type: 'route'}, filePath: 'components2/Customer/CustomerOrder.vue', name: 'posCustomerOrder', path: '/pos-customer-order' },
     {loader: {type: 'route'}, filePath: 'components2/OrderHistory/OrderHistory.vue', name: 'OrderHistory', path: '/pos-order-history'},
     {loader: {type: 'route'}, filePath: 'components2/posPrinterSetting/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
@@ -70,6 +71,7 @@ module.exports = {
     {loader: {type: 'vue-singleton'}, path: 'components/Store/InventoryStore.vue',},
     {loader: {type: 'backend-api'}, path: 'backend/dayjs-utils.js', type: 'backend'},
     {loader: {type: 'backend-api'}, path: 'backend/modifier/index.js', type: 'backend'},
+    {loader: {type: 'backend-api'}, path: 'backend/customer/customerSchemaRegister.js', type: 'backend'},
     {loader: {type: 'backend-api'}, path: 'backend/rest-handler.js', type: 'backend'},
     {loader: {type: 'backend-api'}, path: 'backend/get-version/get-version.js', type: 'backend'},
     {loader: {type: 'backend-api'}, path: 'backend/print/print-report/report-index.js', type: 'backend'},

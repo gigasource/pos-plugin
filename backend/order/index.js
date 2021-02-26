@@ -52,6 +52,8 @@ module.exports = (cms) => {
       //todo: how to get device
       //todo: use test
       await cms.emit('run:print-to-kitchen', ...arguments);
+      if (feSocket)
+        feSocket.emit('update-table', order)
     })
 
     // todo: recent ??
@@ -66,7 +68,8 @@ module.exports = (cms) => {
       /*cms.emitAction('action:endOfDay', {order, recent}, () => {
         cb();
       });*/
-
+      if (feSocket)
+        feSocket.emit('update-table', order)
       cb();
     })
 
@@ -83,7 +86,8 @@ module.exports = (cms) => {
 
     //fixme: refactor
     await orm('Order').deleteOne({_id}).commit({table})
-
+    if (feSocket)
+      feSocket.emit('update-table', order)
     cb()
   }
 

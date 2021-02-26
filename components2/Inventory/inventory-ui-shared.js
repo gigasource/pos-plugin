@@ -183,6 +183,19 @@ export function renderInventoryDialog(t) {
                     v-model={selectedInventory.value.product.price}/>
               </div>
 
+              <g-select
+                  label={t('article.category')}
+                  required
+                  multiple
+                  chips
+                  deletableChips
+                  style={{gridColumn:'span 3'}}
+                  text-field-component="g-text-field-bs"
+                  menu-class="menu-select-inventory" outlined
+                  items={categoriesWithParentName.value} item-text="name" return-object
+                  modelValue={selectedInventory.value.product.category}
+                  onUpdate:modelValue={updateSelectedInventoryCategory}/>
+
               <div style={halfGrid}>
                 <g-select
                     label={t('inventory.tax')}

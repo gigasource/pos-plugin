@@ -40,6 +40,7 @@ export default {
     async function onLogin() {
       incorrectPasscode.value = !(await login(loginPassword.value))
       if (!incorrectPasscode.value) {
+        loginPassword.value = ''
         router.push('/pos-dashboard')
       }
     }
@@ -66,7 +67,7 @@ export default {
 
     return genScopeId(() =>
         <div class="login">
-          <div class="login-bg"></div>
+          <div class={currentAppType.value === appType.POS_RESTAURANT ? "login-bg" : "login-bg-retail"}></div>
           <div class="login-main">
             { renderAppSwitch() }
             <div class="login-logo">
@@ -111,6 +112,12 @@ export default {
   &-bg {
     flex: 0 0 40%;
     background-image: url("/plugins/pos-plugin/assets/login-bg.png");
+    background-size: cover;
+  }
+
+  &-bg-retail {
+    flex: 0 0 40%;
+    background-image: url("/plugins/pos-plugin/assets/login-bg-retail.jpg");
     background-size: cover;
   }
 

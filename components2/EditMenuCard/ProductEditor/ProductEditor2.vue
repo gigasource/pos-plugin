@@ -32,6 +32,7 @@ import {computed, onActivated, reactive, watch} from 'vue';
 import {genScopeId} from '../../utils';
 import dialogEditPopupModifiers2 from "../../Modifiers/dialogEditPopupModifier/dialogEditPopupModifiers2";
 import dialogProductInfo from "../dialog/dialogProductInfo";
+import dialogTextFilter from "../../pos-shared-components/dialogFilter/dialogTextFilter";
 import {appHooks} from "../../AppSharedStates";
 import {modifierGroups} from "../../Modifiers/dialogEditPopupModifier/modifier-ui-logics";
 
@@ -41,7 +42,7 @@ const colors = '#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91'
 export default {
   name: 'ProductEditor2.vue',
   props: {},
-  components: {dialogEditPopupModifiers2, dialogProductInfo}, // TODO: update component
+  components: {dialogEditPopupModifiers2, dialogProductInfo, dialogTextFilter}, // TODO: update component
   setup() {
     const {t} = useI18n()
     const router = useRouter()
