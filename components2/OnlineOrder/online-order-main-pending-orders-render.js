@@ -3,12 +3,14 @@ import { useI18n } from 'vue-i18n'
 import { genScopeId } from '../utils'
 
 import {
-	modemDeviceConnected,
 	calls,
 	missedCalls,
 	cancelMissedCallTimeout,
 	deleteCall,
 	deleteMissedCall
+} from '../Settings/CallSystem/call-system-calls'
+import {
+	modemDeviceConnected,
 } from '../Settings/CallSystem/call-system-logics'
 
 import {
@@ -390,8 +392,8 @@ export function renderPendingOrdersFactory () {
 	function renderPendingOrdersContent() {
 		return (
 			<div class="content">
-				{(!pendingOrders.value || !pendingOrders.value.length) && renderEmptyPendingOrders()}
 				{renderPendingOrdersCalls()}
+				{(!pendingOrders.value || !pendingOrders.value.length) && renderEmptyPendingOrders()}
 				{renderAllPendingOrders()}
 			</div>
 		)
