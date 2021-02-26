@@ -73,7 +73,7 @@ export default {
             </div>
             <g-spacer/>
             { isUSRoboticOrArtechModem.value && <g-btn-bs width="80" background-color="#2979FF" onClick={getUsbDevicesForCurrentMode}>Refresh</g-btn-bs> }
-            <g-btn-bs disabled={!callSystemConfigChanged.value} width="80" background-color="#2979FF" onClick={switchMode}>Save</g-btn-bs>
+            <g-btn-bs width="80" background-color="#2979FF" onClick={switchMode}>Save</g-btn-bs>
           </div>
 
           <dialog-text-filter v-model={dialog.value.ip} label="Call System IP" defaultValue={ipAddresses.value[currentCallSystemMode.value]} onSubmit={changeIp}></dialog-text-filter>
