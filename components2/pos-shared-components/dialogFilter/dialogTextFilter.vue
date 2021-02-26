@@ -2,7 +2,7 @@
   import { nextTick, ref, watch } from 'vue';
   import { isIOS, isMobile } from '../../AppSharedStates'
   import { useI18n } from 'vue-i18n'
-  import {internalValueFactory} from "../../utils";
+  import {internalValueFactory, genScopeId } from "../../utils";
 
   export default {
     name: 'dialogTextFilter',
@@ -27,7 +27,7 @@
           screenValue.value = props.defaultValue
           nextTick(() => {
             setTimeout(() => {
-              textField.onFocus()
+              textField._rawValue.onFocus()
             }, 200)
           })
         }
@@ -38,30 +38,32 @@
         internalValue.value = false
       }
 
-      return (
+      return genScopeId(() => (
           <g-dialog v-model={internalValue.value} width="90%" eager={!isIOS} fullscreen={isMobile}>
-            <div class="wrapper">
-              <g-icon onClick={() => internalValue.value = false} svg size="20" class="icon">icon-close</g-icon>
-                <div class="screen">
-                  <g-text-field-bs class="bs-tf__pos" v-model={screenValue} large label="label" readOnly ref="textField" virtual-event={isIOS}/>
-                  {
-                    isMobile &&
-                    <div class="buttons">
-                      <g-btn uppercase="false" text onClick={() => internalValue.value = false} outlined width="120" class="mr-2">
-                        {t('ui.cancel')}
-                      </g-btn>
-                      <g-btn uppercase="false" text onClick={submit} backgroundColor="#2979FF" text-color="#FFFFFF" width="120">
-                        {t('ui.ok')}
-                      </g-btn>
-                    </div>
-                  }
-                </div>
-                <div class="keyboard">
-                  <pos-keyboard-full v-model={screenValue} onEnter-pressed="submit"/>
-                </div>
-            </div>
+            {genScopeId(() => (
+              <div class="wrapper">
+                <g-icon onClick={() => internalValue.value = false} svg size="20" class="icon">icon-close</g-icon>
+                  <div class="screen">
+                    <g-text-field-bs class="bs-tf__pos" v-model={screenValue.value} large label="label" ref={textField} virtual-event={isIOS}/>
+                    {
+                      isMobile &&
+                      <div class="buttons">
+                        <g-btn uppercase="false" text onClick={() => internalValue.value = false} outlined width="120" class="mr-2">
+                          {t('ui.cancel')}
+                        </g-btn>
+                        <g-btn uppercase="false" text onClick={submit} backgroundColor="#2979FF" text-color="#FFFFFF" width="120">
+                          {t('ui.ok')}
+                        </g-btn>
+                      </div>
+                    }
+                  </div>
+                  <div class="keyboard">
+                    <pos-keyboard-full v-model={screenValue} onEnter-pressed="submit"/>
+                  </div>
+              </div>
+            ))()}
           </g-dialog>
-      )
+      ))
     }
 	}
 </script>
