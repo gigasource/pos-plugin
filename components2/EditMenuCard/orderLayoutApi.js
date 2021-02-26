@@ -107,6 +107,7 @@ async function deleteProductLayout(categoryId, productLayoutId) {
 
 // product api (MOVE TO ANOTHER FILE???)
 async function updateProduct(productId, change) {
+  if (!change) return
   return await cms.getModel('Product').findOneAndUpdate({ _id: productId }, change)
 }
 

@@ -1,29 +1,7 @@
 import { mockProducts } from './mock_products'
 import _ from 'lodash'
-import dayjs from 'dayjs'
 
 export const mockFavorites = _.filter(mockProducts, p => p.option && p.option.favorite)
-export const mockMissedCalls = [
-    /*Customer: see Customer collection*/
-    /*          see OrderStore::getCustomerInfo(phone) */
-  {
-    customer: {
-      name: 'Miss Customer 1',
-      phone: '0123456678',
-      addresses: [
-          {
-            address: 'missCust.1.addrs.address',
-            house: 'missCust.1.addrs.house',
-            street: 'missCust.1.addrs.street',
-            zipcode: 'missCust.1.addrs.zipcode',
-            city: 'missCust.1.addrs.city'
-          }
-      ]
-    }, date: dayjs() },
-  { customer: { name: 'Miss Customer 2', phone: '0123456678', addresses: [] }, date: dayjs() },
-  { customer: { name: 'Miss Customer 3', phone: '0123456678', addresses: [] }, date: dayjs() }
-]
-
 export const selectedCustomerMock = {
   'name': 'Tony',
   'phone': '0988.888.888',

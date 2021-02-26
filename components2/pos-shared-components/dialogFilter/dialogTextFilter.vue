@@ -1,27 +1,8 @@
-<template>
-	<g-dialog v-model="internalValue" width="90%" :eager="!isIOS" :fullscreen="isMobile">
-		<div class="wrapper">
-			<g-icon @click="internalValue = false" svg size="20" class="icon">icon-close</g-icon>
-			<div class="screen">
-				<g-text-field-bs class="bs-tf__pos" v-model="screenValue" large :label="label" readOnly ref="textfield" :virtual-event="isIOS"/>
-				<div v-if="!isMobile" class="buttons">
-					<g-btn :uppercase="false" text @click="internalValue = false" outlined width="120" class="mr-2">
-						{{$t('ui.cancel')}}
-					</g-btn>
-					<g-btn :uppercase="false" text @click="submit" backgroundColor="#2979FF" text-color="#FFFFFF" width="120">
-						{{$t('ui.ok')}}
-					</g-btn>
-				</div>
-			</div>
-			<div class="keyboard">
-				<pos-keyboard-full v-model="screenValue" @enter-pressed="submit"/>
-			</div>
-		</div>
-	</g-dialog>
-</template>
-
 <script>
-  import { nextTick } from 'vue';
+  import { nextTick, ref, watch } from 'vue';
+  import { isIOS, isMobile } from '../../AppSharedStates'
+  import { useI18n } from 'vue-i18n'
+  import {internalValueFactory} from "../../utils";
 
   export default {
     name: 'dialogTextFilter',
@@ -34,40 +15,54 @@
 			},
     },
     emits: ['update:modelValue', 'submit'],
-		injectService: ['PosStore:(isMobile, isIOS)'],
-    data() {
-      return {
-        screenValue: ''
-      }
-    },
-    computed: {
-      internalValue: {
-        get() {
-          return this.modelValue || false
-        },
-        set(value) {
-          this.$emit('update:modelValue', value)
+    setup(props, { emit }) {
+      const { t } = useI18n()
+
+      const screenValue = ref('')
+      const textField = ref(null)
+      const internalValue = internalValueFactory(props, { emit })
+
+      watch(() => internalValue.value, (newVal) => {
+        if (newVal) {
+          screenValue.value = props.defaultValue
+          nextTick(() => {
+            setTimeout(() => {
+              textField.onFocus()
+            }, 200)
+          })
         }
-      },
-    },
-    methods: {
-      async submit() {
-        this.$emit('submit', this.screenValue);
-        this.internalValue = false;
-      },
-    },
-		watch: {
-			internalValue: function(val) {
-				if(val) {
-					this.screenValue = this.defaultValue;
-					nextTick(() => {
-						setTimeout(() => {
-							this.$refs['textfield'].onFocus()
-						}, 200)
-					})
-				}
-			}
-		}
+      })
+
+      const submit = function () {
+        emit('submit', screenValue.value)
+        internalValue.value = false
+      }
+
+      return (
+          <g-dialog v-model={internalValue.value} width="90%" eager={!isIOS} fullscreen={isMobile}>
+            <div class="wrapper">
+              <g-icon onClick={() => internalValue.value = false} svg size="20" class="icon">icon-close</g-icon>
+                <div class="screen">
+                  <g-text-field-bs class="bs-tf__pos" v-model={screenValue} large label="label" readOnly ref="textField" virtual-event={isIOS}/>
+                  {
+                    isMobile &&
+                    <div class="buttons">
+                      <g-btn uppercase="false" text onClick={() => internalValue.value = false} outlined width="120" class="mr-2">
+                        {t('ui.cancel')}
+                      </g-btn>
+                      <g-btn uppercase="false" text onClick={submit} backgroundColor="#2979FF" text-color="#FFFFFF" width="120">
+                        {t('ui.ok')}
+                      </g-btn>
+                    </div>
+                  }
+                </div>
+                <div class="keyboard">
+                  <pos-keyboard-full v-model={screenValue} onEnter-pressed="submit"/>
+                </div>
+            </div>
+          </g-dialog>
+      )
+    }
 	}
 </script>
 

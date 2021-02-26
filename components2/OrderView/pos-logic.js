@@ -507,6 +507,8 @@ export function removeItem(order, query, quantity = 1, force = false) {
     item.quantity -= quantity;
   } else {
     _item = _.assign(_.cloneDeep(item), {quantity});
+    if (item.quantity >= quantity)
+      item.quantity -= quantity
     order.items.splice(query, 1);
   }
   //todo: sent or not

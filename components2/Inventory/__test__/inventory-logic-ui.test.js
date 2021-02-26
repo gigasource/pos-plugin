@@ -4,9 +4,9 @@ import {
   filteredInventory,
   addFilter,
   clearFilter,
-  removeFilter,
-  inventoryCategories
+  removeFilter
 } from "../inventory-logic-ui";
+import { products, categories } from "../../Product/product-logic";
 import { nextTick } from "vue";
 
 const moment = require("moment");
@@ -25,41 +25,57 @@ describe("Test inventory logic ui", function() {
   beforeAll(async () => {
     inventories.value.push({
       _id: "1",
-      name: "Fish",
+      productId: "1",
       unit: "piece",
-      stock: 30,
-      category: { name: "Food", _id: "1" }
+      stock: 30
     });
     inventories.value.push({
       _id: "2",
-      name: "Meat",
+      productId: "2",
       unit: "kg",
-      stock: 12,
-      category: { name: "Food", _id: "1" }
+      stock: 12
     });
     inventories.value.push({
       _id: "3",
-      name: "Apple",
+      productId: "3",
       unit: "piece",
-      stock: 50,
-      category: { name: "Fruit", _id: "2" }
+      stock: 50
     });
     inventories.value.push({
       _id: "4",
-      name: "Banana",
+      productId: "4",
       unit: "piece",
-      stock: 15,
-      category: { name: "Fruit", _id: "2" }
+      stock: 15
     });
-    inventoryCategories.value.push({
+    products.value.push({
+      _id: "1",
+      category: ["1"],
+      name: "Fish"
+    });
+    products.value.push({
+      _id: "2",
+      category: ["1"],
+      name: "Meat"
+    });
+    products.value.push({
+      _id: "3",
+      category: ["2"],
+      name: "Apple"
+    });
+    products.value.push({
+      _id: "4",
+      category: ["2"],
+      name: "Banana"
+    });
+    categories.value.push({
       _id: "1",
       name: "Food"
     });
-    inventoryCategories.value.push({
+    categories.value.push({
       _id: "2",
       name: "Fruit"
     });
-    inventoryCategories.value.push({
+    categories.value.push({
       _id: "3",
       name: "Cream"
     });
@@ -83,21 +99,35 @@ describe("Test inventory logic ui", function() {
       Array [
         Object {
           "_id": "1",
-          "category": Object {
+          "product": Object {
             "_id": "1",
-            "name": "Food",
+            "category": Array [
+              Object {
+                "_id": "1",
+                "available": false,
+                "name": "Food",
+              },
+            ],
+            "name": "Fish",
           },
-          "name": "Fish",
+          "productId": "1",
           "stock": 30,
           "unit": "piece",
         },
         Object {
           "_id": "2",
-          "category": Object {
-            "_id": "1",
-            "name": "Food",
+          "product": Object {
+            "_id": "2",
+            "category": Array [
+              Object {
+                "_id": "1",
+                "available": false,
+                "name": "Food",
+              },
+            ],
+            "name": "Meat",
           },
-          "name": "Meat",
+          "productId": "2",
           "stock": 12,
           "unit": "kg",
         },
@@ -119,11 +149,18 @@ describe("Test inventory logic ui", function() {
       Array [
         Object {
           "_id": "1",
-          "category": Object {
+          "product": Object {
             "_id": "1",
-            "name": "Food",
+            "category": Array [
+              Object {
+                "_id": "1",
+                "available": false,
+                "name": "Food",
+              },
+            ],
+            "name": "Fish",
           },
-          "name": "Fish",
+          "productId": "1",
           "stock": 30,
           "unit": "piece",
         },
@@ -148,31 +185,52 @@ describe("Test inventory logic ui", function() {
       Array [
         Object {
           "_id": "1",
-          "category": Object {
+          "product": Object {
             "_id": "1",
-            "name": "Food",
+            "category": Array [
+              Object {
+                "_id": "1",
+                "available": false,
+                "name": "Food",
+              },
+            ],
+            "name": "Fish",
           },
-          "name": "Fish",
+          "productId": "1",
           "stock": 30,
           "unit": "piece",
         },
         Object {
           "_id": "2",
-          "category": Object {
-            "_id": "1",
-            "name": "Food",
+          "product": Object {
+            "_id": "2",
+            "category": Array [
+              Object {
+                "_id": "1",
+                "available": false,
+                "name": "Food",
+              },
+            ],
+            "name": "Meat",
           },
-          "name": "Meat",
+          "productId": "2",
           "stock": 12,
           "unit": "kg",
         },
         Object {
           "_id": "4",
-          "category": Object {
-            "_id": "2",
-            "name": "Fruit",
+          "product": Object {
+            "_id": "4",
+            "category": Array [
+              Object {
+                "_id": "2",
+                "available": false,
+                "name": "Fruit",
+              },
+            ],
+            "name": "Banana",
           },
-          "name": "Banana",
+          "productId": "4",
           "stock": 15,
           "unit": "piece",
         },
@@ -185,49 +243,73 @@ describe("Test inventory logic ui", function() {
       Array [
         Object {
           "_id": "1",
-          "category": Object {
+          "product": Object {
             "_id": "1",
-            "name": "Food",
+            "category": Array [
+              Object {
+                "_id": "1",
+                "available": false,
+                "name": "Food",
+              },
+            ],
+            "name": "Fish",
           },
-          "name": "Fish",
+          "productId": "1",
           "stock": 30,
           "unit": "piece",
         },
         Object {
           "_id": "2",
-          "category": Object {
-            "_id": "1",
-            "name": "Food",
+          "product": Object {
+            "_id": "2",
+            "category": Array [
+              Object {
+                "_id": "1",
+                "available": false,
+                "name": "Food",
+              },
+            ],
+            "name": "Meat",
           },
-          "name": "Meat",
+          "productId": "2",
           "stock": 12,
           "unit": "kg",
         },
         Object {
           "_id": "3",
-          "category": Object {
-            "_id": "2",
-            "name": "Fruit",
+          "product": Object {
+            "_id": "3",
+            "category": Array [
+              Object {
+                "_id": "2",
+                "available": false,
+                "name": "Fruit",
+              },
+            ],
+            "name": "Apple",
           },
-          "name": "Apple",
+          "productId": "3",
           "stock": 50,
           "unit": "piece",
         },
         Object {
           "_id": "4",
-          "category": Object {
-            "_id": "2",
-            "name": "Fruit",
+          "product": Object {
+            "_id": "4",
+            "category": Array [
+              Object {
+                "_id": "2",
+                "available": false,
+                "name": "Fruit",
+              },
+            ],
+            "name": "Banana",
           },
-          "name": "Banana",
+          "productId": "4",
           "stock": 15,
           "unit": "piece",
         },
       ]
     `);
-  });
-
-  it("Case 2: Test inventory categories", () => {
-    expect(inventoryCategories.value).toMatchSnapshot();
   });
 });

@@ -10,86 +10,90 @@ import {
 } from './pos-dashboard-function-logics';
 import { appHooks } from '../../AppSharedStates';
 import { genScopeId } from '../../utils';
+import { computed } from 'vue'
 
 export default {
   setup() {
     init()
-    const { computedBtnGroup2, computedBtnGroup1 } = DashboardFunctionFactory()
-    return genScopeId(() =>
-        <div class="function">
+    const { computedBtnGroup2, computedBtnGroup1, shouldRenderButtonFnDivider } = DashboardFunctionFactory()
+    function renderTopButtons() {
+      return (
           <div class="function--up" v-show={computedBtnGroup1.value && computedBtnGroup1.value.length}>
             {computedBtnGroup1.value.map((btn, i) =>
                 <div key={`up_${i}`} class="function-btn" onClick={btn.click}>
-                  <g-icon size="60">
-                    {btn.icon} </g-icon>
-                  <span class="mt-3 ta-center">
-                    {btn.title} </span>
+                  <g-icon size="60">{btn.icon}</g-icon>
+                  <span class="mt-3 ta-center">{btn.title}</span>
                 </div>
-            )} </div>
-          {
-            (computedBtnGroup1.value && computedBtnGroup1.value.length) &&
-            <g-divider color="#9e9e9e"></g-divider>
-          }
+            )}
+          </div>
+      )
+    }
+    function renderBottomButtons() {
+      return (
           <div class="function--down">
             {computedBtnGroup2.value.map((btn, i) =>
                 <div key={`down_${i}`} class="function-btn" onClick={btn.click}>
-                  <g-icon size="60">
-                    {btn.icon} </g-icon>
-                  <span class="mt-3 ta-center">
-                    {btn.title} </span>
+                  <g-icon size="60">{btn.icon}</g-icon>
+                  <span class="mt-3 ta-center">{btn.title}</span>
                   {
-                    (btn.notification) &&
-                    <div class="function-noti">
-                      <g-icon color="white" size="16" class="mr-1">
-                        info
-                      </g-icon>
-
+                    (btn.notification) && <div class="function-noti">
+                      <g-icon color="white" size="16" class="mr-1">info</g-icon>
                       {btn.notification}
                     </div>
                   }
                 </div>
-            )} </div>
-
-          {
-            (demoLicense.value) &&
-            <div class={['demo-license-warning', dayLeft.value < 30 ? 'bg-red-lighten-5' : 'bg-blue-lighten-5']}>
-              <div style="margin: 0 32px 0 8px">
-                <p class="fw-700">
-                  You are using demo license </p>
-                <p class={['fs-small-2', dayLeft.value < 30 ? 'text-red' : 'text-grey-darken-1']}>
-                  {dayLeft.value} day{dayLeft.value > 1 && 's'} left </p>
-              </div>
-              <g-btn-bs class="fs-small-2" width="100" background-color="white" border-color="#1271FF"
-                        onClick={viewLicense}>
-                View license
-              </g-btn-bs>
+            )}
+          </div>
+      )
+    }
+    function renderDemoLicenseWarning() {
+      return demoLicense.value && (
+          <div class={['demo-license-warning', dayLeft.value < 30 ? 'bg-red-lighten-5' : 'bg-blue-lighten-5']}>
+            <div style="margin: 0 32px 0 8px">
+              <p class="fw-700">You are using demo license</p>
+              <p class={['fs-small-2', dayLeft.value < 30 ? 'text-red' : 'text-grey-darken-1']}>
+                {dayLeft.value} day{dayLeft.value > 1 && 's'} left
+              </p>
             </div>
-          }
-          <>
-            <g-dnd-dialog v-model={showIframe.value}
-                          width={iframeWidth.value}
-                          height={iframeHeight.value}
-                          lazy
-                          showMinimize={false}
-                          showMaximize={false}
-                          onClose={() => showIframe.value = false}
-                          onDragstart={() => iframeDragging.value = true}
-                          onDragend={() => iframeDragging.value = false}
-                          onResizestart={() => iframeDragging.value = true}
-                          onResizeend={() => iframeDragging.value = false} v-slots={{
-              'default': () => <> {
-                (showIframe.value && iframeDragging.value) &&
-                <div style="height: 100%; width: 100%; position: absolute; background: transparent"></div>
-              }
-                {
-                  (showIframe.value) &&
-                  <iframe src={iframeSrc.value} width="100%" height="100%"></iframe>
-                }
-              </>,
-              'title': () => {'Online Order Setting'}
-            }}></g-dnd-dialog>
-          </>
-        </div>)
+            <g-btn-bs class="fs-small-2" width="100" background-color="white" border-color="#1271FF" onClick={viewLicense}>
+              View license
+            </g-btn-bs>
+          </div>
+      )
+    }
+    // TODO: Moving render online ordering setting to another place
+    function renderOnlineOrderingSettingDialog() {
+      return (
+          <g-dnd-dialog v-model={showIframe.value}
+                        width={iframeWidth.value}
+                        height={iframeHeight.value}
+                        lazy
+                        showMinimize={false}
+                        showMaximize={false}
+                        onClose={() => showIframe.value = false}
+                        onDragstart={() => iframeDragging.value = true}
+                        onDragend={() => iframeDragging.value = false}
+                        onResizestart={() => iframeDragging.value = true}
+                        onResizeend={() => iframeDragging.value = false} v-slots={{
+            default: () => <>
+              { showIframe.value && iframeDragging.value && <div style="height: 100%; width: 100%; position: absolute; background: transparent"></div> }
+              { showIframe.value && <iframe src={iframeSrc.value} width="100%" height="100%"></iframe> }
+            </>,
+            title: () => 'Online Order Setting'
+          }}>
+          </g-dnd-dialog>
+      )
+    }
+
+    return genScopeId(() =>
+        <div class="function">
+          { renderTopButtons() }
+          { shouldRenderButtonFnDivider.value && <g-divider color="#9e9e9e"></g-divider> }
+          { renderBottomButtons() }
+          { renderDemoLicenseWarning() }
+          { renderOnlineOrderingSettingDialog() }
+        </div>
+    )
   }
 }
 </script>
@@ -102,6 +106,7 @@ export default {
   min-height: 100%;
   background-image: url("/plugins/pos-plugin/assets/out.png");
   padding: 24px;
+  overflow: scroll;
 
   &--up,
   &--down {

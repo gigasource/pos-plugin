@@ -7,6 +7,7 @@ import {
   cancelOrder,
   clearPayment,
   getRestTotal,
+  makeRefundOrder,
   mergeSameItems,
   removeItem,
   simulateBackendPrint,
@@ -26,6 +27,7 @@ const {
   createOrder,
   makeLastItemDiscount
 } = require("../pos-logic");
+require("mockdate").set(new Date("2021-01-01").getTime());
 
 const delay = require("delay");
 
@@ -46,14 +48,14 @@ describe("pos-logic", function() {
 
     await nextTick();
     //<editor-fold desc="order-expect">
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
-        "_id": "60110a77b2b0b9a01234a616",
+        "_id": "ObjectID",
         "cancellationItems": Array [],
         "cashback": 0,
         "items": Array [
           Object {
-            "_id": "60110a77b2b0b9a01234a617",
+            "_id": "ObjectID",
             "course": 1,
             "name": "Cola",
             "price": 1.3,
@@ -74,7 +76,7 @@ describe("pos-logic", function() {
             },
           },
           Object {
-            "_id": "60110a77b2b0b9a01234a618",
+            "_id": "ObjectID",
             "course": 1,
             "name": "Fanta",
             "price": 2,
@@ -100,7 +102,7 @@ describe("pos-logic", function() {
         "takeAway": false,
         "tip": 0,
         "user": Array [],
-        "vDate": 2021-01-26T17:00:00.000Z,
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vSum": 53,
         "vTaxSum": Object {
           "16": Object {
@@ -124,11 +126,15 @@ describe("pos-logic", function() {
     await delay(10);
 
     //<editor-fold desc="order-expect">
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
+        "_id": "ObjectID",
         "cancellationItems": Array [],
+        "cashback": 0,
         "items": Array [
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "modifiers": Array [
               Object {
                 "name": "Add Ketchup",
@@ -155,8 +161,12 @@ describe("pos-logic", function() {
             },
           },
         ],
+        "payment": Array [],
         "status": "inProgress",
         "takeAway": false,
+        "tip": 0,
+        "user": Array [],
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vSum": 13,
         "vTaxSum": Object {
           "5": Object {
@@ -178,11 +188,15 @@ describe("pos-logic", function() {
     await nextTick();
 
     //<editor-fold desc="order-expect">
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
+        "_id": "ObjectID",
         "cancellationItems": Array [],
+        "cashback": 0,
         "items": Array [
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "discount": "40%",
             "name": "Cola",
             "originalPrice": 1.3,
@@ -205,7 +219,12 @@ describe("pos-logic", function() {
             },
           },
         ],
+        "payment": Array [],
+        "status": "inProgress",
         "takeAway": false,
+        "tip": 0,
+        "user": Array [],
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vDiscount": 0.52,
         "vSum": 0.78,
         "vTaxSum": Object {
@@ -228,11 +247,15 @@ describe("pos-logic", function() {
     await nextTick();
 
     //<editor-fold desc="order-expect">
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
+        "_id": "ObjectID",
         "cancellationItems": Array [],
+        "cashback": 0,
         "items": Array [
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "discount": "0.5",
             "name": "Cola",
             "originalPrice": 1.3,
@@ -255,7 +278,12 @@ describe("pos-logic", function() {
             },
           },
         ],
+        "payment": Array [],
+        "status": "inProgress",
         "takeAway": false,
+        "tip": 0,
+        "user": Array [],
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vDiscount": 0.5,
         "vSum": 0.8,
         "vTaxSum": Object {
@@ -280,11 +308,15 @@ describe("pos-logic", function() {
     await Promise.resolve();
 
     //<editor-fold desc="order-expect">
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
+        "_id": "ObjectID",
         "cancellationItems": Array [],
+        "cashback": 0,
         "items": Array [
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "discount": "40%",
             "modifiers": Array [
               Object {
@@ -309,20 +341,25 @@ describe("pos-logic", function() {
             "vTaxSum": Object {
               "5": Object {
                 "gross": 7.8,
-                "net": 7.51,
-                "tax": 2.09,
+                "net": 7.43,
+                "tax": 0.37,
               },
             },
           },
         ],
+        "payment": Array [],
+        "status": "inProgress",
         "takeAway": false,
+        "tip": 0,
+        "user": Array [],
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vDiscount": 5.2,
         "vSum": 7.8,
         "vTaxSum": Object {
           "5": Object {
             "gross": 7.8,
-            "net": 7.51,
-            "tax": 2.09,
+            "net": 7.43,
+            "tax": 0.37,
           },
         },
       }
@@ -338,12 +375,16 @@ describe("pos-logic", function() {
     await nextTick();
 
     //<editor-fold desc="order-expect">
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
+        "_id": "ObjectID",
         "cancellationItems": Array [],
+        "cashback": 0,
         "discount": "50%",
         "items": Array [
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "discount": "50%",
             "name": "Cola",
             "originalPrice": 1.3,
@@ -366,7 +407,12 @@ describe("pos-logic", function() {
             },
           },
         ],
+        "payment": Array [],
+        "status": "inProgress",
         "takeAway": false,
+        "tip": 0,
+        "user": Array [],
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vDiscount": 0.65,
         "vSum": 0.65,
         "vTaxSum": Object {
@@ -389,12 +435,16 @@ describe("pos-logic", function() {
     await nextTick();
 
     //<editor-fold desc="order-expect">
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
+        "_id": "ObjectID",
         "cancellationItems": Array [],
+        "cashback": 0,
         "discount": "2",
         "items": Array [
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "discount": 0.48,
             "name": "Cola",
             "originalPrice": 1.3,
@@ -417,6 +467,8 @@ describe("pos-logic", function() {
             },
           },
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "discount": "38%",
             "name": "Fanta",
             "originalPrice": 2,
@@ -439,8 +491,12 @@ describe("pos-logic", function() {
             },
           },
         ],
+        "payment": Array [],
         "status": "inProgress",
         "takeAway": false,
+        "tip": 0,
+        "user": Array [],
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vDiscount": 2,
         "vSum": 3.3,
         "vTaxSum": Object {
@@ -456,12 +512,16 @@ describe("pos-logic", function() {
 
     makeDiscount(order, 1);
     await nextTick();
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
+        "_id": "ObjectID",
         "cancellationItems": Array [],
+        "cashback": 0,
         "discount": 1,
         "items": Array [
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "discount": 0.24,
             "name": "Cola",
             "originalPrice": 1.3,
@@ -484,6 +544,8 @@ describe("pos-logic", function() {
             },
           },
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "discount": "19%",
             "name": "Fanta",
             "originalPrice": 2,
@@ -506,8 +568,12 @@ describe("pos-logic", function() {
             },
           },
         ],
+        "payment": Array [],
         "status": "inProgress",
         "takeAway": false,
+        "tip": 0,
+        "user": Array [],
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vDiscount": 1,
         "vSum": 4.3,
         "vTaxSum": Object {
@@ -530,11 +596,15 @@ describe("pos-logic", function() {
     await nextTick();
 
     //<editor-fold desc="order-expect">
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
+        "_id": "ObjectID",
         "cancellationItems": Array [],
+        "cashback": 0,
         "items": Array [
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "name": "Cola",
             "price": 1.3,
             "quantity": 1,
@@ -554,6 +624,8 @@ describe("pos-logic", function() {
             },
           },
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "name": "Fanta",
             "price": 2,
             "quantity": 2,
@@ -573,6 +645,8 @@ describe("pos-logic", function() {
             },
           },
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "name": "Rice",
             "price": 10,
             "quantity": 2,
@@ -592,7 +666,12 @@ describe("pos-logic", function() {
             },
           },
         ],
+        "payment": Array [],
+        "status": "inProgress",
         "takeAway": false,
+        "tip": 0,
+        "user": Array [],
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vSum": 25.3,
         "vTaxSum": Object {
           "16": Object {
@@ -621,11 +700,15 @@ describe("pos-logic", function() {
     await nextTick();
 
     //<editor-fold desc="order-expect">
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
+        "_id": "ObjectID",
         "cancellationItems": Array [],
+        "cashback": 0,
         "items": Array [
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "modifiers": Array [
               Object {
                 "name": "Add Ketchup",
@@ -652,8 +735,12 @@ describe("pos-logic", function() {
             },
           },
         ],
+        "payment": Array [],
         "status": "inProgress",
         "takeAway": false,
+        "tip": 0,
+        "user": Array [],
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vSum": 26,
         "vTaxSum": Object {
           "5": Object {
@@ -694,11 +781,15 @@ describe("pos-logic", function() {
     await nextTick();
 
     //<editor-fold desc="order-expect">
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
+        "_id": "ObjectID",
         "cancellationItems": Array [],
+        "cashback": 0,
         "items": Array [
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "name": "Keybap Menu",
             "partTax": Object {
               "pricePart": 2,
@@ -731,7 +822,12 @@ describe("pos-logic", function() {
             },
           },
         ],
+        "payment": Array [],
+        "status": "inProgress",
         "takeAway": false,
+        "tip": 0,
+        "user": Array [],
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vSum": 10,
         "vTaxSum": Object {
           "16": Object {
@@ -778,11 +874,15 @@ describe("pos-logic", function() {
     await nextTick();
 
     //<editor-fold desc="order-expect">
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
+        "_id": "ObjectID",
         "cancellationItems": Array [],
+        "cashback": 0,
         "items": Array [
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "discount": "40%",
             "name": "Keybap Menu",
             "originalPrice": 10,
@@ -819,7 +919,12 @@ describe("pos-logic", function() {
             },
           },
         ],
+        "payment": Array [],
+        "status": "inProgress",
         "takeAway": false,
+        "tip": 0,
+        "user": Array [],
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vDiscount": 4,
         "vSum": 6,
         "vTaxSum": Object {
@@ -1033,7 +1138,7 @@ describe("pos-logic", function() {
     removeItem(order, 0, 3);
     await nextTick();
     //<editor-fold desc="order-expect">
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
         "cancellationItems": Array [
           Object {
@@ -1109,7 +1214,7 @@ describe("pos-logic", function() {
     removeItem(order, 0, 10);
     await nextTick();
     //<editor-fold desc="order-expect">
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
         "cancellationItems": Array [
           Object {
@@ -1166,11 +1271,15 @@ describe("pos-logic", function() {
     cancelOrder(order);
     await nextTick();
     //<editor-fold desc="order-expect">
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
+        "_id": "ObjectID",
         "cancellationItems": Array [],
+        "cashback": 0,
         "items": Array [
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "name": "Cola",
             "price": 1.3,
             "quantity": 10,
@@ -1190,6 +1299,8 @@ describe("pos-logic", function() {
             },
           },
           Object {
+            "_id": "ObjectID",
+            "course": 1,
             "name": "Fanta",
             "price": 2,
             "quantity": 20,
@@ -1212,6 +1323,9 @@ describe("pos-logic", function() {
         "payment": Array [],
         "status": "cancelled",
         "takeAway": false,
+        "tip": 0,
+        "user": Array [],
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vSum": 53,
         "vTaxSum": Object {
           "16": Object {
@@ -1230,15 +1344,19 @@ describe("pos-logic", function() {
     order.date = dayjs("01.01.2021 11:11:11", "DD.MM.YYYY HH:");
     await nextTick();
     //<editor-fold desc="order-expect">
-    expect(order).toMatchInlineSnapshot(`
+    expect(stringify(order)).toMatchInlineSnapshot(`
       Object {
+        "_id": "ObjectID",
         "cancellationItems": Array [],
+        "cashback": 0,
         "date": "2021-01-01T04:11:11.000Z",
         "items": Array [],
         "payment": Array [],
         "status": "inProgress",
         "takeAway": false,
-        "vDate": 2020-12-31T17:00:00.000Z,
+        "tip": 0,
+        "user": Array [],
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vSum": 0,
         "vTaxSum": Object {},
       }
@@ -1260,6 +1378,7 @@ describe("pos-logic", function() {
       Object {
         "_id": "ObjectID",
         "cancellationItems": Array [],
+        "cashback": 0,
         "items": Array [
           Object {
             "_id": "ObjectID",
@@ -1267,6 +1386,7 @@ describe("pos-logic", function() {
             "name": "Cola",
             "price": 1.3,
             "quantity": 1,
+            "separate": false,
             "takeAway": false,
             "tax": 16,
             "taxes": Array [
@@ -1287,8 +1407,9 @@ describe("pos-logic", function() {
         "payment": Array [],
         "status": "inProgress",
         "takeAway": false,
+        "tip": 0,
         "user": Array [],
-        "vDate": "2021-01-10T17:00:00.000Z",
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vSum": 1.3,
         "vTaxSum": Object {
           "16": Object {
@@ -1322,11 +1443,13 @@ describe("pos-logic", function() {
       Object {
         "_id": "ObjectID",
         "cancellationItems": Array [],
+        "cashback": 0,
         "items": Array [
           Object {
             "_id": "ObjectID",
             "course": 1,
             "name": "Cola",
+            "originalQuantity": 5,
             "price": 1.3,
             "printed": true,
             "quantity": 10,
@@ -1350,6 +1473,7 @@ describe("pos-logic", function() {
             "_id": "ObjectID",
             "course": 1,
             "name": "Fanta",
+            "originalQuantity": 10,
             "price": 2,
             "printed": true,
             "quantity": 10,
@@ -1373,8 +1497,9 @@ describe("pos-logic", function() {
         "payment": Array [],
         "status": "inProgress",
         "takeAway": false,
+        "tip": 0,
         "user": Array [],
-        "vDate": "2021-01-16T17:00:00.000Z",
+        "vDate": "2020-12-31T17:00:00.000Z",
         "vSum": 33,
         "vTaxSum": Object {
           "16": Object {

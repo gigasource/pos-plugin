@@ -1,4 +1,5 @@
 <script>
+import { withModifier } from 'vue'
 import {selectedProduct, selectedProductLayout,} from '../../OrderView/pos-ui-shared';
 
 import {
@@ -30,6 +31,7 @@ import {useRouter} from 'vue-router'
 import {computed, onActivated, reactive, watch} from 'vue';
 import {genScopeId} from '../../utils';
 import dialogEditPopupModifiers2 from "../../Modifiers/dialogEditPopupModifier/dialogEditPopupModifiers2";
+import dialogProductInfo from "../dialog/dialogProductInfo";
 import {appHooks} from "../../AppSharedStates";
 import {modifierGroups} from "../../Modifiers/dialogEditPopupModifier/modifier-ui-logics";
 
@@ -39,7 +41,7 @@ const colors = '#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91'
 export default {
   name: 'ProductEditor2.vue',
   props: {},
-  components: {dialogEditPopupModifiers2}, // TODO: update component
+  components: {dialogEditPopupModifiers2, dialogProductInfo}, // TODO: update component
   setup() {
     const {t} = useI18n()
     const router = useRouter()
@@ -105,7 +107,7 @@ export default {
             onUpdate:modelValue={e => debounceUpdateTextLayout('text', e)}
             v-slots={{
               'append-inner': () => <g-icon style="cursor: pointer"
-                                            onClick={() => dialog.showTextKbd = true}>icon-keyboard</g-icon>
+                                            onClick={withModifier(() => { dialog.showTextKbd = true}, ['stop'])}>icon-keyboard</g-icon>
             }}/>
       </>
     }

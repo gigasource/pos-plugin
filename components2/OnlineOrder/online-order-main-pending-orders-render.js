@@ -3,21 +3,27 @@ import { useI18n } from 'vue-i18n'
 import { genScopeId } from '../utils'
 
 import {
-	timeoutProgress,
 	modemDeviceConnected,
-	pendingOrders,
 	calls,
 	missedCalls,
+	cancelMissedCallTimeout,
+	deleteCall,
+	deleteMissedCall
+} from '../Settings/CallSystem/call-system-logics'
+
+import {
+	timeoutProgress,
+	pendingOrders,
 	paymentIcon,
 	defaultPrepareTime,
 	getExtraInfo,
 	getItemPrice
 } from './online-order-main-logic'
+
 import {
 	acceptOrder,
-	cancelMissedCallTimeout,
-	deleteCall, deleteMissedCall
 } from './online-order-main-logic-be'
+
 import {$filters} from "../AppSharedStates";
 
 //<editor-fold desc="ref">

@@ -1,0 +1,492 @@
+{
+  "events": [],
+  "_id": "5ddb9759b7744b22a49b5afa",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "binding": [],
+      "slotScopeBinding": [],
+      "component": "GGridLayout",
+      "content": {
+        "props": {
+          "layout": {
+            "name": "payment",
+            "top": -1,
+            "left": -1,
+            "width": 0,
+            "height": 0,
+            "margin": "",
+            "padding": "",
+            "bgColor": "hsl(47, 100%, 50%, 50%)",
+            "alignSelf": "",
+            "justifySelf": "",
+            "wrapInDiv": false,
+            "displayFlex": false,
+            "flexDirection": "row",
+            "flexWrap": false,
+            "flexJustifyContent": "",
+            "flexAlignItems": "",
+            "flexAlignContent": "",
+            "flexOrder": "",
+            "flexGrow": "",
+            "flexShrink": "",
+            "flexBasis": "",
+            "flexAlignSelf": "",
+            "alignItems": "",
+            "alignContent": "",
+            "justifyItems": "",
+            "justifyContent": "",
+            "columns": [
+              "70%",
+              "30%"
+            ],
+            "rows": [
+              "calc(100% - 64px)",
+              "64px"
+            ],
+            "columnGap": 0,
+            "rowGap": 0,
+            "subAreas": [
+              {
+                "name": "layout__left",
+                "top": 1,
+                "left": 1,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(74, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": "",
+                "alignItems": "",
+                "alignContent": "",
+                "justifyItems": "",
+                "justifyContent": "",
+                "columns": [
+                  "1fr"
+                ],
+                "rows": [
+                  "40%",
+                  "60%"
+                ],
+                "columnGap": 0,
+                "rowGap": 0,
+                "subAreas": [
+                  {
+                    "name": "method",
+                    "top": 1,
+                    "left": 1,
+                    "width": 1,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(193, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  },
+                  {
+                    "name": "controller",
+                    "top": 2,
+                    "left": 1,
+                    "width": 1,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "60px 12px",
+                    "bgColor": "hsl(67, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": "",
+                    "alignItems": "",
+                    "alignContent": "",
+                    "justifyItems": "",
+                    "justifyContent": "",
+                    "columns": [
+                      "50%",
+                      "50%"
+                    ],
+                    "rows": [
+                      "100%"
+                    ],
+                    "columnGap": 6,
+                    "rowGap": 6,
+                    "subAreas": [
+                      {
+                        "name": "keyboard",
+                        "top": 1,
+                        "left": 1,
+                        "width": 1,
+                        "height": 1,
+                        "margin": "",
+                        "padding": "",
+                        "bgColor": "hsl(166, 100%, 50%, 50%)",
+                        "alignSelf": "",
+                        "justifySelf": "",
+                        "wrapInDiv": false,
+                        "displayFlex": false,
+                        "flexDirection": "row",
+                        "flexWrap": false,
+                        "flexJustifyContent": "",
+                        "flexAlignItems": "",
+                        "flexAlignContent": "",
+                        "flexOrder": "",
+                        "flexGrow": "",
+                        "flexShrink": "",
+                        "flexBasis": "",
+                        "flexAlignSelf": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "toolbar",
+                "top": 2,
+                "left": 1,
+                "width": 2,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(113, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              },
+              {
+                "name": "detail",
+                "top": 1,
+                "left": 2,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(170, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              }
+            ]
+          },
+          "displayPreviewColor": null,
+          "style": {
+            "_code_": "module.exports = { \n  height: '100%'\n}",
+            "_code_type_": "commonJs"
+          }
+        }
+      },
+      "items": [
+        {
+          "choice": "view",
+          "component": "PosPaymentScreenBalance",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "screen",
+          "url": "plugins/pos-plugin/components/Payment/PosPaymentScreenBalance.vue",
+          "path": "components/Payment/PosPaymentScreenBalance.vue",
+          "pluginName": "pos-plugin"
+        },
+        {
+          "choice": "view",
+          "component": "PosPaymentScreenPaymentMethods",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "method",
+          "url": "plugins/pos-plugin/components/Payment/PosPaymentScreenPaymentMethods.vue",
+          "path": "components/Payment/PosPaymentScreenPaymentMethods.vue",
+          "pluginName": "pos-plugin",
+          "inject": [
+            {
+              "service": "OrderStore:updateCurrentOrder",
+              "local": "updateCurrentOrder",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:currentOrder",
+              "local": "currentOrder",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:paymentTotal",
+              "local": "paymentTotal",
+              "type": "prop"
+            },
+            {
+              "service": "PosStore:storeLocale",
+              "local": "storeLocale",
+              "type": "prop"
+            },
+            {
+              "service": "PosStore:isMobile",
+              "local": "isMobile",
+              "type": "prop"
+            }
+          ]
+        },
+        {
+          "choice": "view",
+          "component": "PosPaymentScreenKeyboard",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "controller",
+          "url": "plugins/pos-plugin/components/Payment/PosPaymentScreenKeyboard.vue",
+          "path": "components/Payment/PosPaymentScreenKeyboard.vue",
+          "pluginName": "pos-plugin",
+          "inject": [
+            {
+              "service": "OrderStore:savePaidOrder",
+              "local": "savePaidOrder",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:paymentTotal",
+              "local": "paymentTotal",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:currentOrder",
+              "local": "currentOrder",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:updateCurrentOrder",
+              "local": "updateCurrentOrder",
+              "type": "event"
+            },
+            {
+              "service": "PosStore:isMobile",
+              "local": "isMobile",
+              "type": "prop"
+            }
+          ]
+        },
+        {
+          "choice": "view",
+          "component": "PosRestaurantPaymentToolbar",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "toolbar",
+          "url": "plugins/pos-plugin/components/posRestaurantPayment/PosRestaurantPaymentToolbar.vue",
+          "path": "components/posRestaurantPayment/PosRestaurantPaymentToolbar.vue",
+          "pluginName": "pos-plugin",
+          "inject": [
+            {
+              "service": "OrderStore:saveRestaurantOrder",
+              "local": "pay",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:paymentAmountTendered",
+              "local": "paymentAmountTendered",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:paymentTotal",
+              "local": "paymentTotal",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:setOrderDiscount",
+              "local": "promotion",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:currentOrder",
+              "local": "currentOrder",
+              "type": "prop"
+            }
+          ]
+        },
+        {
+          "choice": "view",
+          "component": "PosRestaurantPaymentOrderDetail",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "detail",
+          "inject": [
+            {
+              "service": "OrderStore:currentOrder",
+              "local": "currentOrder",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:compactOrder",
+              "local": "compactOrder",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:paymentTotal",
+              "local": "total",
+              "type": "prop"
+            },
+            {
+              "service": "PosStore:user",
+              "local": "user",
+              "type": "prop"
+            }
+          ],
+          "url": "plugins/pos-plugin/components/posRestaurantPayment/PosRestaurantPaymentOrderDetail.vue",
+          "path": "components/posRestaurantPayment/PosRestaurantPaymentOrderDetail.vue",
+          "pluginName": "pos-plugin"
+        }
+      ]
+    },
+    {
+      "choice": "view",
+      "component": "dialogChangeValue",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "dialogDiscount",
+        "binding": [
+          {
+            "serviceName": "open",
+            "type": "method"
+          }
+        ]
+      },
+      "url": "plugins/pos-plugin/components/pos-shared-components/dialogChangeValue.vue",
+      "path": "components/pos-shared-components/dialogChangeValue.vue",
+      "pluginName": "pos-plugin",
+      "inject": [
+        {
+          "service": "OrderStore:discountCurrentOrder",
+          "local": "submit",
+          "type": "event"
+        }
+      ]
+    },
+    {
+      "choice": "view",
+      "component": "GSnackbar",
+      "content": {
+        "props": {
+          "color": "#FFC107",
+          "timeout": 2000,
+          "top": true
+        }
+      },
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "alertDiscount",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "items": [
+        {
+          "choice": "view",
+          "component": "VTag",
+          "content": {
+            "props": {
+              "html": "",
+              "tag": "div",
+              "class": [],
+              "style": {
+                "_code_": "module.exports = {\n  color: '#ff4552',\n  display: 'flex',\n  'align-items': 'center'\n}",
+                "_code_type_": "commonJs"
+              }
+            }
+          },
+          "binding": [],
+          "slotScopeBinding": [],
+          "items": [
+            {
+              "choice": "view",
+              "component": "GIcon",
+              "content": {
+                "props": {
+                  "html": "warning",
+                  "style": {
+                    "_code_": "module.exports = {\n  'margin-right': '8px',\n  color: '#ff4552'\n}",
+                    "_code_type_": "commonJs"
+                  }
+                }
+              },
+              "binding": [],
+              "slotScopeBinding": [],
+              "clipboardType": "cut"
+            },
+            {
+              "choice": "view",
+              "component": "VTag",
+              "content": {
+                "props": {
+                  "html": "This order has already applied discount in items"
+                }
+              },
+              "binding": [],
+              "slotScopeBinding": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "name": "posPayment",
+  "props": {
+    "fields": []
+  },
+  "renderInIframe": false,
+  "renderToRoute": "pos-payment"
+}

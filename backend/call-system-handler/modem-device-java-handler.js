@@ -4,6 +4,7 @@ module.exports = async (cms) => {
   const ARTECH_MODEM_MODE = 'artech-modem';
   const ARTECH_MODEM_MODE_PREFIX = 'artech-';
 
+  const csConstants = require('./call-system-contants')
   const {checkModeActive, getActiveMode, emitNewCall, cancelMissedCallTimeout} = require('./utils');
   let rnBridge;
   let currentMode;
@@ -108,18 +109,20 @@ module.exports = async (cms) => {
 
   cms.socket.on('connect', internalSocket => {
     internalSocket.on('list-usb-devices', listSerialDevices);
-    internalSocket.on('refresh-call-system-config', setupModemDevice);
-    internalSocket.on('get-call-system-status', updateConnectionStatus);
     internalSocket.on('screen-loaded', listSerialDevices);
-    internalSocket.on('cancel-missed-call-timeout', cancelMissedCallTimeout);
+    internalSocket.on(csConstants.RefreshCallSystemConfig, setupModemDevice);
+    internalSocket.on(csConstants.GetCallSystemStatus, updateConnectionStatus);
+    internalSocket.on(csConstants.CancelMissedCallTimeout, cancelMissedCallTimeout);
   });
 
   async function listSerialDevices(mode) {
     if (!mode) mode = await getActiveMode();
     let event = 'list-usb-devices';
 
-    if (mode === USROBOTICS_MODEM_MODE) event = USROBOTICS_MODEM_MODE_PREFIX + event;
-    else if (mode === ARTECH_MODEM_MODE) event = ARTECH_MODEM_MODE_PREFIX + event;
+    if (mode === USROBOTICS_MODEM_MODE)
+      event = USROBOTICS_MODEM_MODE_PREFIX + event;
+    else if (mode === ARTECH_MODEM_MODE)
+      event = ARTECH_MODEM_MODE_PREFIX + event;
 
     rnBridge.app.sendObject(event, {});
   }
@@ -128,8 +131,10 @@ module.exports = async (cms) => {
     const mode = await getActiveMode();
     let event = 'open-usb-device';
 
-    if (mode === USROBOTICS_MODEM_MODE) event = USROBOTICS_MODEM_MODE_PREFIX + event;
-    else if (mode === ARTECH_MODEM_MODE) event = ARTECH_MODEM_MODE_PREFIX + event;
+    if (mode === USROBOTICS_MODEM_MODE)
+      event = USROBOTICS_MODEM_MODE_PREFIX + event;
+    else if (mode === ARTECH_MODEM_MODE)
+      event = ARTECH_MODEM_MODE_PREFIX + event;
 
     selectedDevicePath = devicePath;
     rnBridge.app.sendObject(event, {devicePath});
@@ -139,7 +144,7 @@ module.exports = async (cms) => {
     const mode = await getActiveMode(posSettings);
 
     if (cb && mode === currentMode) cb(connectionStatus);
-    else cms.socket.emit('update-call-system-status', mode === currentMode ? connectionStatus : null);
+    else cms.socket.emit(csConstants.UpdateCallSystemStatus, mode === currentMode ? connectionStatus : null);
   }
 
   function handleArtechData(phoneNumber = '') {

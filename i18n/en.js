@@ -605,7 +605,9 @@ module.exports = {
         name: 'Name',
         category: 'Category',
         stock: 'Stock'
-      }
+      },
+      price: 'Price',
+      costPrice: 'Cost Price'
     },
 
     discount: {

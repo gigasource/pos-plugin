@@ -1,0 +1,754 @@
+{
+  "events": [],
+  "_id": "5dd78a797bcca8354bfcffbf",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "GGridLayout",
+      "content": {
+        "props": {
+          "layout": {
+            "name": "app",
+            "top": -1,
+            "left": -1,
+            "width": 0,
+            "height": 0,
+            "margin": "",
+            "padding": "",
+            "bgColor": "hsl(209, 100%, 50%, 50%)",
+            "alignSelf": "",
+            "justifySelf": "",
+            "wrapInDiv": false,
+            "displayFlex": false,
+            "flexDirection": "row",
+            "flexWrap": false,
+            "flexJustifyContent": "",
+            "flexAlignItems": "",
+            "flexAlignContent": "",
+            "flexOrder": "",
+            "flexGrow": "",
+            "flexShrink": "",
+            "flexBasis": "",
+            "flexAlignSelf": "",
+            "alignItems": "",
+            "alignContent": "",
+            "justifyItems": "",
+            "justifyContent": "",
+            "columns": [
+              "40%",
+              "1fr"
+            ],
+            "rows": [
+              "15%",
+              "30%",
+              "40%",
+              "15%"
+            ],
+            "columnGap": 0,
+            "rowGap": 0,
+            "subAreas": [
+              {
+                "name": "left",
+                "top": 1,
+                "left": 1,
+                "width": 1,
+                "height": 4,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(199, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              },
+              {
+                "name": "keyboard-section",
+                "top": 3,
+                "left": 2,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(321, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": "",
+                "alignItems": "",
+                "alignContent": "",
+                "justifyItems": "",
+                "justifyContent": "",
+                "columns": [
+                  "15%",
+                  "1fr",
+                  "15%"
+                ],
+                "rows": [
+                  "5%",
+                  "1fr",
+                  "5%"
+                ],
+                "columnGap": 0,
+                "rowGap": 0,
+                "subAreas": [
+                  {
+                    "name": "keyboard",
+                    "top": 2,
+                    "left": 2,
+                    "width": 1,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(31, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  },
+                  {
+                    "name": "loginBtn",
+                    "top": 2,
+                    "left": 3,
+                    "width": 1,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(163, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  }
+                ]
+              },
+              {
+                "name": "button-section",
+                "top": 4,
+                "left": 2,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(257, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": "",
+                "alignItems": "",
+                "alignContent": "",
+                "justifyItems": "",
+                "justifyContent": "",
+                "columns": [
+                  "1fr",
+                  "4px",
+                  "1fr",
+                  "4px",
+                  "auto",
+                  "4px",
+                  "auto",
+                  "4px",
+                  "auto"
+                ],
+                "rows": [
+                  "1fr",
+                  "auto",
+                  "7%"
+                ],
+                "columnGap": 0,
+                "rowGap": 0,
+                "subAreas": [
+                  {
+                    "name": "id-button",
+                    "top": 2,
+                    "left": 7,
+                    "width": 1,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(209, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  },
+                  {
+                    "name": "version-button",
+                    "top": 2,
+                    "left": 5,
+                    "width": 1,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(216, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  },
+                  {
+                    "name": "language-button",
+                    "top": 2,
+                    "left": 3,
+                    "width": 1,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(72, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  },
+                  {
+                    "name": "support-button",
+                    "top": 2,
+                    "left": 9,
+                    "width": 1,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(53, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  },
+                  {
+                    "name": "connection-button",
+                    "top": 2,
+                    "left": 1,
+                    "width": 1,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(280, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  }
+                ]
+              },
+              {
+                "name": "input-section",
+                "top": 2,
+                "left": 2,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(142, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": "",
+                "alignItems": "",
+                "alignContent": "",
+                "justifyItems": "",
+                "justifyContent": "",
+                "columns": [
+                  "30%",
+                  "1fr",
+                  "1fr",
+                  "1fr",
+                  "1fr",
+                  "1fr",
+                  "30%"
+                ],
+                "rows": [
+                  "10px",
+                  "40px",
+                  "1fr",
+                  "minmax(90px, auto)",
+                  "5%"
+                ],
+                "columnGap": 0,
+                "rowGap": 0,
+                "subAreas": [
+                  {
+                    "name": "introduction-line",
+                    "top": 2,
+                    "left": 1,
+                    "width": 7,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(318, 100%, 50%, 50%)",
+                    "alignSelf": "center",
+                    "justifySelf": "center",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  },
+                  {
+                    "name": "login-textfield",
+                    "top": 4,
+                    "left": 2,
+                    "width": 5,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(91, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": true,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  }
+                ]
+              },
+              {
+                "name": "icon-section",
+                "top": 1,
+                "left": 2,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(198, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": "",
+                "alignItems": "",
+                "alignContent": "",
+                "justifyItems": "",
+                "justifyContent": "",
+                "columns": [
+                  "30%",
+                  "1fr",
+                  "30%"
+                ],
+                "rows": [
+                  "10%",
+                  "1fr",
+                  "10%"
+                ],
+                "columnGap": 0,
+                "rowGap": 0,
+                "subAreas": [
+                  {
+                    "name": "icon-image",
+                    "top": 2,
+                    "left": 2,
+                    "width": 1,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(92, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  },
+                  {
+                    "name": "quit-btn",
+                    "top": 1,
+                    "left": 3,
+                    "width": 1,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(181, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  }
+                ]
+              }
+            ]
+          },
+          "displayPreviewColor": false,
+          "style": {
+            "height": "100%"
+          }
+        }
+      },
+      "binding": [],
+      "slotScopeBinding": [],
+      "items": [
+        {
+          "choice": "view",
+          "component": "PosLoginKeyboard",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "keyboard",
+          "url": "plugins/pos-plugin/components/pos-shared-components/POSInput/PosLoginKeyboard.vue",
+          "path": "components/pos-shared-components/POSInput/PosLoginKeyboard.vue",
+          "pluginName": "pos-plugin",
+          "inject": [
+            {
+              "service": "PosStore:loginPassword",
+              "local": "value",
+              "type": "v-model"
+            },
+            {
+              "service": "PosStore:login",
+              "local": "login",
+              "type": "event"
+            },
+            {
+              "service": "PosStore:resetIncorrectPasscodeFlag",
+              "local": "clear",
+              "type": "event"
+            },
+            {
+              "service": "PosStore:resetIncorrectPasscodeFlag",
+              "local": "delete",
+              "type": "event"
+            },
+            {
+              "service": "PosStore:resetIncorrectPasscodeFlag",
+              "local": "append",
+              "type": "event"
+            }
+          ]
+        },
+        {
+          "choice": "view",
+          "component": "PosLoginTextfield",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "login-textfield",
+          "url": "plugins/pos-plugin/components/Login/PosLoginTextfield.vue",
+          "path": "components/Login/PosLoginTextfield.vue",
+          "pluginName": "pos-plugin",
+          "inject": [
+            {
+              "service": "PosStore:loginPassword",
+              "local": "value",
+              "isVModel": false,
+              "type": "v-model"
+            },
+            {
+              "service": "PosStore:incorrectPasscode",
+              "local": "incorrectPasscode",
+              "type": "prop"
+            }
+          ]
+        },
+        {
+          "choice": "view",
+          "component": "VersionBtn",
+          "content": {
+            "props": {
+              "flat": true,
+              "html": "Version",
+              "uppercase": null
+            }
+          },
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "version-button",
+          "pluginName": "pos-plugin",
+          "inject": [
+            {
+              "service": "PosStore:version",
+              "local": "version",
+              "type": "prop"
+            }
+          ],
+          "url": "plugins/pos-plugin/components/Login/VersionBtn.vue",
+          "path": "components/Login/VersionBtn.vue"
+        },
+        {
+          "choice": "view",
+          "component": "SupportBtn",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "support-button",
+          "content": {
+            "events": {
+              "click": {
+                "_code_": "module.exports = function(e) {\n  this.$getService('dialogLoginSupport:setActive')(true)\n}",
+                "_code_type_": "commonJs"
+              }
+            },
+            "props": {
+              "flat": true,
+              "html": "",
+              "uppercase": null
+            }
+          },
+          "pluginName": "pos-plugin",
+          "items": [],
+          "url": "plugins/pos-plugin/components/Login/SupportBtn.vue",
+          "path": "components/Login/SupportBtn.vue"
+        },
+        {
+          "choice": "view",
+          "component": "GImg",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "left",
+          "content": {
+            "props": {
+              "width": "100%",
+              "src": "/plugins/pos-plugin/assets/login-bg.png",
+              "height": "100%",
+              "srcType": "src",
+              "class": []
+            }
+          }
+        },
+        {
+          "choice": "view",
+          "component": "GImg",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "icon-image",
+          "content": {
+            "props": {
+              "srcType": "src-inline",
+              "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjIyIiBoZWlnaHQ9IjQxIiB2aWV3Qm94PSIwIDAgMjIyIDQxIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8bWFzayBpZD0ibWFzazAiIG1hc2stdHlwZT0iYWxwaGEiIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjAiIHk9IjExIiB3aWR0aD0iMTkiIGhlaWdodD0iMzAiPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTAgMTEuMTI1N0wxOC42OTggMTEuMTI1N0wxOC42OTggNDAuMTY2NUgwTDAgMTEuMTI1N1oiIGZpbGw9IndoaXRlIi8+CjwvbWFzaz4KPGcgbWFzaz0idXJsKCNtYXNrMCkiPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTE0LjMwNTYgMTUuMjEyNkMxMy4xNzc5IDE0LjgxOTkgMTEuODk1NCAxNC42NjI0IDEwLjU3MzUgMTQuNjYyNEM2Ljk1ODU3IDE0LjY2MjQgNC40MzE5MyAxNy41MzE0IDQuNDMxOTMgMjEuNjE4M0M0LjQzMTkzIDI1LjE5NCA2LjUzMTA3IDI3LjY3IDkuNTI0MjggMjcuNjdDMTIuMzIyOSAyNy42NyAxNC4yNjY1IDI1Ljc0NDMgMTQuMzA1NiAyMy43Nzk0TDE0LjMwNTYgMTUuMjEyNlpNMy4yMjY0OCAzNC45NzkxQzQuNDMxOTMgMzYuMDAxIDYuMjk3NDQgMzYuNjI5OCA4LjU5MDgxIDM2LjYyOThDMTEuOTczMiAzNi42Mjk4IDE0LjMwNTYgMzQuMzExNSAxNC4zMDU2IDMxLjA0OTRMMTQuMzA1NiAyNy42MzA1QzEzLjAyMjcgMjkuNzkyIDEwLjY1MTMgMzEuMjQ2MSA3LjY1ODA2IDMxLjI0NjFDMy4xNDg3MiAzMS4yNDYxIDAgMjcuMzE2MSAwIDIxLjYxODNDMCAxNS4zNjk4IDQuNjI1OCAxMS4xMjU3IDExLjMxMjQgMTEuMTI1N0MxMy45MTY4IDExLjEyNTcgMTYuMzI3IDExLjQ0MDIgMTguNjk4MSAxMi41Nzk4TDE4LjY5ODEgMzEuMDQ5NEMxOC42OTgxIDM2LjQ3MjYgMTQuNTc3NiA0MC4xNjY1IDguNTkwODEgNDAuMTY2NUM1LjQwMzM5IDQwLjE2NjUgMi43OTg5OCAzOS4xMDU1IDAuOTcxODE1IDM3LjI5ODJMMy4yMjY0OCAzNC45NzkxWiIgZmlsbD0iIzAyMDMwMyIvPgo8L2c+CjxtYXNrIGlkPSJtYXNrMSIgbWFzay10eXBlPSJhbHBoYSIgbWFza1VuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeD0iMCIgeT0iMCIgd2lkdGg9IjIyMiIgaGVpZ2h0PSI0MCI+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMCA0MEwyMjIgNDBWMEwwIDBMMCA0MFoiIGZpbGw9IndoaXRlIi8+CjwvbWFzaz4KPGcgbWFzaz0idXJsKCNtYXNrMSkiPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTI1IDMxSDI5TDI5IDExLjcxNDRIMjVMMjUgMzFaTTI1IDguMDg4NTFIMjlWNEwyNSA0VjguMDg4NTFaIiBmaWxsPSIjMDIwMzAzIi8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNNDcuNTM2NiAxNS4wODEyQzQ2LjM5MSAxNC42ODkgNDUuMDg3NSAxNC41MzE3IDQzLjc0NDIgMTQuNTMxN0M0MC4wNzA5IDE0LjUzMTcgMzcuNTAzNSAxNy4zOTY3IDM3LjUwMzUgMjEuNDc3OEMzNy41MDM1IDI1LjA0ODYgMzkuNjM2NSAyNy41MjEgNDIuNjc4MSAyNy41MjFDNDUuNTIxOSAyNy41MjEgNDcuNDk2OSAyNS41OTggNDcuNTM2NiAyMy42MzZWMTUuMDgxMlpNMzYuMjc4NiAzNC44MTk5QzM3LjUwMzUgMzUuODQwMyAzOS4zOTkxIDM2LjQ2ODMgNDEuNzI5NSAzNi40NjgzQzQ1LjE2NjUgMzYuNDY4MyA0Ny41MzY2IDM0LjE1MzIgNDcuNTM2NiAzMC44OTU3TDQ3LjUzNjYgMjcuNDgxNkM0Ni4yMzMgMjkuNjQwMSA0My44MjMyIDMxLjA5MjEgNDAuNzgxNyAzMS4wOTIxQzM2LjE5OTYgMzEuMDkyMSAzMyAyNy4xNjc2IDMzIDIxLjQ3NzhDMzMgMTUuMjM4MiAzNy43MDA1IDExIDQ0LjQ5NSAxMUM0Ny4xNDE4IDExIDQ5LjU5MDYgMTEuMzE0IDUyIDEyLjQ1MlYzMC44OTU3QzUyIDM2LjMxMTMgNDcuODEyOSA0MCA0MS43Mjk1IDQwQzM4LjQ5MSA0MCAzNS44NDQyIDM4Ljk0MDUgMzMuOTg3NSAzNy4xMzU3TDM2LjI3ODYgMzQuODE5OVoiIGZpbGw9IiMwMjAzMDMiLz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik02NS41MTIzIDIxLjQyOThDNjIuNDU2IDIxLjQyOTggNjAuMzU1IDIyLjkxNCA2MC4zNTUgMjQuODY3NEM2MC4zNTUgMjYuNDY4NyA2MS44NDUgMjcuNTYyMyA2My45MDc1IDI3LjU2MjNDNjYuNzM0OSAyNy41NjIzIDY4LjY0NSAyNS4wMjM0IDY4LjY0NSAyMS44NTkzQzY3LjYxMzUgMjEuNTQ3MSA2Ni42MjAxIDIxLjQyOTggNjUuNTEyMyAyMS40Mjk4Wk01Ni44NDAyIDEzLjc3MzNDNTguODI3MSAxMS45NzY1IDYxLjI3MiAxMSA2NC4zMjgzIDExQzY5LjQ4NTIgMTEgNzMgMTMuOTMgNzMgMTguMTQ4N1YzMC44MDQ4SDY4LjY0NVYyNy40MDZDNjcuNDIyMyAyOS41NTQ2IDY1LjI0NSAzMSA2Mi40MTc5IDMxQzU4LjYzNTggMzEgNTYgMjguNjU1OSA1NiAyNS4yNTc4QzU2IDIxLjQyOTggNTkuNjY3MyAxOC44MTI3IDY1LjAxNTQgMTguODEyN0M2Ni4yMzg0IDE4LjgxMjcgNjcuNDYwMyAxOC44OTA4IDY4LjY0NSAxOS4wNDcxVjE4LjM0MzlDNjguNjQ1IDE1Ljk2MDggNjYuOTYzOCAxNC41MTU1IDY0LjU5NTYgMTQuNTE1NUM2Mi42ODUyIDE0LjUxNTUgNjAuNTg0MyAxNC45MDY1IDU4Ljk3OTkgMTYuMDM5TDU2Ljg0MDIgMTMuNzczM1oiIGZpbGw9IiMwMjAzMDMiLz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik04NC4xMTggMzFDODEuMjYyNiAzMSA3OC44OTAyIDI5Ljk1MjEgNzcgMjguMTY1NEw3OS4zMzI0IDI1Ljg3MzlDODAuNDE4MSAyNi44ODM4IDgyLjA2NyAyNy41MDQ5IDg0LjA3NzYgMjcuNTA0OUM4NS44ODY5IDI3LjUwNDkgODcuNDE1MyAyNi40NTY3IDg3LjQxNTMgMjUuMDU4NEM4Ny40MTUzIDIxLjc1NzMgNzcuNDgzIDIzLjExNjMgNzcuNDgzIDE2LjgyNTNDNzcuNDgzIDEzLjMyOTggODAuNjk5OSAxMSA4NC41MTk4IDExQzg3LjQ5NTcgMTEgODkuNzA3NyAxMi4wNDgyIDkxLjQ3NzMgMTMuODM0OUw4OS4xMDQyIDE2LjE2NTFDODcuOTc4NCAxNS4xMTY2IDg2LjY5MTcgMTQuNTMzOCA4NC43NjE1IDE0LjUzMzhDODMuMTEyNyAxNC41MzM4IDgyLjA2NyAxNS40NjYgODIuMDY3IDE2LjYzMTJDODIuMDY3IDIwLjMyMDQgOTIgMTkuMDAwMSA5MiAyNC45NDJDOTIgMjguNTUzNSA4OC4yMTk3IDMxIDg0LjExOCAzMVoiIGZpbGw9IiNGMTk4MzQiLz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMDUgMjcuNDk4MUMxMDguMzMzIDI3LjQ5ODEgMTEwLjYzMiAyNC44MTM3IDExMC42MzIgMjEuMDAwNUMxMTAuNjMyIDE3LjE4NyAxMDguMzMzIDE0LjUwMjIgMTA1IDE0LjUwMjJDMTAxLjcwNSAxNC41MDIyIDk5LjM2NzggMTcuMTg3IDk5LjM2NzggMjEuMDAwNUM5OS4zNjc4IDI0LjgxMzcgMTAxLjcwNSAyNy40OTgxIDEwNSAyNy40OTgxWk0xMDUgMTFDMTEwLjkgMTEgMTE1IDE1LjA0NjcgMTE1IDIxLjAwMDVDMTE1IDI2Ljk1MzcgMTEwLjkgMzEgMTA1IDMxQzk5LjA2MDkgMzEgOTUgMjYuOTUzNyA5NSAyMS4wMDA1Qzk1IDE1LjA0NjcgOTkuMDYwOSAxMSAxMDUgMTFaIiBmaWxsPSIjRjE5ODM0Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTI0LjM1NyAyMi40NzkxQzEyNC4zNTcgMjUuNDM3NyAxMjYuMTUzIDI3LjQ0OTggMTI4LjcxNCAyNy40NDk4QzEzMS41OCAyNy40NDk4IDEzMy41NjcgMjQuNjA5NyAxMzMuNjgxIDIxLjY1MTFWMTFIMTM4VjMwLjcyNDNIMTMzLjY4MVYyNi42NjFDMTMyLjMwNSAyOS4yNjQ3IDEyOS44OTggMzEgMTI2Ljg3OSAzMUMxMjIuNzkgMzEgMTIwIDI3LjgwNSAxMjAgMjMuMTg5M1YxMUwxMjQuMzU3IDExVjIyLjQ3OTFaIiBmaWxsPSIjRjE5ODM0Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTU1IDE0LjgyNjVDMTUxLjEwNiAxNC44MjY1IDE0OC40MjIgMTcuODYzOSAxNDguMzA5IDIxLjA1OTRWMzFIMTQ0VjExLjI3NjRMMTQ4LjMwOSAxMS4yNzY0VjE2LjI4NjFDMTQ5LjUxOSAxMy4xNjk4IDE1MS45MzggMTEgMTU1IDExVjE0LjgyNjVaIiBmaWxsPSIjRjE5ODM0Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTc0IDI4LjE1OTlDMTcyLjI1OCAyOS45ODg1IDE2OS43NTkgMzEgMTY2LjgwNiAzMUMxNjEuMDEzIDMxIDE1NyAyNi45NTM3IDE1NyAyMS4wMDA1QzE1NyAxNS4wNDcxIDE2MS4wMTMgMTEgMTY2Ljg0NCAxMUMxNjkuNzU5IDExIDE3Mi4yMiAxMi4wNTA5IDE3NCAxMy44NDA4TDE3MS42OSAxNi4yNTMzQzE3MC43MDYgMTUuMTYzNiAxNjkuMDc4IDE0LjUwMjIgMTY3LjE0NyAxNC41MDIyQzE2My42NjMgMTQuNTAyMiAxNjEuMzE2IDE3LjE4NyAxNjEuMzE2IDIxLjAwMDVDMTYxLjMxNiAyNC44MTM3IDE2My42NjMgMjcuNDk4MSAxNjcuMTQ3IDI3LjQ5ODFDMTY5LjA3OCAyNy40OTgxIDE3MC43MDYgMjYuODM3MSAxNzEuNjkgMjUuNzQ3NEwxNzQgMjguMTU5OVoiIGZpbGw9IiNGMTk4MzQiLz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xOTAuNTI1IDE5LjM2NkMxOTAuNDg2IDE2LjQ4NjUgMTg4LjM2NiAxNC41NDEgMTg1LjYxOCAxNC41NDFDMTgyLjk0OCAxNC41NDEgMTgwLjk0NiAxNi40ODY1IDE4MC41MTUgMTkuMzY2TDE5MC41MjUgMTkuMzY2Wk0xODAuNDM2IDIyLjQwMDhDMTgwLjg2OCAyNS40NzQ4IDE4My4zNDEgMjcuNDk3OCAxODYuNzU2IDI3LjQ5NzhDMTg4Ljg3NiAyNy40OTc4IDE5MC42MDQgMjYuODM2NyAxOTEuNzAyIDI1Ljc0NzRDMTkyLjUyNyAyNi41MjU0IDE5My4zNTEgMjcuMzgxNiAxOTQuMTM3IDI4LjE5ODdDMTkyLjI1MiAzMC4wMjcyIDE4OS41ODMgMzEgMTg2LjQ4MSAzMUMxODAuMjc5IDMxIDE3NiAyNi45NTMzIDE3NiAyMS4wMDAyQzE3NiAxNS4wODU4IDE3OS44ODcgMTEgMTg1LjUzOSAxMUMxOTEuMTUzIDExIDE5NSAxNS4wODU4IDE5NSAyMS4wMDAyVjIyLjQwMDhMMTgwLjQzNiAyMi40MDA4WiIgZmlsbD0iI0YxOTgzNCIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTE5OCAxNkgyMDBWMTNIMTk4VjE2WiIgZmlsbD0iIzAyMDMwMyIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTIwNCAxNkgyMDZWNC41NzE2MkwyMDQgNC41NzE2MlYxNlpNMjA0IDIuNDIyNzNMMjA2IDIuNDIyNzNWMEwyMDQgMFYyLjQyMjczWiIgZmlsbD0iIzAyMDMwMyIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTIxNiAxMy44OTg3QzIxOCAxMy44OTg3IDIxOS4zNzkgMTIuMjg3OCAyMTkuMzc5IDEwLjAwMDJDMjE5LjM3OSA3LjcxMTg1IDIxOCA2LjEwMDkzIDIxNiA2LjEwMDkzQzIxNC4wMjMgNi4xMDA5MyAyMTIuNjIxIDcuNzExODUgMjEyLjYyMSAxMC4wMDAyQzIxMi42MjEgMTIuMjg3OCAyMTQuMDIzIDEzLjg5ODcgMjE2IDEzLjg5ODdaTTIxNiA0QzIxOS41NCA0IDIyMiA2LjQyNzgzIDIyMiAxMC4wMDAyQzIyMiAxMy41NzIyIDIxOS41NCAxNiAyMTYgMTZDMjEyLjQzNyAxNiAyMTAgMTMuNTcyMiAyMTAgMTAuMDAwMkMyMTAgNi40Mjc4MyAyMTIuNDM3IDQgMjE2IDRaIiBmaWxsPSIjMDIwMzAzIi8+CjwvZz4KPC9zdmc+Cg==",
+              "width": "100%",
+              "height": "100%",
+              "contain": true
+            }
+          }
+        },
+        {
+          "choice": "view",
+          "component": "VTag",
+          "content": {
+            "props": {
+              "html": "Enter your passcode to login",
+              "tag": "p",
+              "class": []
+            }
+          },
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "introduction-line"
+        },
+        {
+          "choice": "view",
+          "component": "PosLoginBtnLanguage",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "language-button",
+          "url": "plugins/pos-plugin/components/Login/PosLoginBtnLanguage.vue",
+          "path": "components/Login/PosLoginBtnLanguage.vue",
+          "pluginName": "pos-plugin",
+          "inject": [
+            {
+              "service": "PosStore:locale",
+              "local": "locale",
+              "type": "prop"
+            },
+            {
+              "service": "PosStore:changeLocale",
+              "local": "changeLocale",
+              "type": "event"
+            }
+          ]
+        },
+        {
+          "choice": "view",
+          "component": "StoreIdBtn",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "id-button",
+          "url": "plugins/pos-plugin/components/Login/StoreIdBtn.vue",
+          "path": "components/Login/StoreIdBtn.vue",
+          "pluginName": "pos-plugin"
+        },
+        {
+          "choice": "view",
+          "component": "ConnectionStatusBtn",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "connection-button",
+          "url": "plugins/pos-plugin/components/Login/ConnectionStatusBtn.vue",
+          "path": "components/Login/ConnectionStatusBtn.vue",
+          "pluginName": "pos-plugin"
+        }
+      ],
+      "slot": null
+    },
+    {
+      "choice": "view",
+      "component": "dialogLoginSupport",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "dialogLoginSupport",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "url": "plugins/pos-plugin/components/Login/dialogLoginSupport.vue",
+      "path": "components/Login/dialogLoginSupport.vue",
+      "pluginName": "pos-plugin"
+    }
+  ],
+  "name": "posLogin",
+  "props": {
+    "fields": []
+  },
+  "renderInIframe": false,
+  "renderToRoute": "pos-login"
+}

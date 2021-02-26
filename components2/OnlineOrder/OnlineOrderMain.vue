@@ -1,5 +1,5 @@
 <script>
-import { onBeforeMount } from 'vue'
+import { onBeforeMount, onActivated, nextTick } from 'vue'
 import { renderPendingOrdersFactory } from "./online-order-main-pending-orders-render";
 import { renderKitchenOrdersFactory, completeOrderDialogShow } from "./online-order-main-kitchen-orders-render";
 import {
@@ -11,6 +11,7 @@ import {
   genScopeId
 } from "../utils";
 import dialogCompleteOrder from "./helpers/dialogCompleteOrder";
+import { getCallSystemStatus } from '../Settings/CallSystem/call-system-logics';
 
 export default {
   components: {dialogCompleteOrder},
@@ -18,6 +19,9 @@ export default {
     onBeforeMount(async () => {
       await loadOrders()
     })
+
+    /*onCreated*/ getCallSystemStatus()
+    onActivated(() => getCallSystemStatus())
 
     const {
       renderPendingOrders

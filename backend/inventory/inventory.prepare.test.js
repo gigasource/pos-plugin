@@ -10,30 +10,39 @@ function genDate() {
 
 async function prepareInventoryDb(orm) {
 	const Inventory = orm('Inventory')
-	const InventoryCategory = orm('InventoryCategory')
-	const InventoryHistory = orm('InventoryHistory')
+	const Category = orm('Category')
+	const InventoryAction = orm('InventoryAction')
+	const Product = orm('Product')
 	await Inventory.remove({})
-	await InventoryCategory.remove({})
-	await InventoryHistory.remove({})
+	await Category.remove({})
+	await InventoryAction.remove({})
+	await Product.remove({})
+
+	const makeProduct = async function (product) {
+		product.appType = 'POS_RESTAURANT'
+		return await Product.create(product)
+	}
+
 	const makeCategory = async function (categoryName) {
-		return await InventoryCategory.create({
+		return await Category.create({
 			_id: new ObjectID(),
 			name: categoryName,
-			available: false
+			appType: 'POS_RESTAURANT'
 		})
 	}
 
 	const makeInventory = async function (inventory) {
 		const createdInventory = await Inventory.create({
 			_id: new ObjectID(),
-			...inventory
+			...inventory,
+			appType: 'POS_RESTAURANT',
 		})
-		await InventoryHistory.create({
+		await InventoryAction.create({
 			_id: new ObjectID(),
 			inventory: createdInventory._id,
-			category: createdInventory.category,
 			type: 'add',
 			amount: inventory.stock,
+			appType: 'POS_RESTAURANT',
 			date: inventory.lastUpdateTimestamp
 		})
 	}
@@ -42,13 +51,26 @@ async function prepareInventoryDb(orm) {
 	const fruitCategory = await makeCategory('Fruit')
 	const drinkCategory = await makeCategory('Drink')
 
+	const products = [
+		{id: '1', name: 'Fish', category: [foodCategory._id]},
+		{id: '2', name: 'Meat', category: [foodCategory._id]},
+		{id: '3', name: 'Pork', category: [foodCategory._id]},
+		{id: '4', name: 'Apple', category: [fruitCategory._id]},
+		{id: '5', name: 'Banana', category: [fruitCategory._id]},
+		{id: '6', name: 'Vodka', category: [drinkCategory._id]}
+	]
+
+	for (let i in products) {
+		products[i] = await makeProduct(products[i])
+	}
+
 	const inventories = [
-		{name: 'Fish', category: foodCategory._id, unit: 'kg', stock: 30, id: '1', lastUpdateTimestamp: genDate()},
-		{name: 'Meat', category: foodCategory._id, unit: 'kg', stock: 50, id: '2', lastUpdateTimestamp: genDate()},
-		{name: 'Pork', category: foodCategory._id, unit: 'kg', stock: 60.22, id: '3', lastUpdateTimestamp: genDate()},
-		{name: 'Apple', category: fruitCategory._id, unit: 'piece', stock: 100, id: '4', lastUpdateTimestamp: genDate()},
-		{name: 'Banana', category: fruitCategory._id, unit: 'piece', stock: 10, id: '5', lastUpdateTimestamp: genDate()},
-		{name: 'Vodka', category: drinkCategory._id, unit: 'l', stock: 5.5, id: '6', lastUpdateTimestamp: genDate()},
+		{productId: products[0]._id, unit: 'kg', stock: 30, id: '1', lastUpdateTimestamp: genDate()},
+		{productId: products[1]._id, unit: 'kg', stock: 50, id: '2', lastUpdateTimestamp: genDate()},
+		{productId: products[2]._id, unit: 'kg', stock: 60.22, id: '3', lastUpdateTimestamp: genDate()},
+		{productId: products[3]._id, unit: 'piece', stock: 100, id: '4', lastUpdateTimestamp: genDate()},
+		{productId: products[4]._id, unit: 'piece', stock: 10, id: '5', lastUpdateTimestamp: genDate()},
+		{productId: products[5]._id, unit: 'l', stock: 5.5, id: '6', lastUpdateTimestamp: genDate()},
 	]
 
 	for (let inventory of inventories) {

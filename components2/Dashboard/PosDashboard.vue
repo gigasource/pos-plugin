@@ -71,7 +71,7 @@ export default {
     };
 
     return () =>
-        <div class="row-flex">
+        <div class="row-flex" style="max-height: 100%">
           {sidebarRender()}
           <KeepAlive>
             {h(DashBoardViews[activeScreen.value])}

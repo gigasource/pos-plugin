@@ -1,4 +1,5 @@
 module.exports = async (cms) => {
+  const csConstants = require('./call-system-contants')
   const {checkModeActive, emitNewCall, cancelMissedCallTimeout} = require('./utils');
   const {CallMonitor} = require('fritz-callmonitor');
   let callMap = {};
@@ -6,9 +7,9 @@ module.exports = async (cms) => {
   let connectionStatus = '';
 
   cms.socket.on('connect', internalSocket => {
-    internalSocket.on('refresh-call-system-config', setupLocalFritzbox);
-    internalSocket.on('get-call-system-status', updateConnectionStatus);
-    internalSocket.on('cancel-missed-call-timeout', cancelMissedCallTimeout);
+    internalSocket.on(csConstants.RefreshCallSystemConfig, setupLocalFritzbox);
+    internalSocket.on(csConstants.GetCallSystemStatus, updateConnectionStatus);
+    internalSocket.on(csConstants.CancelMissedCallTimeout, cancelMissedCallTimeout);
   });
 
   async function updateConnectionStatus(cb, posSettings) {
@@ -16,7 +17,7 @@ module.exports = async (cms) => {
     const useLocalFritzbox = await checkModeActive('localhost-fritzbox', posSettings);
 
     if (cb && useLocalFritzbox) cb(connectionStatus);
-    else cms.socket.emit('update-call-system-status', useLocalFritzbox ? connectionStatus : null);
+    else cms.socket.emit(csConstants.UpdateCallSystemStatus, useLocalFritzbox ? connectionStatus : null);
   }
 
   await setupLocalFritzbox();

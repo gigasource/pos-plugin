@@ -1,5 +1,6 @@
 import {useI18n} from 'vue-i18n'
-import {$filters} from '../AppSharedStates'
+import { $filters } from '../AppSharedStates'
+import {appType, currentAppType} from '../AppType'
 import {useRouter} from 'vue-router'
 import {
 	checkBoxSelectedInventoryIDs,
@@ -12,7 +13,6 @@ import {
 	listIDs,
 	removeFilter,
 	clearFilter,
-	inventories,
 	filteredInventory,
 	filter,
 	isFiltered,
@@ -21,7 +21,7 @@ import {
 import {
 	deleteInventory
 } from "./inventory-logic-be";
-import { genScopeId } from '../utils';
+import { genScopeId } from '../utils'
 
 export function renderMainInventoryTable(props, { emit }) {
 	const router = useRouter()
@@ -36,32 +36,116 @@ export function renderMainInventoryTable(props, { emit }) {
 		router.push({ path: '/pos-inventory-stock' })
 	}
 	const removeInventory = async function () {
-		await deleteInventory(this.selectedInventoryIDs)
+		await deleteInventory(selectedInventoryIDs)
+	}
+	const getCategoryText = function (categoryList) {
+		return categoryList.reduce((result, category) => {
+			if (result.length) result += ', '
+			result += category.name
+			return result
+		}, '')
 	}
 
 	const { t } = useI18n()
+
+	const renderInventory = {
+		[appType.POS_RESTAURANT]: (inventory, i) => {
+			return (
+				<tr key={i}>
+					<td>
+						<g-checkbox v-model={checkBoxSelectedInventoryIDs.value} value={inventory._id}></g-checkbox>
+					</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.id}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.product.name}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{formatDate(inventory.lastUpdateTimestamp)}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{getCategoryText(inventory.product.category)}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.unit}</td>
+					<td onClick={() => openDialogStock(inventory)}>
+						<div className="row-flex justify-between">
+							{$filters.formatCurrency(inventory.stock)}
+							<g-icon size="18" color="#757575">edit</g-icon>
+						</div>
+					</td>
+				</tr>
+			)
+		},
+		[appType.POS_RETAIL]: (inventory, i) => {
+			return (
+				<tr key={i}>
+					<td>
+						<g-checkbox v-model={checkBoxSelectedInventoryIDs.value} value={inventory._id}></g-checkbox>
+					</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.product.id}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.product.name}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{$filters.formatCurrency(inventory.product.price)}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{getCategoryText(inventory.product.category)}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.product.costPrice}</td>
+					<td onClick={() => openDialogStock(inventory)}>
+						<div className="row-flex justify-between">
+							{$filters.formatCurrency(inventory.stock)}
+							<g-icon size="18" color="#757575">edit</g-icon>
+						</div>
+					</td>
+				</tr>
+			)
+		}
+	}
+
+	const renderTableTitle = {
+		[appType.POS_RESTAURANT]: () => {
+			return (
+				<thead>
+				<tr>
+					<th></th>
+					<th>ID</th>
+					<th>
+						{t('article.name')}<g-icon size="12">mdi-filter</g-icon>
+					</th>
+					<th>{t('inventory.lastUpdate')}</th>
+					<th>
+						{t('article.category')}
+						<g-icon size="12">
+							mdi-magnify
+						</g-icon>
+					</th>
+					<th>{t('inventory.unit')}</th>
+					<th>{t('inventory.stock')}</th>
+				</tr>
+				</thead>
+			)
+		},
+		[appType.POS_RETAIL]: () => {
+			return (
+				<thead>
+				<tr>
+					<th></th>
+					<th>Product ID</th>
+					<th>
+						{t('article.name')}<g-icon size="12">mdi-filter</g-icon>
+					</th>
+					<th>
+						{t('inventory.price')}
+						<g-icon size="12">mdi-filter</g-icon>
+					</th>
+					<th>
+						{t('article.category')}
+						<g-icon size="12">
+							mdi-magnify
+						</g-icon>
+					</th>
+					<th>{t('inventory.unitPrice')}</th>
+					<th>{t('inventory.stock')}</th>
+				</tr>
+				</thead>
+			)
+		}
+	}
+
 	const renderMainTable = () => (
 			<g-simple-table striped fixed-header style="flex: 1">
 				{genScopeId(() => (
 				    <>
-    					<thead>
-    					<tr>
-    						<th></th>
-    						<th>ID</th>
-    						<th>
-    							{t('article.name')}<g-icon size="12">mdi-filter</g-icon>
-    						</th>
-    						<th>{t('inventory.lastUpdate')}</th>
-    						<th>
-    							{t('article.category')}
-    							<g-icon size="12">
-    								mdi-magnify
-    							</g-icon>
-    						</th>
-    						<th>{t('inventory.unit')}</th>
-    						<th>{t('inventory.stock')}</th>
-    					</tr>
-    					</thead>
+							{renderTableTitle[currentAppType.value]()}
     					<tr>
     						<td class="bg-grey-lighten-1">
     							{
@@ -93,22 +177,7 @@ export function renderMainInventoryTable(props, { emit }) {
     						</td>
     					</tr>
     					{filteredInventory.value.map((inventory, i) =>
-    							<tr key={i}>
-    								<td>
-    									<g-checkbox v-model={checkBoxSelectedInventoryIDs.value} value={inventory._id}></g-checkbox>
-    								</td>
-    								<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.id}</td>
-    								<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.name}</td>
-    								<td onClick={() => openDialogInventory(inventory, 'edit')}>{formatDate(inventory.lastUpdateTimestamp)}</td>
-    								<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.category.name}</td>
-    								<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.unit}</td>
-    								<td onClick={() => openDialogStock(inventory)}>
-    									<div class="row-flex justify-between">
-    										{$filters.formatCurrency(inventory.stock)}
-    										<g-icon size="18" color="#757575">edit</g-icon>
-    									</div>
-    								</td>
-    							</tr>
+								renderInventory[currentAppType.value](inventory, i)
     					)}
     				</>
 				))()}
@@ -141,10 +210,6 @@ export function renderMainInventoryTable(props, { emit }) {
 					<g-btn disabled={checkBoxSelectedInventoryIDs.value.length === 0} uppercase={false} style="margin-right: 5px" onClick={removeInventory}>
 						<g-icon small style="margin-right: 5px">icon-inventory-delete</g-icon>
 						{t('ui.delete')}
-					</g-btn>
-					<g-btn disabled={checkBoxSelectedInventoryIDs.value.length !== 1} uppercase={false} style="margin-right: 5px" onClick={() => openDialogInventory('edit')}>
-						<g-icon small style="margin-right: 5px">icon-inventory-edit</g-icon>
-						{t('ui.edit')}
 					</g-btn>
 					<g-btn uppercase={false} background-color="#4CAF50" text-color="#FFF" onClick={() => openDialogInventory('add')}>
 						<span style="font-size: 14px !important">+ {t('inventory.newProduct')} </span>

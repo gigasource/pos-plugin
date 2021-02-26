@@ -53,7 +53,8 @@ import {
   quickBtnAction,
   returnItem,
   showIcon,
-  togglePayPrintBtn
+  togglePayPrintBtn, toggleRefundOrder,
+  makeActionList, makeRefundOrder
 } from "../pos-logic-be";
 import '../../AppSharedStates.js'
 import {mockProduct} from "./mock_product";
@@ -762,5 +763,41 @@ describe("pos-logic", function () {
     const orders = await orm('Order').find({});
     expect(orders).toMatchSnapshot();
     await delay(1000);
+  });
+
+  it('Case 17: refund order', async function () {
+    prepareOrder("10");
+    const order = getCurrentOrder();
+    await nextTick();
+    addProduct(order, mockProducts[0]);
+    await nextTick();
+    addProduct(order, mockProducts[1])
+    await nextTick()
+    //actionList.value.length = 0;
+    //expect(stringify(actionList.value)).toMatchSnapshot();
+    await makeActionList()
+    for (const action of _.cloneDeep(actionList.value)) {
+      await orm.execChain({name: action.modelName, chain: action.action}, true);
+    }
+    const _order = await orm("Order").findOne();
+    expect(stringify(_order)).toMatchSnapshot();
+    const refundOrder = makeRefundOrder(order)
+    changeItemQuantity(refundOrder, 0, 1)
+    await nextTick()
+    await toggleRefundOrder(refundOrder)
+    const _orderAfterRefund = await orm('Order').find()
+    expect(stringify(_orderAfterRefund)).toMatchSnapshot()
+  })
+
+  it("case 17a: refund order", async function() {
+    const order = createOrder();
+    addItem(order, mockProducts[0], 5);
+    await nextTick();
+    addItem(order, mockProducts[1], 10);
+    await nextTick();
+    const refundOrder = makeRefundOrder(order);
+    await nextTick();
+    expect(refundOrder._id).not.toEqual(order._id);
+    expect(stringify(refundOrder)).toMatchSnapshot();
   });
 });

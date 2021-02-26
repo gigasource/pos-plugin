@@ -2,7 +2,7 @@
 import { ref, onActivated, onDeactivated } from 'vue'
 import { useRouter } from 'vue-router'
 import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
-import DialogChangeStock from '../../components/Inventory/dialogChangeStock';
+import DialogChangeStock from './helpers/dialogChangeStock';
 import cms from 'cms'
 import _ from 'lodash';
 import { useI18n } from 'vue-i18n'

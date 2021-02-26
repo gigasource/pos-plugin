@@ -1,0 +1,264 @@
+{
+  "events": [],
+  "_id": "5e7c7bd62526c64008ced49f",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "GGridLayout",
+      "binding": [],
+      "slotScopeBinding": [],
+      "content": {
+        "props": {
+          "layout": {
+            "name": "app",
+            "top": -1,
+            "left": -1,
+            "width": 0,
+            "height": 0,
+            "margin": "",
+            "padding": "",
+            "bgColor": "hsl(116, 100%, 50%, 50%)",
+            "alignSelf": "",
+            "justifySelf": "",
+            "wrapInDiv": false,
+            "displayFlex": false,
+            "flexDirection": "row",
+            "flexWrap": false,
+            "flexJustifyContent": "",
+            "flexAlignItems": "",
+            "flexAlignContent": "",
+            "flexOrder": "",
+            "flexGrow": "",
+            "flexShrink": "",
+            "flexBasis": "",
+            "flexAlignSelf": "",
+            "alignItems": "",
+            "alignContent": "",
+            "justifyItems": "",
+            "justifyContent": "",
+            "columns": [
+              "256px",
+              "1fr"
+            ],
+            "rows": [
+              "100%"
+            ],
+            "columnGap": 0,
+            "rowGap": 0,
+            "subAreas": [
+              {
+                "name": "sidebar",
+                "top": 1,
+                "left": 1,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(291, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              },
+              {
+                "name": "content",
+                "top": 1,
+                "left": 2,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(19, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              }
+            ]
+          },
+          "style": {
+            "_code_": "module.exports = {\n  height: '100%'\n}",
+            "_code_type_": "commonJs"
+          }
+        }
+      },
+      "items": [
+        {
+          "choice": "view",
+          "component": "PosPrinterSettingSidebar",
+          "binding": [
+            {
+              "type": ".sync",
+              "root": "data.view",
+              "local": "view"
+            }
+          ],
+          "slotScopeBinding": [],
+          "slot": "sidebar",
+          "url": "plugins/pos-plugin/components/posPrinterSetting/PosPrinterSettingSidebar.vue",
+          "path": "components/posPrinterSetting/PosPrinterSettingSidebar.vue",
+          "pluginName": "pos-plugin"
+        },
+        {
+          "choice": "view",
+          "component": "ContentRender",
+          "binding": [
+            {
+              "type": ".sync",
+              "root": "data.view",
+              "local": "view"
+            }
+          ],
+          "slotScopeBinding": [],
+          "slot": "content",
+          "url": "plugins/pos-plugin/components/common/ContentRender.vue",
+          "path": "components/common/ContentRender.vue",
+          "pluginName": "pos-plugin",
+          "items": [
+            {
+              "choice": "view",
+              "component": "PosPrinterSetting",
+              "binding": [],
+              "slotScopeBinding": [
+                {
+                  "type": "prop",
+                  "slotScope": "id",
+                  "local": "id"
+                },
+                {
+                  "type": "prop",
+                  "slotScope": "name",
+                  "local": "name"
+                },
+                {
+                  "type": "prop",
+                  "slotScope": "type",
+                  "local": "type"
+                }
+              ],
+              "slot": "printer",
+              "url": "plugins/pos-plugin/components/posPrinterSetting/PosPrinterSetting.vue",
+              "path": "components/posPrinterSetting/PosPrinterSetting.vue",
+              "pluginName": "pos-plugin",
+              "isScopedSlot": true,
+              "inject": [
+                {
+                  "service": "SettingsStore:testPrinter",
+                  "local": "testPrinter",
+                  "type": "event"
+                }
+              ]
+            },
+            {
+              "choice": "view",
+              "component": "PosPrinterSettingForMultiple",
+              "binding": [],
+              "slotScopeBinding": [
+                {
+                  "type": "prop",
+                  "slotScope": "id",
+                  "local": "id"
+                },
+                {
+                  "type": "prop",
+                  "slotScope": "name",
+                  "local": "name"
+                },
+                {
+                  "type": "prop",
+                  "slotScope": "type",
+                  "local": "type"
+                }
+              ],
+              "slot": "multiple",
+              "url": "plugins/pos-plugin/components/posPrinterSetting/PosPrinterSettingForMultiple.vue",
+              "path": "components/posPrinterSetting/PosPrinterSettingForMultiple.vue",
+              "pluginName": "pos-plugin",
+              "isScopedSlot": true,
+              "inject": [
+                {
+                  "service": "SettingsStore:testPrinter",
+                  "local": "testPrinter",
+                  "type": "event"
+                }
+              ]
+            },
+            {
+              "choice": "view",
+              "component": "PosPrinterSettingGeneral",
+              "binding": [],
+              "slotScopeBinding": [],
+              "slot": "general",
+              "url": "plugins/pos-plugin/components/posPrinterSetting/PosPrinterSettingGeneral.vue",
+              "path": "components/posPrinterSetting/PosPrinterSettingGeneral.vue",
+              "pluginName": "pos-plugin",
+              "inject": [
+                {
+                  "service": "SettingsStore:setSinglePrinter",
+                  "local": "setSinglePrinter",
+                  "type": "event"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "choice": "view",
+      "component": "dialogConfirmDelete",
+      "content": {
+        "props": {
+          "type": " this category"
+        },
+        "events": {
+          "submit": {
+            "_code_": "module.exports = function() {\n  const selectedMenu = this.$getService('SettingsStore:selectedPrinterMenu')\n  this.$getService('SettingsStore:deleteGroupPrinter')(selectedMenu.id)\n}",
+            "_code_type_": "commonJs"
+          }
+        }
+      },
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "dialogConfirmDeletePrinterCategory",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      }
+    }
+  ],
+  "name": "posPrinterSetting",
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "pos-printer-setting",
+  "data": {
+    "_code_": "module.exports = {\n  data: {\n    view: null\n  }\n}",
+    "_code_type_": "commonJs"
+  }
+}

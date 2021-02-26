@@ -2,16 +2,30 @@
 import { nextTick } from 'vue'
 import {
 	loadInventories,
-	loadInventoryCategories,
 	updateInventory,
-	createInventory, deleteInventory, updateInventoryCategories
-} from "../inventory-logic-be";
-import _ from 'lodash'
-import { inventories, inventoryCategories } from "../inventory-logic-ui";
+	createInventory, deleteInventory, removeFromInventory
+} from '../inventory-logic-be';
+import { inventories, detailInventories } from "../inventory-logic-ui";
 import {
-	filteredInventoryHistories,
-	historyFilter
+	loadCategories,
+	loadProducts
+} from '../../Product/product-logic-be';
+import {
+	products,
+	categories
+} from '../../Product/product-logic';
+import {
+	createProduct
+} from '../../Product/product-logic-be';
+import {
+	filteredInventoryActions,
+	actionFilter
 } from '../inventory-ui-shared'
+import {
+	appType,
+	currentAppType
+} from '../../AppType'
+
 const {stringify} = require("schemahandler/utils");
 require("mockdate").set(new Date("2021-01-05").getTime());
 const moment = require('moment')
@@ -23,7 +37,7 @@ const delay = require('delay')
 jest.mock("cms", () => {
   process.env.USE_GLOBAL_ORM = true;
   const { cmsFactory } = require("../../../test-utils");
-  const _cms = cmsFactory("eodDom");
+  const _cms = cmsFactory("inventoryBe");
   global.cms = _cms;
   return {
     socket: _cms.feSocket,
@@ -39,18 +53,22 @@ let { orm } = cms;
 
 describe("Test inventory logic be", function() {
   beforeAll(async () => {
+  	currentAppType.value = appType.POS_RESTAURANT
     await cms.initDemoData();
     cms.triggerFeConnect();
   });
   beforeEach(async () => {
 	  await prepareInventoryDb(orm);
-	  await loadInventoryCategories();
+	  await loadCategories()
+	  await loadProducts()
 	  await loadInventories();
   })
   it("Case 1: Check load inventories", async () => {
     await nextTick()
     expect(stringify(inventories.value)).toMatchSnapshot();
-    expect(stringify(inventoryCategories.value)).toMatchSnapshot();
+	  expect(stringify(products.value)).toMatchSnapshot()
+	  expect(stringify(categories.value)).toMatchSnapshot()
+	  expect(stringify(detailInventories.value)).toMatchSnapshot()
   });
   it('Case 2: Update inventory', async () => {
   	await nextTick()
@@ -60,45 +78,33 @@ describe("Test inventory logic be", function() {
 		  	stock: 20
 		  }
 	  })
-	  historyFilter.value = {
+	  actionFilter.value = {
   		fromDate: moment('04.01.2021', 'DD.MM.YYYY').toDate(),
 			toDate: moment('06.01.2021', 'DD.MM.YYYY').toDate()
 		}
 		await nextTick()
 		await delay(50)
-	  expect(stringify(filteredInventoryHistories.value)).toMatchSnapshot()
-	  await updateInventory({
-		  ...inventories.value[1],
-		  ...{
-		  	name: 'Lamb',
-		  }
-	  })
-	  await updateInventory({
-		  ...inventories.value[2],
-		  ...{
-		  	category: inventoryCategories.value[1]
-		  }
-	  })
-	  await nextTick()
-	  expect(stringify(inventories.value)).toMatchSnapshot()
+	  expect(stringify(filteredInventoryActions.value)).toMatchSnapshot()
   })
 	it('Case 3: Create inventory', async () => {
 		let oldLength = inventories.value.length
+		const newProduct = await createProduct({id: '7', name: 'Whiskey', category: [categories.value[2]._id]})
 		await createInventory({
-			name: 'Whiskey',
-			category: inventoryCategories.value[2],
+			id: '7',
+			productId: newProduct._id,
 			unit: 'l',
 			stock: 20
 		})
 		await nextTick()
 		expect(stringify(inventories.value)).toMatchSnapshot()
+		expect(stringify(detailInventories.value)).toMatchSnapshot()
 		expect(inventories.value.length).toEqual(oldLength + 1)
 	})
 	it('Case 3a: Create inventory with duplicate id', async () => {
 		let oldLength = inventories.value.length
+		const newProduct = await createProduct({id: '7', name: 'Whiskey', category: [categories.value[2]._id]})
 		await createInventory({
-			name: 'Whiskey',
-			category: _.cloneDeep(inventoryCategories.value[2]),
+			productId: newProduct._id,
 			unit: 'l',
 			stock: 20,
 			id: '6'
@@ -115,44 +121,30 @@ describe("Test inventory logic be", function() {
 		])
 		await nextTick()
 		expect(stringify(inventories.value)).toMatchSnapshot()
+		expect(stringify(products.value)).toMatchSnapshot()
 		expect(inventories.value.length).toEqual(oldLength - 2)
 	})
-	it('Case 5: Update and delete category', async () => {
-		const addedCategory = [{
-			name: 'Cream',
-			available: true
-		}]
-		await updateInventoryCategories([...addedCategory, ...inventoryCategories.value])
+	it('Case 5: Create inventory with product', async () => {
+		await createInventory({
+			product: {id: '7', name: 'Whiskey', category: [categories.value[2]._id]},
+			unit: 'l',
+			stock: 20,
+			id: '7'
+		})
 		await nextTick()
-		expect(stringify(inventoryCategories.value)).toMatchSnapshot()
-		const oldValue = _.cloneDeep(inventoryCategories.value)
-		await loadInventoryCategories()
-		await nextTick()
-		expect(inventoryCategories.value.length).toEqual(oldValue.length)
-		expect(stringify(inventoryCategories.value)).toMatchSnapshot()
-		for (const category of inventoryCategories.value) {
-			const oldCategory = oldValue.find(_category => category._id.toString() === _category._id.toString())
-			expect(!!oldCategory).toBe(true)
-		}
+		expect(stringify(inventories.value)).toMatchSnapshot()
+		expect(stringify(products.value)).toMatchSnapshot()
 	})
-	it('Case 6: Update inventory with object id', async () => {
+	it('Case 5a: Create inventory with product', async () => {
 		await updateInventory({
-			...inventories.value[0],
-			...{
-				category: inventoryCategories.value[1]._id
+			...detailInventories.value[0],
+			product: {
+				...detailInventories.value[0].product,
+				name: 'Test item'
 			}
 		})
 		await nextTick()
 		expect(stringify(inventories.value)).toMatchSnapshot()
-		expect(stringify(inventoryCategories.value)).toMatchSnapshot()
-		await updateInventory({
-			...inventories.value[0],
-			...{
-				category: inventoryCategories.value[2]._id.toString()
-			}
-		})
-		await nextTick()
-		expect(stringify(inventories.value)).toMatchSnapshot()
-		expect(stringify(inventoryCategories.value)).toMatchSnapshot()
+		expect(stringify(products.value)).toMatchSnapshot()
 	})
 });

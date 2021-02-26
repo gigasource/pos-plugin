@@ -1,0 +1,1287 @@
+{
+  "events": [],
+  "_id": "5ddb55dde59d660c478cd7e7",
+  "items": [
+    {
+      "choice": "view",
+      "component": "GGridLayout",
+      "content": {
+        "props": {
+          "layout": {
+            "name": "app",
+            "top": -1,
+            "left": -1,
+            "width": 0,
+            "height": 0,
+            "margin": "",
+            "padding": "",
+            "bgColor": "hsl(53, 100%, 50%, 50%)",
+            "alignSelf": "",
+            "justifySelf": "",
+            "wrapInDiv": false,
+            "displayFlex": false,
+            "flexDirection": "row",
+            "flexWrap": false,
+            "flexJustifyContent": "",
+            "flexAlignItems": "",
+            "flexAlignContent": "",
+            "flexOrder": "",
+            "flexGrow": "",
+            "flexShrink": "",
+            "flexBasis": "",
+            "flexAlignSelf": "",
+            "alignItems": "",
+            "alignContent": "",
+            "justifyItems": "",
+            "justifyContent": "",
+            "columns": [
+              "100%"
+            ],
+            "rows": [
+              "100%"
+            ],
+            "columnGap": 0,
+            "rowGap": 0,
+            "subAreas": [
+              {
+                "name": "content",
+                "top": 1,
+                "left": 1,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(39, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": "",
+                "alignItems": "",
+                "alignContent": "",
+                "justifyItems": "",
+                "justifyContent": "",
+                "columns": [
+                  "1fr"
+                ],
+                "rows": [
+                  "1fr"
+                ],
+                "columnGap": 0,
+                "rowGap": 0,
+                "subAreas": [
+                  {
+                    "name": "buttons",
+                    "top": 1,
+                    "left": 1,
+                    "width": 1,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "24px",
+                    "bgColor": "hsl(141, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": "",
+                    "alignItems": "",
+                    "alignContent": "",
+                    "justifyItems": "",
+                    "justifyContent": "",
+                    "columns": [
+                      "1fr",
+                      "1fr",
+                      "1fr",
+                      "1fr",
+                      "1fr"
+                    ],
+                    "rows": [
+                      "1fr",
+                      "1px",
+                      "1fr",
+                      "1fr"
+                    ],
+                    "columnGap": 10,
+                    "rowGap": 40,
+                    "subAreas": [
+                      {
+                        "name": "line",
+                        "top": 2,
+                        "left": 1,
+                        "width": 5,
+                        "height": 1,
+                        "margin": "",
+                        "padding": "",
+                        "bgColor": "hsl(217, 100%, 50%, 50%)",
+                        "alignSelf": "",
+                        "justifySelf": "",
+                        "wrapInDiv": false,
+                        "displayFlex": false,
+                        "flexDirection": "row",
+                        "flexWrap": false,
+                        "flexJustifyContent": "",
+                        "flexAlignItems": "",
+                        "flexAlignContent": "",
+                        "flexOrder": "",
+                        "flexGrow": "",
+                        "flexShrink": "",
+                        "flexBasis": "",
+                        "flexAlignSelf": ""
+                      },
+                      {
+                        "name": "btn1",
+                        "top": 1,
+                        "left": 1,
+                        "width": 1,
+                        "height": 1,
+                        "margin": "",
+                        "padding": "",
+                        "bgColor": "hsl(100, 100%, 50%, 50%)",
+                        "alignSelf": "",
+                        "justifySelf": "",
+                        "wrapInDiv": false,
+                        "displayFlex": false,
+                        "flexDirection": "row",
+                        "flexWrap": false,
+                        "flexJustifyContent": "",
+                        "flexAlignItems": "",
+                        "flexAlignContent": "",
+                        "flexOrder": "",
+                        "flexGrow": "",
+                        "flexShrink": "",
+                        "flexBasis": "",
+                        "flexAlignSelf": ""
+                      },
+                      {
+                        "name": "btn2",
+                        "top": 1,
+                        "left": 2,
+                        "width": 1,
+                        "height": 1,
+                        "margin": "",
+                        "padding": "",
+                        "bgColor": "hsl(240, 100%, 50%, 50%)",
+                        "alignSelf": "",
+                        "justifySelf": "",
+                        "wrapInDiv": false,
+                        "displayFlex": false,
+                        "flexDirection": "row",
+                        "flexWrap": false,
+                        "flexJustifyContent": "",
+                        "flexAlignItems": "",
+                        "flexAlignContent": "",
+                        "flexOrder": "",
+                        "flexGrow": "",
+                        "flexShrink": "",
+                        "flexBasis": "",
+                        "flexAlignSelf": ""
+                      },
+                      {
+                        "name": "btn3",
+                        "top": 1,
+                        "left": 3,
+                        "width": 1,
+                        "height": 1,
+                        "margin": "",
+                        "padding": "",
+                        "bgColor": "hsl(25, 100%, 50%, 50%)",
+                        "alignSelf": "",
+                        "justifySelf": "",
+                        "wrapInDiv": false,
+                        "displayFlex": false,
+                        "flexDirection": "row",
+                        "flexWrap": false,
+                        "flexJustifyContent": "",
+                        "flexAlignItems": "",
+                        "flexAlignContent": "",
+                        "flexOrder": "",
+                        "flexGrow": "",
+                        "flexShrink": "",
+                        "flexBasis": "",
+                        "flexAlignSelf": ""
+                      },
+                      {
+                        "name": "btn5",
+                        "top": 3,
+                        "left": 1,
+                        "width": 1,
+                        "height": 1,
+                        "margin": "",
+                        "padding": "",
+                        "bgColor": "hsl(169, 100%, 50%, 50%)",
+                        "alignSelf": "",
+                        "justifySelf": "",
+                        "wrapInDiv": false,
+                        "displayFlex": false,
+                        "flexDirection": "row",
+                        "flexWrap": false,
+                        "flexJustifyContent": "",
+                        "flexAlignItems": "",
+                        "flexAlignContent": "",
+                        "flexOrder": "",
+                        "flexGrow": "",
+                        "flexShrink": "",
+                        "flexBasis": "",
+                        "flexAlignSelf": ""
+                      },
+                      {
+                        "name": "btn6",
+                        "top": 3,
+                        "left": 2,
+                        "width": 1,
+                        "height": 1,
+                        "margin": "",
+                        "padding": "",
+                        "bgColor": "hsl(190, 100%, 50%, 50%)",
+                        "alignSelf": "",
+                        "justifySelf": "",
+                        "wrapInDiv": false,
+                        "displayFlex": false,
+                        "flexDirection": "row",
+                        "flexWrap": false,
+                        "flexJustifyContent": "",
+                        "flexAlignItems": "",
+                        "flexAlignContent": "",
+                        "flexOrder": "",
+                        "flexGrow": "",
+                        "flexShrink": "",
+                        "flexBasis": "",
+                        "flexAlignSelf": ""
+                      },
+                      {
+                        "name": "btn7",
+                        "top": 3,
+                        "left": 3,
+                        "width": 1,
+                        "height": 1,
+                        "margin": "",
+                        "padding": "",
+                        "bgColor": "hsl(129, 100%, 50%, 50%)",
+                        "alignSelf": "",
+                        "justifySelf": "",
+                        "wrapInDiv": false,
+                        "displayFlex": false,
+                        "flexDirection": "row",
+                        "flexWrap": false,
+                        "flexJustifyContent": "",
+                        "flexAlignItems": "",
+                        "flexAlignContent": "",
+                        "flexOrder": "",
+                        "flexGrow": "",
+                        "flexShrink": "",
+                        "flexBasis": "",
+                        "flexAlignSelf": ""
+                      },
+                      {
+                        "name": "btn8",
+                        "top": 3,
+                        "left": 4,
+                        "width": 1,
+                        "height": 1,
+                        "margin": "",
+                        "padding": "",
+                        "bgColor": "hsl(326, 100%, 50%, 50%)",
+                        "alignSelf": "",
+                        "justifySelf": "",
+                        "wrapInDiv": false,
+                        "displayFlex": false,
+                        "flexDirection": "row",
+                        "flexWrap": false,
+                        "flexJustifyContent": "",
+                        "flexAlignItems": "",
+                        "flexAlignContent": "",
+                        "flexOrder": "",
+                        "flexGrow": "",
+                        "flexShrink": "",
+                        "flexBasis": "",
+                        "flexAlignSelf": ""
+                      },
+                      {
+                        "name": "btn4",
+                        "top": 1,
+                        "left": 4,
+                        "width": 1,
+                        "height": 1,
+                        "margin": "",
+                        "padding": "",
+                        "bgColor": "hsl(154, 100%, 50%, 50%)",
+                        "alignSelf": "",
+                        "justifySelf": "",
+                        "wrapInDiv": false,
+                        "displayFlex": false,
+                        "flexDirection": "row",
+                        "flexWrap": false,
+                        "flexJustifyContent": "",
+                        "flexAlignItems": "",
+                        "flexAlignContent": "",
+                        "flexOrder": "",
+                        "flexGrow": "",
+                        "flexShrink": "",
+                        "flexBasis": "",
+                        "flexAlignSelf": ""
+                      },
+                      {
+                        "name": "btn9",
+                        "top": 4,
+                        "left": 1,
+                        "width": 1,
+                        "height": 1,
+                        "margin": "",
+                        "padding": "",
+                        "bgColor": "hsl(8, 100%, 50%, 50%)",
+                        "alignSelf": "",
+                        "justifySelf": "",
+                        "wrapInDiv": false,
+                        "displayFlex": false,
+                        "flexDirection": "row",
+                        "flexWrap": false,
+                        "flexJustifyContent": "",
+                        "flexAlignItems": "",
+                        "flexAlignContent": "",
+                        "flexOrder": "",
+                        "flexGrow": "",
+                        "flexShrink": "",
+                        "flexBasis": "",
+                        "flexAlignSelf": ""
+                      },
+                      {
+                        "name": "btn10",
+                        "top": 4,
+                        "left": 2,
+                        "width": 1,
+                        "height": 1,
+                        "margin": "",
+                        "padding": "",
+                        "bgColor": "hsl(121, 100%, 50%, 50%)",
+                        "alignSelf": "",
+                        "justifySelf": "",
+                        "wrapInDiv": false,
+                        "displayFlex": false,
+                        "flexDirection": "row",
+                        "flexWrap": false,
+                        "flexJustifyContent": "",
+                        "flexAlignItems": "",
+                        "flexAlignContent": "",
+                        "flexOrder": "",
+                        "flexGrow": "",
+                        "flexShrink": "",
+                        "flexBasis": "",
+                        "flexAlignSelf": ""
+                      },
+                      {
+                        "name": "btn11",
+                        "top": 4,
+                        "left": 3,
+                        "width": 1,
+                        "height": 1,
+                        "margin": "",
+                        "padding": "",
+                        "bgColor": "hsl(180, 100%, 50%, 50%)",
+                        "alignSelf": "",
+                        "justifySelf": "",
+                        "wrapInDiv": false,
+                        "displayFlex": false,
+                        "flexDirection": "row",
+                        "flexWrap": false,
+                        "flexJustifyContent": "",
+                        "flexAlignItems": "",
+                        "flexAlignContent": "",
+                        "flexOrder": "",
+                        "flexGrow": "",
+                        "flexShrink": "",
+                        "flexBasis": "",
+                        "flexAlignSelf": ""
+                      },
+                      {
+                        "name": "btn12",
+                        "top": 4,
+                        "left": 4,
+                        "width": 1,
+                        "height": 1,
+                        "margin": "",
+                        "padding": "",
+                        "bgColor": "hsl(135, 100%, 50%, 50%)",
+                        "alignSelf": "",
+                        "justifySelf": "",
+                        "wrapInDiv": false,
+                        "displayFlex": false,
+                        "flexDirection": "row",
+                        "flexWrap": false,
+                        "flexJustifyContent": "",
+                        "flexAlignItems": "",
+                        "flexAlignContent": "",
+                        "flexOrder": "",
+                        "flexGrow": "",
+                        "flexShrink": "",
+                        "flexBasis": "",
+                        "flexAlignSelf": ""
+                      },
+                      {
+                        "name": "btn13",
+                        "top": 4,
+                        "left": 5,
+                        "width": 1,
+                        "height": 1,
+                        "margin": "",
+                        "padding": "",
+                        "bgColor": "hsl(274, 100%, 50%, 50%)",
+                        "alignSelf": "",
+                        "justifySelf": "",
+                        "wrapInDiv": false,
+                        "displayFlex": false,
+                        "flexDirection": "row",
+                        "flexWrap": false,
+                        "flexJustifyContent": "",
+                        "flexAlignItems": "",
+                        "flexAlignContent": "",
+                        "flexOrder": "",
+                        "flexGrow": "",
+                        "flexShrink": "",
+                        "flexBasis": "",
+                        "flexAlignSelf": ""
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "style": {
+            "width": "100%",
+            "height": "100vh",
+            "backgroundImage": "url('/plugins/pos-plugin/assets/out.png')"
+          },
+          "displayPreviewColor": null,
+          "passThrough": null
+        }
+      },
+      "binding": [],
+      "slotScopeBinding": [],
+      "items": [
+        {
+          "choice": "view",
+          "component": "GBtn",
+          "content": {
+            "props": {
+              "height": "100%",
+              "background-color": "white",
+              "text-color": "#424242",
+              "uppercase": false
+            },
+            "events": {
+              "click": {
+                "_code_": "module.exports = function () {\n  this.$router.push({path: `/pos-order-2`})\n}",
+                "_code_type_": "commonJs"
+              }
+            }
+          },
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "btn1",
+          "items": [
+            {
+              "choice": "view",
+              "component": "VTag",
+              "content": {
+                "props": {
+                  "tag": "div"
+                }
+              },
+              "binding": [],
+              "slotScopeBinding": [],
+              "items": [
+                {
+                  "choice": "view",
+                  "component": "GIcon",
+                  "content": {
+                    "props": {
+                      "html": "icon-fast-checkout",
+                      "svg": true,
+                      "size": 60
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": [],
+                  "clipboardType": "cut"
+                },
+                {
+                  "choice": "view",
+                  "component": "VTag",
+                  "content": {
+                    "props": {
+                      "html": "Fast Checkout",
+                      "tag": "div",
+                      "style": {
+                        "font-size": "16px",
+                        "letter-spacing": 0,
+                        "color": "#424242",
+                        "margin-top": "20px",
+                        "white-space": "pre-wrap"
+                      }
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": [],
+                  "key": "undefined_copy"
+                }
+              ],
+              "key": "undefined_copy"
+            }
+          ]
+        },
+        {
+          "choice": "view",
+          "component": "GBtn",
+          "content": {
+            "props": {
+              "height": "100%",
+              "background-color": "white",
+              "text-color": "#424242",
+              "uppercase": false
+            },
+            "events": {
+              "click": {
+                "_code_": "module.exports = function () {\n  // this.$router.push({path: `/pos-delivery`})\n}",
+                "_code_type_": "commonJs"
+              }
+            }
+          },
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "btn2",
+          "items": [
+            {
+              "choice": "view",
+              "component": "VTag",
+              "content": {
+                "props": {
+                  "tag": "div"
+                }
+              },
+              "binding": [],
+              "slotScopeBinding": [],
+              "items": [
+                {
+                  "choice": "view",
+                  "component": "GIcon",
+                  "content": {
+                    "props": {
+                      "html": "icon-delivery",
+                      "svg": true,
+                      "size": 60
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": [],
+                  "clipboardType": "cut"
+                },
+                {
+                  "choice": "view",
+                  "component": "VTag",
+                  "content": {
+                    "props": {
+                      "html": "Delivery",
+                      "tag": "div",
+                      "style": {
+                        "font-size": "16px",
+                        "letter-spacing": 0,
+                        "color": "#424242",
+                        "margin-top": "20px",
+                        "white-space": "pre-wrap"
+                      }
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": [],
+                  "key": "undefined_copy"
+                }
+              ],
+              "key": "undefined_copy"
+            }
+          ],
+          "key": "undefined_copy"
+        },
+        {
+          "choice": "view",
+          "component": "GBtn",
+          "content": {
+            "props": {
+              "height": "100%",
+              "background-color": "white",
+              "text-color": "#424242",
+              "uppercase": false
+            },
+            "events": {
+              "click": {
+                "_code_": "module.exports = function () {\n  this.$router.push({path: '/pos-staff-report'})\n}",
+                "_code_type_": "commonJs"
+              }
+            }
+          },
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "btn5",
+          "items": [
+            {
+              "choice": "view",
+              "component": "VTag",
+              "content": {
+                "props": {
+                  "tag": "div"
+                }
+              },
+              "binding": [],
+              "slotScopeBinding": [],
+              "items": [
+                {
+                  "choice": "view",
+                  "component": "GIcon",
+                  "content": {
+                    "props": {
+                      "html": "icon-staff-report",
+                      "svg": true,
+                      "size": 60
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": [],
+                  "clipboardType": "cut"
+                },
+                {
+                  "choice": "view",
+                  "component": "VTag",
+                  "content": {
+                    "props": {
+                      "html": "Staff Report",
+                      "tag": "div",
+                      "style": {
+                        "font-size": "16px",
+                        "letter-spacing": 0,
+                        "color": "#424242",
+                        "margin-top": "20px",
+                        "white-space": "pre-wrap"
+                      }
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": [],
+                  "key": "undefined_copy"
+                }
+              ],
+              "key": "undefined_copy"
+            }
+          ],
+          "key": "undefined_copy_copy_copy"
+        },
+        {
+          "choice": "view",
+          "component": "GBtn",
+          "content": {
+            "props": {
+              "height": "100%",
+              "background-color": "white",
+              "text-color": "#424242",
+              "uppercase": false
+            },
+            "events": {
+              "click": {
+                "_code_": "module.exports = function () {\n  this.$router.push({path: '/pos-settings'})\n}",
+                "_code_type_": "commonJs"
+              }
+            }
+          },
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "btn6",
+          "items": [
+            {
+              "choice": "view",
+              "component": "VTag",
+              "content": {
+                "props": {
+                  "tag": "div"
+                }
+              },
+              "binding": [],
+              "slotScopeBinding": [],
+              "items": [
+                {
+                  "choice": "view",
+                  "component": "GIcon",
+                  "content": {
+                    "props": {
+                      "html": "icon-dashboard",
+                      "svg": true,
+                      "size": 60
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": [],
+                  "clipboardType": "cut"
+                },
+                {
+                  "choice": "view",
+                  "component": "VTag",
+                  "content": {
+                    "props": {
+                      "html": "Settings",
+                      "tag": "div",
+                      "style": {
+                        "font-size": "16px",
+                        "letter-spacing": 0,
+                        "color": "#424242",
+                        "margin-top": "20px",
+                        "white-space": "pre-wrap"
+                      }
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": [],
+                  "key": "undefined_copy"
+                }
+              ],
+              "key": "undefined_copy"
+            }
+          ],
+          "key": "undefined_copy_copy_copy_copy"
+        },
+        {
+          "choice": "view",
+          "component": "GBtn",
+          "content": {
+            "props": {
+              "height": "100%",
+              "background-color": "white",
+              "text-color": "#424242",
+              "uppercase": false
+            },
+            "events": {
+              "click": {
+                "_code_": "module.exports = function () {\n  this.$router.push({path: `/pos-eod-report`})\n}",
+                "_code_type_": "commonJs"
+              }
+            }
+          },
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "btn7",
+          "items": [
+            {
+              "choice": "view",
+              "component": "VTag",
+              "content": {
+                "props": {
+                  "tag": "div"
+                }
+              },
+              "binding": [],
+              "slotScopeBinding": [],
+              "items": [
+                {
+                  "choice": "view",
+                  "component": "GIcon",
+                  "content": {
+                    "props": {
+                      "html": "icon-calendar",
+                      "svg": true,
+                      "size": 60
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": [],
+                  "clipboardType": "cut"
+                },
+                {
+                  "choice": "view",
+                  "component": "VTag",
+                  "content": {
+                    "props": {
+                      "html": "End Of Day",
+                      "tag": "div",
+                      "style": {
+                        "font-size": "16px",
+                        "letter-spacing": 0,
+                        "color": "#424242",
+                        "margin-top": "20px",
+                        "white-space": "pre-wrap"
+                      },
+                      "class": []
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": [],
+                  "key": "undefined_copy"
+                }
+              ],
+              "key": "undefined_copy"
+            }
+          ],
+          "key": "undefined_copy_copy_copy_copy_copy_copy"
+        },
+        {
+          "choice": "view",
+          "component": "GBtn",
+          "content": {
+            "props": {
+              "height": "100%",
+              "background-color": "white",
+              "text-color": "#424242",
+              "uppercase": false
+            },
+            "events": {
+              "click": {
+                "_code_": "module.exports = function () {\n  this.$router.push({path: `/pos-order-history`})\n}",
+                "_code_type_": "commonJs"
+              }
+            }
+          },
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "btn8",
+          "items": [
+            {
+              "choice": "view",
+              "component": "VTag",
+              "content": {
+                "props": {
+                  "tag": "div"
+                }
+              },
+              "binding": [],
+              "slotScopeBinding": [],
+              "items": [
+                {
+                  "choice": "view",
+                  "component": "GIcon",
+                  "content": {
+                    "props": {
+                      "html": "icon-history",
+                      "svg": true,
+                      "size": 60
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": [],
+                  "clipboardType": "cut"
+                },
+                {
+                  "choice": "view",
+                  "component": "VTag",
+                  "content": {
+                    "props": {
+                      "html": "Order History",
+                      "tag": "div",
+                      "style": {
+                        "font-size": "16px",
+                        "letter-spacing": 0,
+                        "color": "#424242",
+                        "margin-top": "20px",
+                        "white-space": "pre-wrap"
+                      },
+                      "class": []
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": [],
+                  "key": "undefined_copy"
+                }
+              ],
+              "key": "undefined_copy"
+            }
+          ],
+          "key": "undefined_copy_copy_copy_copy_copy"
+        },
+        {
+          "choice": "view",
+          "component": "GBtn",
+          "content": {
+            "props": {
+              "height": "100%",
+              "background-color": "white",
+              "text-color": "#424242",
+              "uppercase": false
+            },
+            "events": {
+              "click": {
+                "_code_": "module.exports = function () {\n  this.$router.push({path: `/pos-month-report`})\n}",
+                "_code_type_": "commonJs"
+              }
+            }
+          },
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "btn9",
+          "items": [
+            {
+              "choice": "view",
+              "component": "VTag",
+              "content": {
+                "props": {
+                  "tag": "div"
+                }
+              },
+              "binding": [],
+              "slotScopeBinding": [],
+              "items": [
+                {
+                  "choice": "view",
+                  "component": "GIcon",
+                  "content": {
+                    "props": {
+                      "html": "icon-month_report",
+                      "svg": true,
+                      "size": 60
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": [],
+                  "clipboardType": "cut"
+                },
+                {
+                  "choice": "view",
+                  "component": "VTag",
+                  "content": {
+                    "props": {
+                      "html": "Month",
+                      "tag": "div",
+                      "style": {
+                        "font-size": "16px",
+                        "letter-spacing": 0,
+                        "color": "#424242",
+                        "margin-top": "20px",
+                        "white-space": "pre-wrap"
+                      },
+                      "class": []
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": [],
+                  "key": "undefined_copy"
+                }
+              ],
+              "key": "undefined_copy"
+            }
+          ],
+          "key": "undefined_copy_copy_copy_copy_copy_copy",
+          "clipboardType": "cut"
+        },
+        {
+          "choice": "view",
+          "component": "GBtn",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "btn10",
+          "items": [
+            {
+              "choice": "view",
+              "component": "VTag",
+              "binding": [],
+              "slotScopeBinding": [],
+              "items": [
+                {
+                  "choice": "view",
+                  "component": "GIcon",
+                  "content": {
+                    "props": {
+                      "html": "icon-support-2",
+                      "svg": true,
+                      "size": 60
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": [],
+                  "items": []
+                },
+                {
+                  "choice": "view",
+                  "component": "VTag",
+                  "content": {
+                    "props": {
+                      "html": "Support",
+                      "tag": "div",
+                      "style": {
+                        "fontSize": "16px",
+                        "letterSpacing": "0px",
+                        "color": "rgb(66, 66, 66)",
+                        "marginTop": "20px",
+                        "whiteSpace": "pre-wrap"
+                      }
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": []
+                }
+              ],
+              "content": {
+                "props": {
+                  "tag": "div"
+                }
+              }
+            }
+          ],
+          "content": {
+            "props": {
+              "background-color": "white",
+              "text-color": "#424242",
+              "height": "100%",
+              "uppercase": null
+            },
+            "events": {
+              "click": {
+                "_code_": "module.exports = function () {\n  //this.$router.push({path: `/pos-support`})\n}",
+                "_code_type_": "commonJs"
+              }
+            }
+          }
+        },
+        {
+          "choice": "view",
+          "component": "GBtn",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "btn11",
+          "items": [
+            {
+              "choice": "view",
+              "component": "VTag",
+              "content": {
+                "props": {
+                  "tag": "div"
+                }
+              },
+              "binding": [],
+              "slotScopeBinding": [],
+              "items": [
+                {
+                  "choice": "view",
+                  "component": "GIcon",
+                  "content": {
+                    "props": {
+                      "html": "icon-edit-table-plan",
+                      "svg": true,
+                      "size": 60
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": []
+                },
+                {
+                  "choice": "view",
+                  "component": "VTag",
+                  "content": {
+                    "props": {
+                      "html": "Edit Table Plan",
+                      "tag": "div",
+                      "style": {
+                        "fontSize": "16px",
+                        "letterSpacing": "0px",
+                        "color": "rgb(66, 66, 66)",
+                        "marginTop": "20px",
+                        "whiteSpace": "pre-wrap"
+                      }
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": []
+                }
+              ]
+            }
+          ],
+          "content": {
+            "props": {
+              "background-color": "white",
+              "text-color": "#424242",
+              "height": "100%",
+              "uppercase": null
+            },
+            "events": {
+              "click": {
+                "_code_": "module.exports = function () {\n  this.$router.push({path: `/pos-edit-table-plan`})\n}",
+                "_code_type_": "commonJs"
+              }
+            }
+          }
+        },
+        {
+          "choice": "view",
+          "component": "GBtn",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "btn12",
+          "items": [
+            {
+              "choice": "view",
+              "component": "VTag",
+              "content": {
+                "props": {
+                  "tag": "div"
+                }
+              },
+              "binding": [],
+              "slotScopeBinding": [],
+              "items": [
+                {
+                  "choice": "view",
+                  "component": "GIcon",
+                  "content": {
+                    "props": {
+                      "html": "icon-edit-menu-card",
+                      "svg": true,
+                      "size": 60
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": []
+                },
+                {
+                  "choice": "view",
+                  "component": "VTag",
+                  "content": {
+                    "props": {
+                      "html": "Edit Menu Card",
+                      "tag": "div",
+                      "style": {
+                        "fontSize": "16px",
+                        "letterSpacing": "0px",
+                        "color": "rgb(66, 66, 66)",
+                        "marginTop": "20px",
+                        "whiteSpace": "pre-wrap"
+                      }
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": []
+                }
+              ]
+            }
+          ],
+          "content": {
+            "props": {
+              "background-color": "white",
+              "text-color": "#424242",
+              "height": "100%",
+              "uppercase": null
+            },
+            "events": {
+              "click": {
+                "_code_": "module.exports = function () {\n  this.$router.push({path: `/pos-edit-menu-card`})\n}",
+                "_code_type_": "commonJs"
+              }
+            }
+          }
+        },
+        {
+          "choice": "view",
+          "component": "GBtn",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "btn13",
+          "items": [
+            {
+              "choice": "view",
+              "component": "VTag",
+              "content": {
+                "props": {
+                  "tag": "div"
+                }
+              },
+              "binding": [],
+              "slotScopeBinding": [],
+              "items": [
+                {
+                  "choice": "view",
+                  "component": "GIcon",
+                  "content": {
+                    "props": {
+                      "html": "icon-printer-setting",
+                      "svg": true,
+                      "size": 60
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": []
+                },
+                {
+                  "choice": "view",
+                  "component": "VTag",
+                  "content": {
+                    "props": {
+                      "html": "Printer Setting",
+                      "tag": "div",
+                      "style": {
+                        "fontSize": "16px",
+                        "letterSpacing": "0px",
+                        "color": "rgb(66, 66, 66)",
+                        "marginTop": "20px",
+                        "whiteSpace": "pre-wrap"
+                      }
+                    }
+                  },
+                  "binding": [],
+                  "slotScopeBinding": []
+                }
+              ]
+            }
+          ],
+          "content": {
+            "props": {
+              "background-color": "white",
+              "text-color": "#424242",
+              "height": "100%",
+              "uppercase": null
+            },
+            "events": {
+              "click": {
+                "_code_": "module.exports = function () {\n  this.$router.push({path: `/pos-printer-setting`})\n}",
+                "_code_type_": "commonJs"
+              }
+            }
+          },
+          "key": "undefined_copy",
+          "clipboardType": "cut"
+        },
+        {
+          "choice": "view",
+          "component": "VTag",
+          "content": {
+            "props": {
+              "tag": "div",
+              "style": {
+                "backgroundColor": "#E0E0E0"
+              }
+            }
+          },
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "line"
+        }
+      ]
+    }
+  ],
+  "props": {
+    "fields": []
+  },
+  "name": "posFunctions",
+  "isProduction": true,
+  "renderToRoute": "pos-functions",
+  "renderInIframe": null,
+  "registerAsVueComponent": true
+}
