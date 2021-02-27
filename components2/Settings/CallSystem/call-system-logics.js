@@ -101,7 +101,6 @@ export function changeIp(value) {
 }
 
 export function initCallSystem() {
-  console.log('initCallSystem')
   cms.socket.emit(csConstants.Init)
 }
 

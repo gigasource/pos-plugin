@@ -192,11 +192,6 @@ module.exports = async (cms) => {
 
     // init call-system each time app run
     clientSocket.on(csConstants.Init, async () => {
-      console.log('initCallSystem')
-      if (initialized) {
-        console.log('Call system has been init. skip.')
-        return;
-      }
       const callConfig = await getCallConfig()
       currentMode = callConfig.mode;
       selectedDevicePath = callConfig.ipAddresses[currentMode];
