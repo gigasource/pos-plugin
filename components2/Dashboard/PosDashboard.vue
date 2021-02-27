@@ -25,7 +25,7 @@ export default {
   setup() {
     fetchRooms().then(() => {
       //auto select first room
-      roomsStates.value.length && (selectingRoomId.value = roomsStates.value[0].room._id.toString())
+      // roomsStates.value.length && (selectingRoomId.value = roomsStates.value[0].room._id.toString())
     })
 
     appHooks.emit('orderChange')
