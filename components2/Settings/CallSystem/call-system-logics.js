@@ -17,15 +17,10 @@ export const callSystemModes = [
   CALL_SYSTEM_MODES.MODEM_ROBOTIC,
   CALL_SYSTEM_MODES.MODEM_ARTECH,
 ]
-export const currentCallSystemMode = ref(CALL_SYSTEM_MODES.OFF)
 export const modemDeviceConnected = ref(false) // true / false
-export const callSystemStatus = ref('') // connected | ...
+export const callSystemStatus = ref({}) // connected | ...
 
-// allow the user to change ip address fritxbox
-export const ipAddresses = ref({})
-export const dialog = ref({
-  ip: false,
-})
+// allow the user to change ip address fritzbox
 export const callSystemIpText = computed(() => {
   switch (currentCallSystemMode.value) {
     case CALL_SYSTEM_MODES.FRITZBOX.value:
@@ -36,18 +31,54 @@ export const callSystemIpText = computed(() => {
       return '';
   }
 })
-
-export const lastSavedConfig = ref(null)
+// store current config for multiple modes, with or without saved
+export const ipAddresses = ref({})
+export const dialog = ref({ ip: false })
 
 // cache usb devices
 export const usbDevices = ref([])
-export const selectedSerialDevice = ref('')
+export const filteredUsbDevices = computed(() => {
+  switch(currentCallSystemMode.value) {
+    case CALL_SYSTEM_MODES.MODEM_ARTECH.value:
+      return usbDevices.value.filter(usbDevice => usbDevice.manufactureName === 'ARTECH')
+      break;
+    case CALL_SYSTEM_MODES.MODEM_ROBOTIC.value:
+      return usbDevices.value.filter(usbDevice => usbDevice.manufactureName !== 'ARTECH') // TODO: More correct
+      break;
+    default:
+      return [];
+  }
+
+})
+
+// cache
+export const lastSavedConfig = ref(null)
 
 // change ??
+export const currentCallSystemMode = ref(CALL_SYSTEM_MODES.OFF)
+watch(() => currentCallSystemMode.value, (newMode) => {
+  switch(newMode) {
+    case CALL_SYSTEM_MODES.OFF.value:
+      ipAddresses.value[newMode] = '';
+      break;
+    case CALL_SYSTEM_MODES.DEMO.value:
+      ipAddresses.value[newMode] = ipAddresses.value[newMode] /*changed value*/ || 'https://fritzbox-proxy-10000.gigasource.io' /*default value*/;
+      break;
+    case CALL_SYSTEM_MODES.FRITZBOX.value:
+      ipAddresses.value[newMode] = ipAddresses.value[newMode] /*changed value*/ || '192.168.178.1:1012' /*default value*/;
+      break;
+    case CALL_SYSTEM_MODES.MODEM_ROBOTIC.value:
+    case CALL_SYSTEM_MODES.MODEM_ARTECH.value:
+      getUsbDevicesForCurrentMode()
+      break;
+  }
+})
+
 export const callSystemConfigChanged = computed(() => {
-  return !(lastSavedConfig.value
-    && lastSavedConfig.value.mode === currentCallSystemMode.value
-    && lastSavedConfig.value.ipAddresses[currentCallSystemMode.value] === ipAddresses.value[currentCallSystemMode.value])
+  if (!lastSavedConfig.value)
+    return false
+  const { mode, ipAddresses: ipAddrs } = lastSavedConfig.value
+  return mode !== currentCallSystemMode.value || ipAddrs[mode] !==  ipAddresses.value[mode]
 })
 export const changeNotSavedWarningMessage = computed(() => {
   return callSystemConfigChanged.value ? ' Change was not saved, press "Save" to apply new changes' : ''
@@ -64,45 +95,10 @@ export async function loadData() {
 
   getUsbDevicesForCurrentMode()
 }
-export async function update() {
-  console.log('update')
-  const configChanged = callSystemConfigChanged.value;
-  const call = {
-    ipAddresses: ipAddresses.value,
-    mode: currentCallSystemMode.value,
-  }
-  await cms.getModel('PosSetting').findOneAndUpdate({}, { call })
-  await loadData()
-  if (configChanged)
-    cms.socket.emit(csConstants.RefreshCallSystemConfig)
-}
+
 export function changeIp(value) {
   ipAddresses.value[currentCallSystemMode.value] = value
 }
-
-watch(() => currentCallSystemMode.value, (newValue) => {
-  let defaultValue = null;
-  switch(newValue) {
-    case CALL_SYSTEM_MODES.OFF.value:
-      defaultValue = null;
-      break;
-    case CALL_SYSTEM_MODES.DEMO.value:
-      defaultValue = 'https://fritzbox-proxy-10000.gigasource.io';
-      break;
-    case CALL_SYSTEM_MODES.FRITZBOX.value:
-      defaultValue = '192.168.178.1:1012';
-      break;
-    case CALL_SYSTEM_MODES.MODEM_ROBOTIC.value:
-    case CALL_SYSTEM_MODES.MODEM_ARTECH.value:
-      getUsbDevicesForCurrentMode()
-      break;
-  }
-
-  if (defaultValue === null)
-    return;
-
-  ipAddresses[newValue] = ipAddresses[newValue] || defaultValue;
-})
 
 export function initCallSystem() {
   console.log('initCallSystem')
@@ -110,12 +106,13 @@ export function initCallSystem() {
 }
 
 export function switchMode() {
-  cms.socket.emit(csConstants.SwitchMode, {
-    mode: currentCallSystemMode.value,
-    devicePath: selectedSerialDevice.value
-  })
+  const mode = currentCallSystemMode.value
+  const devicePath = ipAddresses.value[mode]
+  console.log('switchMode', mode, devicePath)
+  cms.socket.emit(csConstants.SwitchMode, { mode, devicePath })
 }
 cms.socket.on(csConstants.SwitchModeResponse, call => {
+  console.log('SwitchModeResponse', call)
   lastSavedConfig.value = cloneDeep(call)
 })
 
@@ -134,17 +131,15 @@ cms.socket.on(csConstants.GetUsbDevicesResponse, payload => {
   usbDevices.value = devices.map(({devicePath, deviceManufacturerName, deviceProductName}) => {
     return {
       text: `${devicePath} - ${deviceProductName} - ${deviceManufacturerName}`,
-      value: devicePath
+      value: devicePath,
+      productName: deviceProductName,
+      manufactureName: deviceManufacturerName
     }
   })
-
-  selectedSerialDevice.value = ipAddresses.value[mode]
-      ? ipAddresses.value[mode]
-      : (usbDevices.value.length > 0 ? usbDevices.value[0].value : '');
 })
 
 cms.socket.on(csConstants.ConnectionStatusChange, payload => {
-  const { status } = payload
-  callSystemStatus.value = status
+  const { status, mode } = payload
+  callSystemStatus.value[mode] = status
   modemDeviceConnected.value = typeof(status) === 'string' && status.toLowerCase() === 'connected'
 })

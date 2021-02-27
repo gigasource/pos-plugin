@@ -155,10 +155,10 @@ module.exports = async (cms) => {
     if (!status || !devicePath || devicePath !== selectedDevicePath)
       return;
     connectionStatus = status;
-    notifyConnectionStatusToFrontend();
+    notifyConnectionStatusToFrontend(mode);
   }
-  function notifyConnectionStatusToFrontend() {
-    cms.socket.emit(csConstants.ConnectionStatusChange, { status: connectionStatus })
+  function notifyConnectionStatusToFrontend(mode) {
+    cms.socket.emit(csConstants.ConnectionStatusChange, { status: connectionStatus, mode })
   }
 
   // switch call system
