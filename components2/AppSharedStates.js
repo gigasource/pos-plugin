@@ -49,7 +49,8 @@ export let isMobile = ref(mobileCheck());
 export const isIOS = navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPod') || navigator.userAgent.includes('iPad')
 
 export const online = ref(true)
-
+window.addEventListener('online', () => online.value = true)
+window.addEventListener('offline', () => online.value = false);
 export const webShopConnected = ref(true)
 appHooks.on('updateWebShopConnectionStatus', () => {
   cms.socket.emit('socketConnected', value => {

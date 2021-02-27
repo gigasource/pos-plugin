@@ -35,6 +35,7 @@ export default {
     async function changeLocale(_locale) {
       await appHooks.emit('changeLocale', _locale)
       i18nLocale.value = _locale
+      router.go()
     }
 
     async function onLogin() {
