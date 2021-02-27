@@ -11,16 +11,18 @@ import {
   genScopeId
 } from "../utils";
 import dialogCompleteOrder from "./helpers/dialogCompleteOrder";
+import NewReservationDialog from '../Reservation/NewReservationDialog';
 
 export default {
-  components: {dialogCompleteOrder},
+  components: {dialogCompleteOrder, NewReservationDialog},
   setup() {
     onBeforeMount(async () => {
       await loadOrders()
     })
 
     const {
-      renderPendingOrders
+      renderPendingOrders,
+      renderReservationDialog
     } = renderPendingOrdersFactory()
     const {
       renderKitchenOdrers
@@ -30,6 +32,7 @@ export default {
       <div class="main">
         {renderPendingOrders()}
         {renderKitchenOdrers()}
+        {renderReservationDialog()}
         <dialog-complete-order v-model={completeOrderDialogShow.value} onCompleteorder={completeOrder} onDeclineorder={declineOrder}></dialog-complete-order>
         <dialog-text-filter label="Reason"></dialog-text-filter>
       </div>
