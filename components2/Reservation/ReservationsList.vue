@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { formatDate, genScopeId } from '../utils';
 import dayjs from 'dayjs';
 import _ from 'lodash'
-import NewReservationDialog from './NewReservationDialog2';
+import NewReservationDialog from './NewReservationDialog';
 import { selectedReservation, showReservationDialog, reservationDialogEditMode } from './reservation-shared'
 
 import {
@@ -20,7 +20,7 @@ import {
 import cms from 'cms';
 
 export default {
-  name: 'ReservationLists2',
+  name: 'ReservationLists',
   components: {NewReservationDialog},
   setup() {
     const { t } = useI18n()

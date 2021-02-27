@@ -12,13 +12,15 @@ import DashboardSidebarFactory from './DashboardSidebar/DashboardSidebarItems';
 import PosOrderManualTable from '../TablePlan/BasicRoom/ManualTable/PosOrderManualTable';
 import PosDashboardFunction from './DashboardFunctions/PosDashboardFunction';
 import VirtualPrinterView from '../VirtualPrinter/VirtualPrinterView';
+import ReservationsList from '../Reservation/ReservationsList';
 
 export default {
   name: 'Dashboard',
   components: {
     VirtualPrinterView,
     OnlineOrderList,
-    OnlineOrderMain, PosDashboardFunction, RestaurantRoom, EditableRoom, PosDashboardSidebar, PosOrderManualTable
+    OnlineOrderMain, PosDashboardFunction, RestaurantRoom, EditableRoom, PosDashboardSidebar, PosOrderManualTable,
+    ReservationsList
   },
   setup() {
     fetchRooms().then(() => {
@@ -59,6 +61,7 @@ export default {
     const OnlineOrderMainView = <OnlineOrderMain/>
     const OnlineOrderListDeclinedView = <OnlineOrderList status="declined"/>
     const OnlineOrderListCompletedView = <OnlineOrderList status="completed"/>
+    const ReservationView = <ReservationsList/>
     const VirtualPrinter = <VirtualPrinterView/>
     const DashBoardViews = {
       KeptAliveRoomViews,
@@ -67,6 +70,7 @@ export default {
       OnlineOrderMainView,
       OnlineOrderListDeclinedView,
       OnlineOrderListCompletedView,
+      ReservationView,
       VirtualPrinter
     };
 

@@ -78,7 +78,9 @@ const DashboardSidebarFactory = () => {
         icon: 'icon-reservation',
         title: t('sidebar.reservation'),
         feature: 'reservation',
-        key: 'Reservation'
+        onClick() {
+          dashboardHooks.emit('updateScreen', 'ReservationView')
+        }
       },
       {
         icon: 'icon-functions',
