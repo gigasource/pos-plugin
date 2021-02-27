@@ -134,6 +134,7 @@ export const loadPopupModifierGroups = async () => {
   popupModifierGroups.value = await cms.getModel('PosModifierGroup').find()
 }
 export async function changePopupModifierGroup(group) {
+  selectedProduct.value.activePopupModifierGroup = group && group._id
   return await updateProduct({ activePopupModifierGroup: group && group._id })
 }
 export const addPopupModifierGroup = (toggleSelect, item) => {
