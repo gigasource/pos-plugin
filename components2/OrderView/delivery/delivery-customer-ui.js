@@ -11,6 +11,7 @@ import _ from "lodash";
 import {v4 as uuidv4} from "uuid";
 import cms from 'cms';
 import {addProduct} from "../pos-logic-be";
+import { execGenScopeId } from '../../utils';
 
 // TODO: split customerUiRender function into ->
 //  1. render selected customer
@@ -351,7 +352,7 @@ export function deliveryCustomerUiFactory() {
     return (
         <g-menu v-model={menuMissed.value} top left nudge-top="5"
                 v-slots={{
-                  default: () => (
+                  default: () => execGenScopeId(() =>
                       <div class="menu-missed">
                         {missedCalls.value.map((call, i) => (
                             <div class="menu-missed__call" key={`missed_${i}`}>
@@ -377,9 +378,8 @@ export function deliveryCustomerUiFactory() {
                         ))}
                       </div>
                   ),
-                  activator: ({ on }) => (
-                      <div onClick={on.click}
-                           class={['delivery-info__call--missed', menuMissed.value && 'delivery-info__call--missed--selected']}>
+                  activator: ({ on }) => execGenScopeId(() =>
+                      <div onClick={on.click} class={['delivery-info__call--missed', menuMissed.value && 'delivery-info__call--missed--selected']}>
                         <b>Missed</b>
                         <div class="delivery-info__call--missed-num">
                           {missedCalls.value.length}
