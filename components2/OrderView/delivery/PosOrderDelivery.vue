@@ -677,7 +677,6 @@ export default {
         border: 1px solid #FF4452;
         color: #FF4452;
         border-radius: 4px;
-        height: 46px;
         padding: 4px;
 
         &--selected {
