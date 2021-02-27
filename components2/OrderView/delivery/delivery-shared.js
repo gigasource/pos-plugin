@@ -1,6 +1,6 @@
 import {ref} from "vue";
 
-export const deliveryOrderMode = ref('tablet');
+export const deliveryOrderMode = ref('mobile');
 export const showKeyboard = ref(false); // only show in mobile mode
 export const favorites = ref([]);
 export const selectedCustomer = ref({});

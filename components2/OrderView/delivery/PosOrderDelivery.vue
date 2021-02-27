@@ -32,12 +32,14 @@ import {
 import cms from 'cms'
 import { deliveryCustomerUiFactory } from './delivery-customer-ui'
 import { genScopeId } from '../../utils';
+import PosOrderDeliveryKeyboard from '../Helper/posOrderDeliveryKeyboard2'
 
 export default {
   name: "PosOrderDelivery",
   directives: {
     Touch
   },
+  components: { PosOrderDeliveryKeyboard },
   setup() {
     const {t, locale} = useI18n();
     const selectedProduct = ref()
@@ -47,7 +49,7 @@ export default {
     const time = ref(30)
 
     const enterPressed = ref(0)
-    const token = ref('')
+
 
     const quantity = ref(1)
     const paymentTotal = ref(0)
@@ -56,7 +58,7 @@ export default {
     const user = ref({})
 
     let debounceUpdatePrice, keyboardEventHandler
-    const autocomplete = ref();
+
 
     async function created() {
       //fixme refactor here
@@ -64,7 +66,7 @@ export default {
       await loadKeyboard()
       debounceUpdatePrice = _.debounce(updatePrice, 300)
       const setting = await cms.getModel('PosSetting').findOne()
-      deliveryOrderMode.value = setting['generalSetting'].deliveryOrderMode || 'tablet'
+      deliveryOrderMode.value = setting['generalSetting'].deliveryOrderMode || 'mobile'
       keyboardEventHandler = keyboardHandler;
       if (deliveryOrderMode.value === 'tablet') {
         window.addEventListener('keydown', keyboardEventHandler, false)
@@ -193,6 +195,7 @@ export default {
     }
 
     function chooseProduct(productString) {
+      console.log('chooseProduct', productString)
       if (typeof productString === 'string') {
         let [productId, _quantity] = productString.split(' x ')
         if (!productId) return
@@ -214,6 +217,7 @@ export default {
       }
     }
 
+    const autocomplete = ref('')
     function keyboardHandler(event) {
       event.stopPropagation()
       if (event.key === 'p') {
@@ -316,7 +320,7 @@ export default {
             {(deliveryOrderMode.value === 'mobile') ?
                 <>
                   <g-spacer/>
-                  <pos-order-delivery-keyboard mode="active" keyboardConfig={keyboardConfig.value} onSubmit={chooseProduct}/>
+                  <pos-order-delivery-keyboard mode="active" keyboard-config={keyboardConfig.value} onSubmit={chooseProduct}/>
                 </> :
                 <>
                   <div class="delivery-order__content">
@@ -459,7 +463,8 @@ export default {
     const renderChoiceDialog = () => {
       return (
           <g-dialog v-model={dialog.value.choice} eager width="500">
-            <g-card class="dialog r">
+            { execGenScopeId(()=> <g-card class="dialog r">
+              { execGenScopeId(() => <>
               <g-icon class="dialog-icon--close" onClick={() => dialog.value.choice = false} size="20">icon-close</g-icon>
               <div class="dialog-title">Select options</div>
               {(selectedProduct.value && selectedProduct.value.choices) &&
@@ -472,13 +477,13 @@ export default {
                       </div>
                       <div class="dialog-content__choice-option">
                         {(choice.select === 'one' && choice.mandatory) ?
-                            <g-radio-group v-model={modifiers[index]}>
+                            <g-radio-group v-model={modifiers.value[index]}>
                               {choice.options.map(option =>
                                   <g-radio color="#536DFE" value={option} key={option._id}
                                            label={`${option.name} (${t('common.currency', locale)}${$filters.formatCurrency(option.price)} )`}/>)}
                             </g-radio-group>
                             : choice.options.map(option =>
-                                <g-checkbox v-model={modifiers[index]}
+                                <g-checkbox v-model={modifiers.value[index]}
                                             color="#536DFE"
                                             value={option}
                                             label={getCheckboxLabel(option)}
@@ -490,21 +495,17 @@ export default {
               </div>}
               <div class="dialog-action">
                 <div class="row-flex align-items-center" style="line-height: 2">
-                  <g-icon onClick={withModifiers(() => changeQuantity(-1), ['stop'])} color="#424242"
-                          size="28">remove_circle_outline
-                  </g-icon>
-                  <span style="margin-left: 4px; margin-right: 4px; min-width: 20px; text-align: center">{quantity}</span>
+                  <g-icon onClick={withModifiers(() => changeQuantity(-1), ['stop'])} color="#424242" size="28">remove_circle_outline</g-icon>
+                  <span style="margin-left: 4px; margin-right: 4px; min-width: 20px; text-align: center">{quantity.value}</span>
                   <g-icon onClick={withModifiers(() => changeQuantity(1), ['stop'])} color="#424242" size="28">add_circle</g-icon>
                 </div>
                 <g-spacer/>
-                <g-btn-bs min-width="80" height="100%" text-color="#424242"
-                          onClick={() => dialog.value.choice = false}>Cancel
-                </g-btn-bs>
+                <g-btn-bs min-width="80" height="100%" text-color="#424242" onClick={() => dialog.value.choice = false}>Cancel</g-btn-bs>
                 <g-btn-bs width="80" height="100%" rounded text-color="#FFFFFF" background-color="#536DFE"
-                          disabled={unavailableToAdd.value} onClick={addProduct}>OK
-                </g-btn-bs>
+                          disabled={unavailableToAdd.value} onClick={addProduct}>OK</g-btn-bs>
               </div>
-            </g-card>
+              </>) }
+            </g-card>)}
           </g-dialog>
       )
     }

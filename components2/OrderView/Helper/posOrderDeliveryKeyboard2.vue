@@ -1,8 +1,14 @@
 <script>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { defaultKeyboard, actionMap} from './PosOrderKeyboardShared';
+import { genScopeId } from '../../utils';
 
 export default {
+  name: 'PosOrderDeliveryKeyboard',
+  props: {
+    keyboardConfig: Array,
+    mode: String
+  },
   setup(props, {emit}) {
     const { keyboardConfig, mode} = props
     const value = ref('')
@@ -75,20 +81,20 @@ export default {
       value.value = ''
     }
     const submit = function() {
-      emit('submit', value)
+      emit('submit', value.value)
       clear()
     }
     const editKeyboard = function(position) {
       emit('edit:keyboard', position)
     }
 
-    return () => <div class="delivery-keyboard" style={keyboardStyles.value}>
+    return genScopeId(() => <div class="delivery-keyboard" style={keyboardStyles.value}>
       <div class="delivery-keyboard__screen" style={screenStyles.value}>
         <input class="delivery-keyboard__input" v-model={value.value}/>
         <g-icon color="#FF4552" class="delivery-keyboard__icon" onClick={clear}>cancel</g-icon>
       </div>
-      <g-keyboard v-model={value.value} items={keyboardItems} template={keyboardTemplate.value} onSubmit={submit} onEdit={editKeyboard}/>
-    </div>
+      <g-keyboard v-model={value.value} items={keyboardItems.value} template={keyboardTemplate.value} onSubmit={submit} onEdit={editKeyboard}/>
+    </div>)
   }
 }
 </script>

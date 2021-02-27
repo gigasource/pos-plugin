@@ -54,7 +54,9 @@ export function deliveryCustomerUiFactory() {
   }
 
   let debounceSearchAddress = _.debounce(searchAddress, 300);
-
+  //fixme: autocomplete use in both PosOrderDelivery & this file
+  const autocomplete = ref();
+  const token = ref('')
   async function searchAddress(text) {
     if (!text || text.length < 4) return
     token.value = uuidv4()
