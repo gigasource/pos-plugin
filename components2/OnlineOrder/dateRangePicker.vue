@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useI18n } from 'vue-i18n';
+import { genScopeId } from "../utils";
+
 dayjs.extend(customParseFormat)
 // format used in current app
 const DATE_FORMAT = 'DD/MM/YYYY'
@@ -21,7 +23,7 @@ export default {
     const toDate = ref(props.to || today)
     const formattedRange = computed(() => {
       let from = dayjs(fromDate.value, DATE_PICKER_FORMAT).format('MMM DD');
-      let to = dayjs(toDate.value.value, DATE_PICKER_FORMAT).format('MMM DD');
+      let to = dayjs(toDate.value, DATE_PICKER_FORMAT).format('MMM DD');
       return from === to ? `${from}` : `${from} - ${to}`
     })
     const formattedFromDate = computed(() => {
@@ -82,7 +84,7 @@ export default {
       showMenu.value = false
       emit('save', { fromDate: fromDate.value, toDate: toDate.value })
     }
-    return () => <>
+    return genScopeId(() => <>
       <div class={['date-range-picker', showMenu.value && 'date-range-picker__active']}>
         <div class="date-range-picker__nav left" onClick={goPrev}>
           <g-icon>
@@ -90,19 +92,19 @@ export default {
           </g-icon>
         </div>
         <g-menu v-model={showMenu.value} minWidth={100} maxWidth={333} nudge-bottom="10" nudge-left="70" closeOnClick={true} contentFillWidth={false} content-class="aw-date-range-picker-content" v-slots={{
-          'default': () => <>
+          'default': genScopeId(() => <>
             <div class="date-range-picker__container">
-              <div class="arrow-top"></div>
+              <div class="arrow-top"/>
               <div style="display: flex; margin-bottom: 10px;">
                 <div style="width: 50%">
                   <div class="date-range-picker__label">
                     {t('onlineOrder.from')} </div>
                   <g-menu v-model={showFromDatePicker.value} nudge-bottom="10" content-class="date-picker-content" v-slots={{
-                    'default': () => <>
-                      <g-date-picker max={toDate.value} type="date" no-title onUpdate:modelValue={onFromDateSelected}></g-date-picker>
-                    </>
+                    'default': genScopeId(() =>
+                      <g-date-picker max={toDate.value} type="date" no-title onUpdate:modelValue={onFromDateSelected}/>
+                    )
                     ,
-                    'activator': ({ on }) => <>
+                    'activator': genScopeId(({ on }) =>
                       <div class="date-range-picker__input--from" onClick={on.click}>
                         <g-icon size="16">
                           far fa-calendar-alt
@@ -110,18 +112,18 @@ export default {
                         <span class="date-range-picker__date">
                           {formattedFromDate.value} </span>
                       </div>
-                    </>
-                  }}></g-menu>
+                    )
+                  }}/>
                 </div>
                 <div style="width: 50%">
                   <div class="date-range-picker__label">
                     {t('onlineOrder.to')} </div>
                   <g-menu v-model={showToDatePicker.value} nudge-bottom="10" content-class="date-picker-content" v-slots={{
-                    'default': () => <>
-                      <g-date-picker min={fromDate.value} max={today} type="date" no-title onUpdate:modelValue={onToDateSelected}></g-date-picker>
-                    </>
+                    'default': genScopeId(() =>
+                      <g-date-picker min={fromDate.value} max={today} type="date" no-title onUpdate:modelValue={onToDateSelected}/>
+                    )
                     ,
-                    'activator': ({ on }) => <>
+                    'activator': genScopeId(({ on }) =>
                       <div class="date-range-picker__input--to" onClick={on.click}>
                         <g-icon size="16">
                           far fa-calendar-alt
@@ -129,14 +131,14 @@ export default {
                         <span class="date-range-picker__date">
                           {formattedToDate.value} </span>
                       </div>
-                    </>
-                  }}></g-menu>
+                    )
+                  }}/>
                 </div>
               </div>
               <g-btn-bs height="40" width="100%" background-color="#1976D2" text-color="#fff" onClick={save}>
                 Confirm
               </g-btn-bs>
-              <g-divider style="margin: 8px 0" color="#e0e0e0"></g-divider>
+              <g-divider style="margin: 8px 0" color="#e0e0e0"/>
               <div class="row-flex flex-wrap w-100 justify-between">
                 <g-btn-bs class="mb-2" height="40" background-color="#E0E0E0" onClick={selectToday}>
                   {t('onlineOrder.today')} </g-btn-bs>
@@ -148,20 +150,20 @@ export default {
                   {t('onlineOrder.thisMonth')} </g-btn-bs>
               </div>
             </div>
-          </>
+          </>)()
           ,
-          'activator': ({ on }) => <>
+          'activator': genScopeId(({ on }) =>
             <div class={['value', showMenu.value && 'value--active']} onClick={on.click}>
               {formattedRange.value} </div>
-          </>
-        }}></g-menu>
+          )
+        }}/>
         <div class="date-range-picker__nav right" onClick={goNext}>
           <g-icon>
             chevron_right
           </g-icon>
         </div>
       </div>
-    </>
+    </>)
   }
 }
 </script>
@@ -192,6 +194,7 @@ export default {
 
   .value {
     display: flex;
+    flex: 1;
     align-items: center;
     justify-content: center;
     height: 30px;
