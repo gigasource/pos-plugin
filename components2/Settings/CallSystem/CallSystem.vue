@@ -21,7 +21,7 @@ export default {
     loadData()
 
     const callSystemModesRender = genScopeId(() => <div class="row-flex align-items-center justify-start">
-        <g-select label="Call system"
+        <g-select label="Caller Id"
                   style="width: 250px" class="mt-2 mb-4 call_system"
                   text-field-component="GTextFieldBs"
                   mandatory
