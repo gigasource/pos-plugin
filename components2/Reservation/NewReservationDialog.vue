@@ -13,7 +13,7 @@ import ScrollSelect from './ScrollSelect';
 // appHooks.emit('settingChange')
 
 export default {
-  name: 'NewReservationDialog2',
+  name: 'NewReservationDialog',
   components: { ScrollSelect },
   props: {
     modelValue: Boolean,

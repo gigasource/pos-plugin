@@ -41,7 +41,7 @@ export default {
           name: name.value,
           price: Number(price.value),
         }
-        emit('submit', change, product._id)
+        emit('submit', change, true)
       }
       internalValue.value = false
     }

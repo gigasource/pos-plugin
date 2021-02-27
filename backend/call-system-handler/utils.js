@@ -1,9 +1,6 @@
 const csConstants = require('./call-system-contants')
 const phoneCallMap = {};
 
-// calls are considered missed if no action is taken during this time
-const CALL_TIMEOUT_THRESHOLD = 60 * 1000;
-
 const {v4: uuidv4} = require('uuid');
 
 async function checkModeActive(modeName, posSettings) {
@@ -11,32 +8,34 @@ async function checkModeActive(modeName, posSettings) {
   return mode === modeName;
 }
 
-async function getActiveMode(posSettings) {
-  posSettings = posSettings || await cms.getModel('PosSetting').findOne();
-  const {call: callConfig} = posSettings;
-  const {mode} = callConfig;
-  return mode;
+async function getCallConfig(posSettings) {
+  return (posSettings || await cms.getModel('PosSetting').findOne()).call;
 }
 
-function emitNewCall(phoneNumber) {
+async function getActiveMode(posSettings) {
+  return (await getCallConfig(posSettings)).mode
+}
+
+async function emitNewCall(phoneNumber) {
   const callId = uuidv4();
-
   cms.socket.emit(csConstants.NewPhoneCall, phoneNumber, new Date(), callId);
-
+  const callConfig = await getCallConfig();
   phoneCallMap[callId] = setTimeout(() => {
     if (!phoneCallMap[callId]) return;
     cms.socket.emit(csConstants.NewMissedPhoneCall, callId);
-  }, CALL_TIMEOUT_THRESHOLD);
+  }, (callConfig && callConfig.timeOut) || 45000);
 }
 
 function cancelMissedCallTimeout(callId) {
-  if (!phoneCallMap[callId]) return;
-
+  console.log('cancelMissedCallTimeout')
+  if (!phoneCallMap[callId])
+    return
   clearTimeout(phoneCallMap[callId]);
   delete phoneCallMap[callId];
 }
 
 module.exports = {
+  getCallConfig,
   checkModeActive,
   getActiveMode,
   emitNewCall,

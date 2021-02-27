@@ -16,20 +16,29 @@ import {
   showKeyboard,
   dialog
 } from "./delivery-shared";
+import {
+  products,
+  currentOrder,
+  itemsWithQty,
+  keyboardConfig,
+  addItem,
+  removeItem,
+  loadProduct,
+  removeModifier,
+  loadKeyboard,
+} from './delivery-logic'
 
 import cms from 'cms'
 import { deliveryCustomerUiFactory } from './delivery-customer-ui'
 import { genScopeId } from '../../utils';
 
 export default {
-  name: "PosOrderDelivery2",
+  name: "PosOrderDelivery",
   directives: {
     Touch
   },
   setup() {
     const {t, locale} = useI18n();
-
-    const products = ref([])
     const selectedProduct = ref()
     const modifiers = ref([])
     const type = ref('')
@@ -40,12 +49,10 @@ export default {
     const token = ref('')
 
     const quantity = ref(1)
-    const keyboardConfig = ref([])
     const paymentTotal = ref(0)
     // TODO: Refactor
-    const currentOrder = ref({ items: [], hasOrderWideDiscount: false, firstInit: false })
-    const user = ref({})
 
+    const user = ref({})
 
     let debounceUpdatePrice, keyboardEventHandler
     const autocomplete = ref();
@@ -65,13 +72,6 @@ export default {
 
     created();
 
-    const itemsWithQty = computed(() => {
-      if (currentOrder.value && currentOrder.value.items)
-        return currentOrder.value.items.filter(i => i.quantity > 0)
-      return []
-    });
-
-
     const unavailableToAdd = computed(() => {
       if (!selectedProduct.value) return true
       if (!selectedProduct.value.choices || selectedProduct.value.choices.length === 0) return false
@@ -79,8 +79,8 @@ export default {
         if (choice.mandatory) {
           let flag = true
           for (const option of choice.options) {
-            const modifiers = modifiers.value
-            if (modifiers && modifiers.find(m => m._id === option._id)) {
+            const _modifiers = modifiers.value
+            if (_modifiers && _modifiers.find(m => m._id === option._id)) {
               flag = false
             }
           }
@@ -89,31 +89,14 @@ export default {
       }
       return false
     })
-
     const disabledConfirm = computed(() => {
       return !selectedCustomer.value || _.isEmpty(selectedCustomer.value) || !selectedCustomer.value.name || !selectedCustomer.value.phone || !selectedCustomer.value.addresses || selectedCustomer.value.addresses.length === 0
     })
-
-    async function loadProduct() {
-      products.value = (await cms.getModel('Product').find({type: 'delivery'})).map(p => ({
-        ...p,
-        text: `${p.id}. ${p.name}`
-      }))
-      favorites.value = products.value.filter(p => p.option.favorite)
-    }
-
-    async function loadKeyboard() {
-      const setting = await cms.getModel('PosSetting').findOne()
-      keyboardConfig.value = setting && setting['keyboardDeliveryConfig']
-    }
-
     const router = useRouter();
 
     function back() {
       resetOrderData()
-      router.push({
-        path: '/pos-dashboard'
-      })
+      router.go(-1)
       selectedCustomer.value = {}
       name.value = ''
       phone.value = ''
@@ -122,18 +105,6 @@ export default {
       street.value = ''
       city.value = ''
       placeId.value = ''
-    }
-
-    function addItem(item) {
-      //fixme: refactore
-    }
-
-    function removeItem(item) {
-      //fixme: refactore
-    }
-
-    function removeModifier(item, index) {
-      //fixme: refactore
     }
 
     function selectOption(choice, option) {
@@ -169,7 +140,8 @@ export default {
     }
 
     function addProduct() {
-      if (!selectedProduct.value) return
+      if (!selectedProduct.value)
+        return
 
       const product = {
         ...selectedProduct.value,
@@ -277,7 +249,7 @@ export default {
       await cms.getModel('Product').findOneAndUpdate({
         _id: selectedProduct.value._id
       }, {price})
-      loadProduct();
+      await loadProduct();
       selectedProduct.value = products.value[index]
     }
 
@@ -336,15 +308,14 @@ export default {
       console.warn('PosOrderDelivery2:removeItemQuantity was not implemented')
     }
 
-    const { customerUiRender, renderDialogs } =  deliveryCustomerUiFactory()
-    const renderDeliveryOrder = () => {
+    const { customerUiRender : renderCustomerSection, renderDialogs : renderCustomerDialogs, orderType } =  deliveryCustomerUiFactory()
+    const renderSelectCartItemSection = () => {
       return (
           <div class="delivery-order">
             {(deliveryOrderMode.value === 'mobile') ?
                 <>
                   <g-spacer/>
-                  <pos-order-delivery-keyboard mode="active" keyboardConfig={keyboardConfig.value}
-                                               onSubmit={chooseProduct}/>
+                  <pos-order-delivery-keyboard mode="active" keyboardConfig={keyboardConfig.value} onSubmit={chooseProduct}/>
                 </> :
                 <>
                   <div class="delivery-order__content">
@@ -367,7 +338,7 @@ export default {
                           </p>
                           <div class="delivery-order__options">
                             {choice.options.map((option, i0) =>
-                                <div key={`option_${iC}_ ${iO}`}
+                                <div key={`option_${iC}_ ${i0}`}
                                      onClick={withModifiers(() => selectOption(choice, option), ['stop'])}
                                      class={['delivery-order__option', isModifierSelect(option) && 'delivery-order__option--selected']}>
                                   {option.name} - {t('common.currency', locale)}{option.price}
@@ -383,7 +354,7 @@ export default {
           </div>
       )
     }
-    const renderDeliveryDetail = () => {
+    const renderCartSection = () => {
       return (
           <div class="delivery-detail">
             <div class="delivery-detail__info">
@@ -396,9 +367,9 @@ export default {
                 <g-icon>icon-back</g-icon>
               </g-btn-bs>
               <g-spacer/>
-              <div
-                  class="delivery-detail__total">{t('common.currency', locale)}{$filters.formatCurrency(paymentTotal)}</div>
+              <div class="delivery-detail__total">{t('common.currency', locale)}{$filters.formatCurrency(paymentTotal.value)}</div>
             </div>
+
             <div class="delivery-detail__order">
               {itemsWithQty.value.map((item, i) =>
                   <div key={i} class="item">
@@ -406,11 +377,8 @@ export default {
                       <div>
                         <p class="item-detail__name">{item.id}. {item.name}</p>
                         <p>
-                          <span
-                              class={['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']}>{$filters.formatCurrency(item.originalPrice)}</span>
-                          {isItemDiscounted(item) &&
-                          <span
-                              class="item-detail__price--new">{t('common.currency', locale)} {$filters.formatCurrency(item.price)}</span>}
+                          <span class={['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']}>{$filters.formatCurrency(item.originalPrice)}</span>
+                          {isItemDiscounted(item) && <span class="item-detail__price--new">{t('common.currency', locale)} {$filters.formatCurrency(item.price)}</span>}
                         </p>
                       </div>
                       <div class="item-action">
@@ -419,12 +387,12 @@ export default {
                         <g-icon onClick={withModifiers(() => addItem(item), ['stop'])}>add_circle_outline</g-icon>
                       </div>
                     </div>
-                    {item.modifiers && <div> {item.modifiers.map((modifier, index) =>
+                    {item.modifiers && <div> {
+                      item.modifiers.map((modifier, index) =>
                         <div key={`${item._id}_${index}`}>
-                          <g-chip label small text-color="#616161" close onClose={() => removeModifier(item, index)}>
-                            {modifier.name} | {t('common.currency', locale)}{
-                            $filters.formatCurrency(modifier.price)
-                          }
+                          <g-chip label small text-color="#616161" close
+                                  onClose={() => removeModifier(item, index)}>
+                            {modifier.name} | {t('common.currency', locale)} {$filters.formatCurrency(modifier.price)}
                           </g-chip>
                         </div>)}
                     </div>}
@@ -459,25 +427,19 @@ export default {
               <div class="mx-2">
                 <b>Address: </b> {selectedCustomerAddress.value}
               </div>
-              <g-text-field-bs label="Delivery note:" v-model={note.value}>
-                {{
-                  'append-inner': () => <g-icon onClick={() => dialog.value.note = true}>icon-keyboard</g-icon>
-                }}
-              </g-text-field-bs>
+              <g-text-field-bs label="Delivery note:" v-model={note.value} v-slots={{
+                'append-inner': () => <g-icon onClick={() => dialog.value.note = true}>icon-keyboard</g-icon>
+              }}/>
               <div class="ma-2">Time to complete (minute)</div>
               <div class="mb-3">
                 <g-btn-bs class="elevation-1" backgroundColor={time.value === 15 ? '#BBDEFB' : 'white'}
-                          onClick={() => time.value = 15}>15
-                </g-btn-bs>
+                          onClick={() => time.value = 15}>15</g-btn-bs>
                 <g-btn-bs class="elevation-1" backgroundColor={time.value === 30 ? '#BBDEFB' : 'white'}
-                          onClick={() => time.value = 30}>30
-                </g-btn-bs>
+                          onClick={() => time.value = 30}>30</g-btn-bs>
                 <g-btn-bs class="elevation-1" backgroundColor={time.value === 45 ? '#BBDEFB' : 'white'}
-                          onClick={() => time.value = 45}>45
-                </g-btn-bs>
+                          onClick={() => time.value = 45}>45</g-btn-bs>
                 <g-btn-bs class="elevation-1" backgroundColor={time.value === 60 ? '#BBDEFB' : 'white'}
-                          onClick={() => time.value = 60}>60
-                </g-btn-bs>
+                          onClick={() => time.value = 60}>60</g-btn-bs>
               </div>
               <g-btn-bs disabled={disabledConfirm.value} block large background-color="#2979FF"
                         onClick={confirmOrder.value}>Confirm
@@ -542,12 +504,15 @@ export default {
     }
 
     return genScopeId(() => <div class="delivery">
-      { customerUiRender() }
-      { renderDeliveryOrder() }
-      { renderDeliveryDetail() }
-      { renderOrderDialog() }
-      { renderChoiceDialog() }
-      { renderDialogs() }
+      { renderCustomerSection() }
+      { renderSelectCartItemSection() }
+      { renderCartSection() }
+
+      <>
+        { renderOrderDialog() }
+        { renderChoiceDialog() }
+        { renderCustomerDialogs() }
+      </>
     </div>)
   }
 }

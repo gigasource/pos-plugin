@@ -5,6 +5,7 @@ import _ from 'lodash';
 import { computed, ref } from 'vue'
 import Snackbar from '../../../components/Store/Snackbar';
 import { genScopeId } from '../../utils';
+import { prepareMockData } from './delivery-mock-data'
 
 export default {
   components: { Snackbar },
@@ -63,6 +64,7 @@ export default {
           <div class="row-flex align-items-center mb-2">
             <p class="fw-600">Delivery Menu</p>
             <g-btn-bs background-color="#1271FF" onClick={fetchMenu}>Fetch</g-btn-bs>
+            <g-btn-bs background-color="#1271FF" onClick={prepareMockData}>Mock Data</g-btn-bs>
           </div>
           <div class="mb-2 fw-600">Delivery keyboard</div>
           <div class="row-flex align-items-center mb-2">

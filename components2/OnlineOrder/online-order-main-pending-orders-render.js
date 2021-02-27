@@ -3,14 +3,14 @@ import { useI18n } from 'vue-i18n'
 import { genScopeId } from '../utils'
 
 import {
-	modemDeviceConnected,
 	calls,
 	missedCalls,
 	cancelMissedCallTimeout,
 	deleteCall,
 	deleteMissedCall
-} from '../Settings/CallSystem/call-system-logics'
-
+} from '../Settings/CallSystem/call-system-calls'
+import { modemDeviceConnected } from '../Settings/CallSystem/call-system-logics'
+import { showReservationDialog } from '../Reservation/reservation-shared'
 import {
 	timeoutProgress,
 	pendingOrders,
@@ -20,46 +20,24 @@ import {
 	getItemPrice
 } from './online-order-main-logic'
 
-import {
-	acceptOrder,
-} from './online-order-main-logic-be'
-
+import { acceptOrder } from './online-order-main-logic-be'
 import {$filters} from "../AppSharedStates";
 
-//<editor-fold desc="ref">
 export const selectedCustomer = ref({})
-const dialog = ref({
 
-})
-//</editor-fold>
-
-//<editor-fold desc="function">
-/**
- *
- * @description
- * Remove missed call when openOrderDialog
- */
-export function openOrderDialog({ customer, callId }, type, index) {
+export function navigateToDeliveryScreen({ customer, callId }, type, missedCallIndex) {
 	cancelMissedCallTimeout(callId)
-	if (index) {
-		calls.unshift({
-			...missedCalls.value[index],
-			type: 'missed'
-		})
-		deleteMissedCall(index)
+	if (missedCallIndex) {
+		calls.unshift({ ...missedCalls.value[missedCallIndex], type: 'missed' })
+		deleteMissedCall(missedCallIndex)
 	}
 	selectedCustomer.value = customer
-	/**
-	 * Why used these code ?
-	orderType.value = type
-	router.push(
-		{ path: '/pos-order-delivery' }
-	)
-	 */
+	// orderType.value = type // TODO: selecgted order type
+	router.push({ path: '/pos-order-delivery' })
 }
 export function openReservationDialog({ customer, callId }) {
 	selectedCustomer.value = customer
-	dialog.value.reservation = true
+	showReservationDialog.value = true
 	cancelMissedCallTimeout()
 }
 
@@ -71,7 +49,6 @@ export async function onClickAccept(order) {
 	}
 	await acceptOrder(order)
 }
-//</editor-fold>
 
 //<editor-fold desc="pendingOrders">
 export function renderPendingOrdersFactory () {
@@ -108,38 +85,26 @@ export function renderPendingOrdersFactory () {
 				{calls.value.map((call, i) =>
 					<div class="pending-orders--call" key={`call_${i}`}>
 						<div class="pending-orders--call-title">
-							<div>
-								{call.customer.name}
-								<span> - </span>
-								{call.customer.phone} </div>
+							<div> {call.customer.name} <span> - </span> {call.customer.phone} </div>
 							<g-spacer></g-spacer>
-							<g-icon>
-								icon-call
-							</g-icon>
+							<g-icon>icon-call</g-icon>
 						</div>
-						<p class="fs-small-2 text-grey-darken-1">
-							Incoming call </p>
+						<p class="fs-small-2 text-grey-darken-1">Incoming call</p>
 						<div class="pending-orders--call-buttons">
 							<g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" onClick={() => deleteCall(i, call)}>
-								<g-icon size="16">
-									icon-cross-red
-								</g-icon>
+								<g-icon size="16">icon-cross-red</g-icon>
 							</g-btn-bs>
+
 							<g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" onClick={() => openReservationDialog(call)}>
-								<g-icon size="16">
-									icon-table-reservation
-								</g-icon>
+								<g-icon size="16">icon-table-reservation</g-icon>
 							</g-btn-bs>
-							<g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4"
-							          onClick={() => openOrderDialog(call, 'pickup')}>
-								<g-icon size="16">
-									icon-take-away
-								</g-icon>
+
+							<g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" onClick={() => navigateToDeliveryScreen(call, 'pickup')}>
+								<g-icon size="16">icon-take-away</g-icon>
 							</g-btn-bs>
-							<g-btn-bs class="flex-equal" border-color="#C4C4C4" onClick={() => openOrderDialog(call, 'delivery')}>
-								<g-icon size="16">
-									icon-delivery-scooter
-								</g-icon>
+
+							<g-btn-bs class="flex-equal" border-color="#C4C4C4" onClick={() => navigateToDeliveryScreen(call, 'delivery')}>
+								<g-icon size="16">icon-delivery-scooter</g-icon>
 							</g-btn-bs>
 						</div>
 					</div>
@@ -154,16 +119,11 @@ export function renderPendingOrdersFactory () {
 				{missedCalls.value.map((call, i) =>
 					<div class="pending-orders--call b-red" key={`missed_call_${i}`}>
 						<div class="pending-orders--call-title">
-							<div>
-								{call.customer.name} <span> - </span>
-								{call.customer.phone} </div>
+							<div> {call.customer.name} <span> - </span> {call.customer.phone} </div>
 							<g-spacer></g-spacer>
-							<g-icon size="20">
-								icon-missed-call
-							</g-icon>
+							<g-icon size="20">icon-missed-call</g-icon>
 						</div>
-						<p class="fs-small-2 text-grey-darken-1">
-							Missed call </p>
+						<p class="fs-small-2 text-grey-darken-1">Missed call</p>
 						<div class="pending-orders--call-buttons">
 							<g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" onClick={() => deleteMissedCall(i)}>
 								<g-icon size="16">icon-cross-red</g-icon>
@@ -171,12 +131,10 @@ export function renderPendingOrdersFactory () {
 							<g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" onClick={() => openReservationDialog(call)}>
 								<g-icon size="16">icon-table-reservation</g-icon>
 							</g-btn-bs>
-							<g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4"
-							          onClick={() => openOrderDialog(call, 'pickup', i)}>
+							<g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" onClick={() => navigateToDeliveryScreen(call, 'pickup', i)}>
 								<g-icon size="16">icon-take-away</g-icon>
 							</g-btn-bs>
-							<g-btn-bs class="flex-equal" border-color="#C4C4C4"
-							          onClick={() => openOrderDialog(call, 'delivery', i)}>
+							<g-btn-bs class="flex-equal" border-color="#C4C4C4" onClick={() => navigateToDeliveryScreen(call, 'delivery', i)}>
 								<g-icon size="16">icon-delivery-scooter</g-icon>
 							</g-btn-bs>
 						</div>
@@ -390,12 +348,14 @@ export function renderPendingOrdersFactory () {
 	function renderPendingOrdersContent() {
 		return (
 			<div class="content">
-				{(!pendingOrders.value || !pendingOrders.value.length) && renderEmptyPendingOrders()}
 				{renderPendingOrdersCalls()}
+				{(!pendingOrders.value || !pendingOrders.value.length) && renderEmptyPendingOrders()}
 				{renderAllPendingOrders()}
 			</div>
 		)
 	}
+
+
 
 	function renderPendingOrders() {
 		return (
@@ -406,6 +366,15 @@ export function renderPendingOrdersFactory () {
 		)
 	}
 
+	function renderReservationDialog() {
+		return <new-reservation-dialog
+				v-model={showReservationDialog.value}
+				received-phone={selectedCustomer.value ? selectedCustomer.value.phone : ''}
+				onSubmit={data => {
+					console.log(data)
+				}}/>
+	}
+
 	return {
 		renderPendingOrdersHeader,
 		renderPendingOrdersContent,
@@ -413,7 +382,8 @@ export function renderPendingOrdersFactory () {
 		renderPendingOrdersCalls,
 		renderPendingOrdersMissedCall,
 		renderPendingOrders,
-		renderAllPendingOrders
+		renderAllPendingOrders,
+		renderReservationDialog
 	}
 };
 

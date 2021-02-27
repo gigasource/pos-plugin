@@ -3,18 +3,15 @@ import { computed } from 'vue'
 import { CALL_SYSTEM_MODES } from '../../../components/constants';
 import {
   callSystemStatus,
-  callSystemConfigChanged,
-  callSystemStatusComputed,
+  changeNotSavedWarningMessage,
   currentCallSystemMode,
   callSystemIpText,
   dialog,
-  selectedSerialDevice,
-  usbDevices,
   ipAddresses,
   callSystemModes,
-  updateUsbDeviceList,
+  filteredUsbDevices,
   changeIp,
-  update,
+  switchMode,
   loadData
 } from './call-system-logics';
 import { genScopeId } from '../../utils';
@@ -24,8 +21,8 @@ export default {
     loadData()
 
     const callSystemModesRender = genScopeId(() => <div class="row-flex align-items-center justify-start">
-        <g-select label="Call system"
-                  style="width: 250px" class="mt-2 call_system"
+        <g-select label="Caller Id"
+                  style="width: 250px" class="mt-2 mb-4 call_system"
                   text-field-component="GTextFieldBs"
                   mandatory
                   items={callSystemModes} v-model={currentCallSystemMode.value}/>
@@ -54,20 +51,27 @@ export default {
         <div class="call">
           { callSystemModesRender() }
 
-          <div class="call-title mb-2">
-            {(callSystemStatus.value || callSystemConfigChanged.value) && <i style="color: red; font-size: 10px"> {callSystemStatusComputed.value} </i>}
-          </div>
-
           { isFritzBoxMode.value
                 ? renderFritzbox()
-                : isUSRoboticOrArtechModem.value && <div>
-                  <p class="call-title">{callSystemIpText.value}</p>
-                  <g-list class="call-device-table" selectable mandatory elevation={0} height="200px" v-model={selectedSerialDevice.value} items={usbDevices.value}></g-list>
+                : isUSRoboticOrArtechModem.value && <div class="call-device-table">
+                  <g-list
+                      mandatory selectable
+                      elevation={0} height="200px"
+                      items={filteredUsbDevices.value}
+                      model-value={ipAddresses.value[currentCallSystemMode.value]}
+                      onUpdate:modelValue={devicePath => ipAddresses.value[currentCallSystemMode.value] = devicePath}
+                      />
                 </div> }
 
-          <div class="action-buttons">
-            { isUSRoboticOrArtechModem.value && <g-btn-bs width="80" background-color="#2979FF" onClick={updateUsbDeviceList}>Refresh</g-btn-bs> }
-            <g-btn-bs width="80" background-color="#2979FF" onClick={update}>Update</g-btn-bs>
+          <div class="call-title mb-2">
+            {<i style="color: red; font-size: 10px"> {callSystemStatus.value[currentCallSystemMode.value]} </i>}
+            <g-spacer/>
+            {<i style="color: red; font-size: 10px"> {changeNotSavedWarningMessage.value} </i>}
+          </div>
+
+          <div class="row-flex">
+            <g-spacer/>
+            <g-btn-bs style="margin-right:0" width="80" background-color="#2979FF" onClick={switchMode}>Save</g-btn-bs>
           </div>
 
           <dialog-text-filter v-model={dialog.value.ip} label="Call System IP" defaultValue={ipAddresses.value[currentCallSystemMode.value]} onSubmit={changeIp}></dialog-text-filter>
@@ -77,23 +81,12 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@media only screen and (max-width: 1280px) {
-  .call {
-    width: initial;
-    padding-right: 24px;
-  }
-}
-@media only screen and (min-width: 1281px) {
-  .call {
-    width: 65%;
-  }
-}
-
 .call {
   display: flex;
   flex-direction: column;
   background-color: white;
   padding-left: 24px;
+  padding-right: 24px;
   height: 100%;
   overflow: auto;
 
@@ -126,11 +119,7 @@ export default {
 
   &-device-table {
     border: 1px solid #ced4d9;
-  }
-
-  .action-buttons {
-    align-self: flex-end;
-    margin-top: 12px;
+    min-height: 100px;
   }
 }
 </style>
