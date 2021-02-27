@@ -18,6 +18,8 @@ import {useI18n} from 'vue-i18n';
 import RestaurantRoomEventHandlers from './EventHandlersForRestaurantRoom'
 import {appHooks, user} from '../../AppSharedStates';
 import NumberOfCustomersDialog from './NumberOfCustomersDialog';
+import { computed } from 'vue'
+import { viewH, viewW } from '../RoomLogics';
 
 export default {
   name: 'RestaurantRoom',
@@ -28,21 +30,21 @@ export default {
   },
   directives: {Touch},
   setup(props, {emit}) {
-    // appHooks.emit('updateTseConfig')
     initRouter()
     const {t, locale} = useI18n()
     const {touchHandlers} = RestaurantRoomEventHandlers(props)
     const {selectingRoomStates, objectsInSelectingRoom} = roomsFactory(props);
     const {roomObjectContainerStyle, roomObjectStyle} = RoomStyleFactory(selectingRoomStates)
     const curTime = ref(new Date())
-
+    const zoom = computed(() => {
+      return selectingRoomStates.value ? selectingRoomStates.value.zoom : 1
+    })
     const timerInterval = setInterval(() => curTime.value = new Date(), 30000)
     onBeforeUnmount(() => clearInterval(timerInterval));
 
     const objectContentRender = (obj) => {
       const isActiveTable = obj.type === 'table' && isBusyTable(obj)
       const order = getTableOrderInfo(obj)
-      const zoom = selectingRoomStates.value ? selectingRoomStates.value.zoom : 1
       const isUserTable = (order, user) => {
         if (!user) return false
         //todo: check this logic: compare by name is correct ?
@@ -56,14 +58,14 @@ export default {
           </g-icon>
           }
           {isBusyTable(obj) &&
-          <div style={`font-size: ${11 * zoom}px ;position: absolute; top: 2px`}>
+          <div style={`font-size: ${11 * zoom.value}px ;position: absolute; top: 2px`}>
             {t('common.currency', locale.value)}{order.vSum}
           </div>}
           <div>
             <div> {obj.name} </div>
           </div>
           {isActiveTable ?
-              <div style={`font-size: ${11 * zoom}px; position: absolute; bottom: 2px`}>
+              <div style={`font-size: ${11 * zoom.value}px; position: absolute; bottom: 2px`}>
                 {`${getDiffTime(order.date, curTime.value)} mins`} </div> : null}
         </>}
       </div>
@@ -102,10 +104,7 @@ export default {
     //     >
     //
     //     </NumberOfCustomersDialog>
-    return () => <>
-      {renderRoom()}
-
-    </>
+    return renderRoom
   }
 }
 </script>
