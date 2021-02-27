@@ -420,6 +420,7 @@ export function deliveryCustomerUiFactory() {
                              <pos-textfield-new style="width: 48%" label="Phone"
                                                 v-model={phone.value}/>
                              <g-combobox style="width: 98%" label="Address"
+                                         text-field-component="PosTextfieldNew"
                                          modelValue={placeId.value} clearable
                                          virtualEvent={isIOS.value}
                                          skip-search
