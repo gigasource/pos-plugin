@@ -754,6 +754,8 @@ export default {
   }
 
   &-detail {
+    max-width: 33%;
+
     @include card;
     display: flex;
     flex-direction: column;
