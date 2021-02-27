@@ -2,7 +2,7 @@
 import { computed, onActivated, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { genScopeId } from '../utils';
+import { dateFormat, genScopeId } from '../utils';
 import {
   dialog,
   getOrderHistory,
@@ -30,7 +30,8 @@ export default {
   setup() {
     const { t } = useI18n()
     const orderHistoryPagination = ref({ limit: 15, currentPage: 1 })
-
+    //fixme: this is hot fix, need a better solution
+    dateFormat.value
     initI18n()
     appHooks.emit('settingChange') // to update payment methods list
 
