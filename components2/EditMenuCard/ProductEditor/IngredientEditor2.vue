@@ -10,6 +10,12 @@ import {
   loadOrderLayout
 } from '../../OrderView/pos-ui-shared'
 import PosKeyboardFull from '../../pos-shared-components/PosKeyboardFull'
+import {
+  detailInventories
+} from '../../Inventory/inventory-logic-ui'
+import {loadInventories} from "../../Inventory/inventory-logic-be";
+import {loadCategories} from "../../Product/product-logic-be";
+import {loadProducts} from "../../Product/product-logic-be";
 
 export default {
   name: 'IngredientEditor2',
@@ -21,11 +27,16 @@ export default {
   setup() {
     const { t } = useI18n()
     const showKeyboard = ref(false)
-    const inventories = ref([])
     const ingredients = ref([])
+
+    const productInventoryName = computed(() => {
+      return detailInventories.value.map((inventory) => inventory.product.name)
+    })
 
     function loadIngredients() {
       if (selectedProductExisted.value) {
+        if (!selectedProduct.value.ingredients)
+          selectedProduct.value.ingredients = []
         ingredients.value = selectedProduct.value.ingredients.map(item => ({
           inventory: item.inventory,
           amount: '' + item.amount
@@ -34,24 +45,20 @@ export default {
         ingredients.value = []
       }
     }
-    async function reloadInventories() {
-      inventories.value = (await cms.getModel('Inventory').find()).map(item => ({
-        text: `${item.name} (${item.unit})`,
-        value: item._id
-      }))
-    }
 
     // reload ingredients each time product changed
     watch(selectedProduct, () => loadIngredients())
 
-    onActivated(async() => await reloadInventories())
-    /*onCreated*/ reloadInventories(); loadIngredients();
+    /*onCreated*/ loadIngredients();
+    loadCategories()
+    loadProducts()
+    loadInventories()
 
     const rules = computed(() => {
       let rules = []
       const _inventories = ingredients.value.map(item => {
-        const invt = inventories.value.find(invt => invt.value === item.inventory)
-        return invt ? invt.text : ''
+        const inventory = detailInventories.value.find(invt => invt.value === item.inventory)
+        return inventory ? inventory.text : ''
       })
       rules.push(val => _inventories.filter(item => item.toString() === val.toString()).length <= 1 || '')
       return rules
@@ -93,18 +100,18 @@ export default {
                       menu-class="menu-select-inventory"
                       key={`auto_${ingredients.length - i}`}
                       rules={rules.value}
-                      items={inventories.value}
+                      items={productInventoryName.value}
                       arrow={false}
                       v-model={ingredient.inventory}
                       onInputClick={() => showKeyboard.value = true}
-                      onUpdate:modelValue={updateProductIngredient}></g-autocomplete>
+                      onUpdate:modelValue={updateProductIngredient}/>
                   <g-text-field-bs
                       rules={[val => !isNaN(val) || '']}
                       class="ingredient-editor__input--right"
                       virtual-event
                       v-model={ingredient.amount}
                       onClick={() => showKeyboard.value = true}
-                      onUpdate:modelValue={debounceUpdateAmount}></g-text-field-bs>
+                      onUpdate:modelValue={debounceUpdateAmount}/>
                 </div>
             )}
             <div class="ingredient-editor__message">
