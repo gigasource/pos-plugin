@@ -1,6 +1,6 @@
 <script>
 import dialogProductSearchResult from '../../components/Order/components/dialogProductSearchResult';
-import {computed, onActivated, onBeforeMount, onBeforeUnmount, onDeactivated} from "vue";
+import {computed, onActivated, onBeforeMount, onBeforeUnmount, onDeactivated, watch} from "vue";
 import {useRoute} from "vue-router";
 import {category, showOverlay,} from "./order-layout-setting-logic";
 import {loadKeyboardConfig} from "./order-layout-keyboard";
@@ -47,9 +47,23 @@ export default {
       console.log('onBeforeMount')
       await created()
     })
+
     onActivated(async () => {
-      console.log('onActivated')
-      await created()
+      editable.value = props.editable
+    })
+
+    onDeactivated(() => {
+      if (editable.value) editable.value = false // force rerender in room
+    })
+
+    watch(() => editable.value, async (newVal, oldVal) => {
+      if (oldVal !== newVal) {
+        let type = 'default'
+        if (route.query && route.query.type) {
+          type = route.query.type
+        }
+        await loadOrderLayout(type);
+      }
     })
 
     onBeforeUnmount(() => cms.socket.off('updateOrderLayouts'))
