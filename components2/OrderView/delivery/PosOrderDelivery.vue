@@ -346,7 +346,9 @@ export default {
                                 </div>
                             )}
                           </div>
-                        </div>)}
+                        </div>)
+                    }
+                    <div style="height: 50px"></div>
                   </div>
                   <g-btn-bs block large class="elevation-2" icon="icon-kitchen" background-color="#0EA76F"
                             disabled={unavailableToAdd.value} onClick={addProduct}>Add to order list
