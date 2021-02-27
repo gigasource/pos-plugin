@@ -22,7 +22,7 @@ import { deliveryCustomerUiFactory } from './delivery-customer-ui'
 import { genScopeId } from '../../utils';
 
 export default {
-  name: "PosOrderDelivery2",
+  name: "PosOrderDelivery",
   directives: {
     Touch
   },
@@ -111,9 +111,7 @@ export default {
 
     function back() {
       resetOrderData()
-      router.push({
-        path: '/pos-dashboard'
-      })
+      router.go(-1)
       selectedCustomer.value = {}
       name.value = ''
       phone.value = ''

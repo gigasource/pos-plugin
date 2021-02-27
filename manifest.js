@@ -20,7 +20,7 @@ module.exports = {
     {loader: {type: 'route'}, filePath: 'components2/EditMenuCard/EditMenuCard2.vue', name: 'EditMenuCard2', path: '/pos-edit-menu-card'},
     {loader: {type: 'route'}, filePath: 'components2/OrderView/Order2.vue', name: 'Order2', path: '/pos-order/:id?'},
     {loader: {type: 'route'}, filePath: 'components2/Dashboard/PosDashboard.vue', name: 'Dashboard', path: '/pos-dashboard'},
-    {loader: {type: 'route'}, filePath: 'components2/OrderView/delivery/PosOrderDelivery2.vue', name: 'posOrderDelivery', path: '/pos-order-delivery'},
+    {loader: {type: 'route'}, filePath: 'components2/OrderView/delivery/PosOrderDelivery.vue', name: 'posOrderDelivery', path: '/pos-order-delivery'},
     {loader: {type: 'route'}, filePath: 'components2/Inventory/Inventory.vue', name: 'Inventory', path: '/pos-inventory'},
     {loader: {type: 'route'}, filePath: 'components2/Inventory/InventoryReport.vue', name: 'InventoryReport', path: '/pos-inventory-report'},
     {loader: {type: 'route'}, filePath: 'components2/Inventory/InventoryStock.vue', name: 'InventoryStock', path: '/pos-inventory-stock'},
