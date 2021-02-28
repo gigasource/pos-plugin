@@ -11,6 +11,7 @@ import _ from "lodash";
 import {v4 as uuidv4} from "uuid";
 import cms from 'cms';
 import {addProduct} from "../pos-logic-be";
+import { execGenScopeId } from '../../utils';
 
 // TODO: split customerUiRender function into ->
 //  1. render selected customer
@@ -53,7 +54,9 @@ export function deliveryCustomerUiFactory() {
   }
 
   let debounceSearchAddress = _.debounce(searchAddress, 300);
-
+  //fixme: autocomplete use in both PosOrderDelivery & this file
+  const autocomplete = ref();
+  const token = ref('')
   async function searchAddress(text) {
     if (!text || text.length < 4) return
     token.value = uuidv4()
@@ -351,7 +354,7 @@ export function deliveryCustomerUiFactory() {
     return (
         <g-menu v-model={menuMissed.value} top left nudge-top="5"
                 v-slots={{
-                  default: () => (
+                  default: () => execGenScopeId(() =>
                       <div class="menu-missed">
                         {missedCalls.value.map((call, i) => (
                             <div class="menu-missed__call" key={`missed_${i}`}>
@@ -377,9 +380,8 @@ export function deliveryCustomerUiFactory() {
                         ))}
                       </div>
                   ),
-                  activator: ({ on }) => (
-                      <div onClick={on.click}
-                           class={['delivery-info__call--missed', menuMissed.value && 'delivery-info__call--missed--selected']}>
+                  activator: ({ on }) => execGenScopeId(() =>
+                      <div onClick={on.click} class={['delivery-info__call--missed', menuMissed.value && 'delivery-info__call--missed--selected']}>
                         <b>Missed</b>
                         <div class="delivery-info__call--missed-num">
                           {missedCalls.value.length}
@@ -420,6 +422,7 @@ export function deliveryCustomerUiFactory() {
                              <pos-textfield-new style="width: 48%" label="Phone"
                                                 v-model={phone.value}/>
                              <g-combobox style="width: 98%" label="Address"
+                                         text-field-component="PosTextfieldNew"
                                          modelValue={placeId.value} clearable
                                          virtualEvent={isIOS.value}
                                          skip-search

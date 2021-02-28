@@ -1,4 +1,4 @@
-{
+module.exports = {
   "user": [
     {
       "name": {},
@@ -68,23 +68,11 @@
       "isVoucher": {}
     }
   ],
-  "vTaxGroups": [
-    {
-      "taxType": {},
-      "tax": {},
-      "sum": {}
-    }
-  ],
-  "printer": [
-    {}
-  ],
-  "discounts": [
-    {
-      "name": {},
-      "type": {},
-      "coupon": {},
-      "value": {}
-    }
-  ],
-  "cancellationItems": [{}]
+  "cancellationItems": [{}],
+  "date": {
+    "type": Date
+  },
+  "vDate": {
+    "type": Date
+  }
 }

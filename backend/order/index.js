@@ -11,7 +11,7 @@ module.exports = (cms) => {
   const feSocketLock = new AwaitLock()
 
   // Register manually orderSchema instead of using buildform
-  const schema = require('./orderSchema.json')
+  const schema = require('./orderSchema.js')
   orm.registerSchema('Order', schema)
   cms.Types['Order'] = {
     schema,
@@ -48,6 +48,7 @@ module.exports = (cms) => {
   cms.socket.on('connect', async (socket) => {
     feSocket = socket
     socket.on('print-to-kitchen', async function (actionList, order, recent, device) {
+      [actionList, order] = JsonFn.clone([actionList, order])
       await execAllChain(actionList)
       //todo: how to get device
       //todo: use test
@@ -58,6 +59,7 @@ module.exports = (cms) => {
 
     // todo: recent ??
     socket.on('pay-order', async (actionList, order, recent, cb = () => null) => {
+      [actionList, order] = JsonFn.clone([actionList, order])
       await execAllChain(actionList)
       //todo: when should call callback
 

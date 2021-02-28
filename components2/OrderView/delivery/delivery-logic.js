@@ -14,17 +14,17 @@ export const itemsWithQty = computed(() => {
 });
 
 // inc 1
-function addItem(item) {
+export function addItem(item) {
   //fixme: refactore
 }
 
 // dec 1
-function removeItem(item) {
+export function removeItem(item) {
   //fixme: refactore
 }
 
 // remove modifier from specified item in order
-function removeModifier(item, index) {
+export function removeModifier(item, index) {
   //fixme: refactore
 }
 
