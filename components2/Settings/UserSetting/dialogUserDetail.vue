@@ -55,7 +55,7 @@ export default {
       }, 200);
       name.value = props.add ? '' : selectedUser.value.name;
       passcode.value = props.add ? '' : selectedUser.value.passcode;
-    }, { onTrigger: () => console.log('trigger')})
+    })
     return genScopeId(() =>
         <g-dialog v-model={showDialogUserDetail.value} overlay-color="#6b6f82" overlay-opacity="0.95" width="90%" eager fullscreen={isMobile.value}>
           {
