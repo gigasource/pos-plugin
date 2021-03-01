@@ -341,15 +341,10 @@ export function deliveryCustomerUiFactory() {
         </div>
     )
   }
-  // when -- how activate ??
   const menuMissed = ref(false)
   const renderMissedCalls = () => {
     if (!missedCalls.value || missedCalls.value.length < 1)
       return
-
-    // return <div>
-    //   { missedCalls.value.map((call, i) => <div> { call.customer.name } </div>) }
-    // </div>
 
     return (
         <g-menu v-model={menuMissed.value} top left nudge-top="5"
