@@ -22,7 +22,7 @@ export default {
       { content: ['2'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: onAppend, style: 'grid-area: key2; width: 100%; height: 100%; border: 1px solid #979797;' },
       { content: ['3'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: onAppend, style: 'grid-area: key3; width: 100%; height: 100%; border: 1px solid #979797;' },
       { content: ['0'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: onAppend, style: 'grid-area: key0; width: 100%; height: 100%; border: 1px solid #979797;' },
-      { content: ['Clear'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: onClear, style: 'grid-area: keyClear; width: 100%; height: 100%; border: 1px solid #979797;' },
+      { content: [t('login.clearKey')], classes: 'key-number bg-white ba-blue-9 ba-thin', action: onClear, style: 'grid-area: keyClear; width: 100%; height: 100%; border: 1px solid #979797;' },
       { content: [''], icon: 'mdi-backspace', classes: 'key-number bg-white ba-blue-9 ba-thin', action: onDelete, style: 'grid-area: keyBack; width: 100%; height: 100%; border: 1px solid #979797;' },
       { content: [t('login.key')], classes: 'key-login key-number ba-blue-9 ba-thin', action: onLogin, style: 'grid-area: keyLogin; background-color: #2979FF; color: #ffffff; border: none; font-size: 16px;text-transform: capitalize; text-align: center' },
     ]))

@@ -6,11 +6,12 @@ module.exports = {
       support: 'Unterstützung',
       version: 'Version',
       internet: 'Internet',
-      errorPasscode: 'Passcode is incorrect',
+      errorPasscode: 'Passcode ist falsch',
       english: 'English',
       german: 'German',
       vietnam: 'Vietnam',
       key: 'Einloggen',
+      clearKey: 'Löschen',
       loginMess: 'Geben Sie Passcode ein, um sich einzuloggen'
     },
     //dashboard
