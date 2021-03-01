@@ -91,7 +91,7 @@ appHooks.on('fetchLocale', async() => {
 export const $filters = {
   formatCurrency(val, decimals = 2) {
     if (!val || isNaN(val) || Math.floor(val) === val) return val
-    return val.toFixed(decimals)
+    return Number(val).toFixed(decimals)
   }
 }
 
