@@ -49,24 +49,18 @@ export default {
         await genWeek(date.value)
       })
     })
-    onMounted(() => {
+
+    function scrollToFirstReservation() {
       const firstReservation = _.minBy(reservations.value, r => r.date)
       if (firstReservation) {
         const hour = dayjs(firstReservation.date).format('HH')
         const row = document.getElementById(hour + 'h')
-        row.scrollIntoView()
+        row && row.scrollIntoView()
       }
-    })
+    }
 
-    watch(reservations, (newV) => {
-      // todo: refactor: duplicate code with onMounted
-      const firstReservation = _.minBy(newV, r => r.date)
-      if (firstReservation) {
-        const hour = dayjs(firstReservation.date).format('HH')
-        const row = document.getElementById(hour + 'h')
-        row.scrollIntoView()
-      }
-    })
+    onMounted(() => scrollToFirstReservation())
+    watch(reservations, () => scrollToFirstReservation())
 
     const renderReservationHeader = () => {
       return (
