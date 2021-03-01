@@ -167,7 +167,7 @@ module.exports = {
       lastOrder: 'Last Order',
       printDate: 'Print date',
       totalSales: 'Total Sales',
-      total:'Total',
+      total: 'Total',
       subtotal: 'Subtotal',
       tax: 'Tax',
       cancelledTotal: 'Canceled total',
@@ -467,7 +467,7 @@ module.exports = {
       },
       refundingDialog: {
         title: 'Refunding',
-        message: "We're refunding for this order. Please wait...",
+        message: 'We\'re refunding for this order. Please wait...',
       },
       refundFailedDialog: {
         title: 'Refund failed',
@@ -488,7 +488,7 @@ module.exports = {
       },
       capturingDialog: {
         title: 'Capturing transaction',
-        message: "We're capturing money for this order. Please wait..."
+        message: 'We\'re capturing money for this order. Please wait...'
       },
 
       settings: {
@@ -564,9 +564,7 @@ module.exports = {
       paid: 'PAID'
     },
 
-    service: {
-
-    },
+    service: {},
 
     inventory: {
       basicMode: 'Basic mode',
@@ -617,6 +615,9 @@ module.exports = {
       discount: 'Discount',
       custom: 'Custom',
       quickDiscount: 'Quick discount'
+    },
+    editablePlan: {
+      existedTableNameErrorMsg: 'Table "{tableName}" already existed, please select another name! E.g: "{suggestionName}"'
     }
   }
 }

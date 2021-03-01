@@ -615,6 +615,9 @@ module.exports = {
       discount: 'Giảm giá',
       custom: 'Tuỳ chỉnh',
       quickDiscount: 'Lịch sử giảm giá'
+    },
+    editablePlan: {
+      existedTableNameErrorMsg: 'Bàn "{tableName}" đã tồn tại. Vui lòng chon tên khác! Ví dụ: "{suggestionName}"'
     }
   }
 }

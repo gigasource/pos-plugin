@@ -167,7 +167,7 @@ module.exports = {
       lastOrder: 'Letzter Verkauf',
       printDate: 'Druckdatum',
       totalSales: 'Gesamtumsatz',
-      total:'Brutto',
+      total: 'Brutto',
       subtotal: 'Netto',
       tax: 'MwSt',
       cancelledTotal: 'Storno Summe',
@@ -463,7 +463,7 @@ module.exports = {
       },
       refundingDialog: {
         title: 'Rückerstattung',
-        message: "Wir erstatten Geld für diese Bestellung. Warten Sie mal...",
+        message: 'Wir erstatten Geld für diese Bestellung. Warten Sie mal...',
       },
       refundFailedDialog: {
         title: 'Rückerstattung fehlgeschlagen',
@@ -484,7 +484,7 @@ module.exports = {
       },
       capturingDialog: {
         title: 'Erfassung der Transaktion',
-        message: "Wir sammeln Geld für diese Bestellung. Warten Sie mal..."
+        message: 'Wir sammeln Geld für diese Bestellung. Warten Sie mal...'
       },
 
       settings: {
@@ -604,6 +604,9 @@ module.exports = {
       discount: 'Rabatt',
       custom: 'Selbserstellte',
       quickDiscount: 'Schneller Rabatt'
+    },
+    editablePlan: {
+      existedTableNameErrorMsg: 'Nr. "{tableName}" Tisch war bereits vorhanden, bitte wählen Sie andere Tische! z.B: "{suggestionName}"'
     }
   }
 }
