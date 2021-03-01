@@ -47,7 +47,7 @@ export default {
       if (!checkEqual) {
         selectedAvatar.value = null;
       }
-    }, { onTrigger: () => console.log('trigger') })
+    })
 
     const avatarListRender = genScopeId(() =>
         <g-card-text class="content">

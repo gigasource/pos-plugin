@@ -12,9 +12,6 @@ export default {
 
     onMounted(() => {
       online.value = navigator.onLine
-      //todo: should move to appShared?
-      window.addEventListener('online', () => online.value = true)
-
     })
 
     const icon = computed(() => {

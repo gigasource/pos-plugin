@@ -5,6 +5,7 @@ import { computed, ref, watch } from 'vue'
 import { genScopeId, internalValueFactory } from '../../utils';
 import { useI18n } from 'vue-i18n';
 import { userList, selectedUser, updateUser } from './view-user-logics';
+import { execGenScopeId } from '../../utils';
 
 export default {
   props: {
@@ -54,32 +55,34 @@ export default {
       }, 200);
       name.value = props.add ? '' : selectedUser.value.name;
       passcode.value = props.add ? '' : selectedUser.value.passcode;
-    }, { onTrigger: () => console.log('trigger')})
+    })
     return genScopeId(() =>
         <g-dialog v-model={showDialogUserDetail.value} overlay-color="#6b6f82" overlay-opacity="0.95" width="90%" eager fullscreen={isMobile.value}>
-          <div class="dialog-user w-100">
-            <g-icon onClick={() => showDialogUserDetail.value = false} svg size="20" class="icon">
-              icon-close
-            </g-icon>
-            <div class="form">
-              <div class="input">
-                <pos-textfield-new ref={usernameRef} onClick={() => check.value = 'username'} label={t('settings.userName')} v-model={name.value}/>
-                <pos-textfield-new ref={passcodeRef} onClick={() => check.value = 'passcode'} label={t('settings.passcode')} v-model={passcode.value}/>
-              </div>
-              {
-                (!isMobile.value) &&
-                <div class="action">
-                  <g-btn uppercase={false} outlined class="mr-3" width="120" onClick={() => showDialogUserDetail.value = false}>
-                    {t('ui.cancel')} </g-btn>
-                  <g-btn uppercase={false} flat background-color="blue accent 3" text-color="white" width="120" onClick={submit}>
-                    {t('ui.ok')} </g-btn>
+          {
+            execGenScopeId(() => <div class="dialog-user w-100">
+              <g-icon onClick={() => showDialogUserDetail.value = false} svg size="20" class="icon">
+                icon-close
+              </g-icon>
+              <div class="form">
+                <div class="input">
+                  <pos-textfield-new ref={usernameRef} onClick={() => check.value = 'username'} label={t('settings.userName')} v-model={name.value}/>
+                  <pos-textfield-new ref={passcodeRef} onClick={() => check.value = 'passcode'} label={t('settings.passcode')} v-model={passcode.value}/>
                 </div>
-              }
-            </div>
-            <div class="bg-grey-lighten-1 pa-2">
-              <pos-keyboard-full onEnterPressed={submit}/>
-            </div>
-          </div>
+                {
+                  (!isMobile.value) &&
+                  <div class="action">
+                    <g-btn uppercase={false} outlined class="mr-3" width="120" onClick={() => showDialogUserDetail.value = false}>
+                      {t('ui.cancel')} </g-btn>
+                    <g-btn uppercase={false} flat background-color="blue accent 3" text-color="white" width="120" onClick={submit}>
+                      {t('ui.ok')} </g-btn>
+                  </div>
+                }
+              </div>
+              <div class="bg-grey-lighten-1 pa-2">
+                <pos-keyboard-full onEnterPressed={submit}/>
+              </div>
+            </div>)
+          }
         </g-dialog>)
   }
 }

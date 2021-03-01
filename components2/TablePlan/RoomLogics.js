@@ -1,6 +1,5 @@
-import { reactive, watchEffect, ref } from 'vue'
+import { computed, reactive, ref, watchEffect } from 'vue'
 import _ from 'lodash'
-import { computed } from 'vue';
 
 export const viewW = ref(0)
 export const viewH = ref(0);
@@ -10,13 +9,12 @@ const createRoom = function (_room) {
     roomObjects: (_room && _room.roomObjects) || [],
   })
   room = reactive(room)
-  const zoom = ref(1);
   const maxX = computed(() => {
     const obj = _.maxBy(room.roomObjects, (obj) => obj.location.x + obj.size.width)
     return obj ? obj.location.x + obj.size.width : 0
   })
   const maxY = computed(() => {
-    const obj =  _.maxBy(room.roomObjects, (obj) => obj.location.y + obj.size.height)
+    const obj = _.maxBy(room.roomObjects, (obj) => obj.location.y + obj.size.height)
     return obj ? obj.location.y + obj.size.height : 0
   })
 
@@ -27,13 +25,14 @@ const createRoom = function (_room) {
     return maxY.value
   });
   //viewW, viewH, w1, h1 => zoom
-  watchEffect(() => {
-    const isRoomElInitialized = (viewW.value > 0 && viewH.value > 0)
-    if (isRoomElInitialized && h1.value > 0 && w1.value > 0) {
+
+  const zoom = computed(() => {
+    if (viewW.value > 0 && viewH.value > 0 && h1.value > 0 && w1.value > 0) {
       const zoomVerticalRatio = viewH.value / h1.value
       const zoomHorizontalRatio = viewW.value / w1.value
-      zoom.value = Math.min(zoomVerticalRatio, zoomHorizontalRatio, 1)
-    } else zoom.value = 1
+      return Math.min(zoomVerticalRatio, zoomHorizontalRatio, 1)
+    }
+    return 1
   })
 
   //room.zoom => obj.realLocation & obj.realSize
@@ -51,10 +50,10 @@ const createRoom = function (_room) {
   })
 
 
-  return { room, zoom}
+  return { room, zoom }
 }
 
-export const updateObjectLocation = function(room, object, newLocation, zoom) {
+export const updateObjectLocation = function (room, object, newLocation, zoom) {
   const idx = _.findIndex(room.roomObjects, i => i._id === object._id)
   if (zoom && idx !== -1) {
     room.roomObjects[idx].location.x = newLocation.x / zoom
@@ -62,7 +61,7 @@ export const updateObjectLocation = function(room, object, newLocation, zoom) {
   }
 }
 
-export const updateObjectSize = function(room, object, newSize, zoom) {
+export const updateObjectSize = function (room, object, newSize, zoom) {
   const idx = _.findIndex(room.roomObjects, i => i._id === object._id)
   if (zoom && idx !== -1) {
     room.roomObjects[idx].size.width = newSize.width / zoom

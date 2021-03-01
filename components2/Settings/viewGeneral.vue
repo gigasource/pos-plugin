@@ -10,12 +10,18 @@ export default {
   setup() {
     const { t } = useI18n()
     appHooks.emit('settingChange')
-    const generalSettings = computed(() => {
-      const _generalSettings = posSettings.value.generalSetting || {};
-      if (!_generalSettings.googleMapApiKey && posSettings.value.call) {
-        _generalSettings['googleMapApiKey'] = posSettings.value.call.googleMapApiKey
+
+    async function fetchGeneralSettings() {
+      return await cms.getModel('PosSetting').findOne({})
+    }
+
+    const generalSettings = ref(null)
+    fetchGeneralSettings().then(posSettings => {
+      const _generalSettings = posSettings.generalSetting || {};
+      if (!_generalSettings.googleMapApiKey && posSettings.call) {
+        _generalSettings['googleMapApiKey'] = posSettings.call.googleMapApiKey
       }
-      return _generalSettings
+      generalSettings.value = _generalSettings
     })
     const quickPayButtonActions = ['auto', 'pay', 'receipt']
     const dialog = ref({ googleMapApiKey: false })
@@ -35,9 +41,9 @@ export default {
     const showTutorial = attrComputed(generalSettings, 'showTutorial', false)
 
     //todo: should not watch like this, should add handler for update:modelValue
-    watch(() => generalSettings.value, async (val, oldV) => {
+    watch(() => generalSettings.value,(val, oldV) => {
       if (val) {
-        await updateSetting({ generalSetting: val })
+        updateSetting({ generalSetting: val })
       }
     }, {
       deep: true

@@ -2,6 +2,7 @@ module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
     // components 2
+    { loader: { type: 'route' }, filePath: 'components2/FirstTimeSetup/FirstTimeSetup2.vue', name: 'setup', path: '/pos2-setup' },
     {loader: {type: 'route'}, filePath: 'components2/PosCustomer/PosCustomer.vue', name: 'posCustomer', path: '/pos-customer' },
     {loader: {type: 'route'}, filePath: 'components2/Customer/CustomerOrder.vue', name: 'posCustomerOrder', path: '/pos-customer-order' },
     {loader: {type: 'route'}, filePath: 'components2/OrderHistory/OrderHistory.vue', name: 'OrderHistory', path: '/pos-order-history'},
@@ -32,7 +33,7 @@ module.exports = {
     {loader: {type: 'route'}, filePath: 'components2/Customer/Customer.vue', name: 'Customer', path: '/pos-customer'},
     /// old components
     //{ loader: { type: 'route' }, filePath: 'components2/Dashboard/DashboardSidebar/PosDashboardSidebar2.vue', name: 'Dashboard2', path: '/pos2-dashboard' },
-    //{ loader: { type: 'route' }, filePath: 'components/View/FirstTimeSetUp.vue', name: 'Setup', path: '/pos-setup' },
+    { loader: { type: 'route' }, filePath: 'components/View/FirstTimeSetup.vue', name: 'Setup', path: '/pos-setup' },
     //{ loader: { type: 'route' }, filePath: 'components/View/Login.vue', name: 'Login', path: '/pos-login' },
     //{ loader: { type: 'route' }, filePath: 'components/View/Dashboard.vue', name: 'Dashboard', path: '/pos2-dashboard' },
     //{ loader: { type: 'route' }, filePath: 'components/View/OrderHistory.vue', name: 'OrderHistory', path: '/pos-order-history' },
