@@ -1,6 +1,6 @@
 <script>
 import RestaurantRoom from '../TablePlan/BasicRoom/RestaurantRoom';
-import EditableRoom from '../TablePlan/EditableRoom/EditableRoom';
+import EditableRoom from '../EditTablePlan/EditableRoom/EditableRoom';
 import PosDashboardSidebar from './DashboardSidebar/PosDashboardSidebar2';
 import OnlineOrderMain from '../OnlineOrder/OnlineOrderMain';
 import OnlineOrderList from '../OnlineOrder/OnlineOrderList'

@@ -1,14 +1,10 @@
 import * as mouseEventUtil from '../../../utils/mouseEventUtil';
-import {
-  onSelectObject,
-  selectingObject,
-  updateSelectingObjectInSelectingRoom
-} from './EditTablePlanLogics'
+import { onSelectObject, selectingObject, updateSelectingObjectInSelectingRoom } from './EditTablePlanLogics'
 
 import _ from 'lodash';
 import { ref } from 'vue'
-import { updateObjectLocation, updateObjectSize } from '../RoomLogics';
-import { selectingRoomStates } from '../RoomState';
+import { updateObjectLocation, updateObjectSize } from '../../TablePlan/RoomLogics';
+import { selectingRoomStates } from '../../TablePlan/RoomState';
 
 const EditableRoomEventHandlersFactory = () => {
   const action = ref('')
@@ -58,7 +54,7 @@ const EditableRoomEventHandlersFactory = () => {
     } else {
       if (action.value === 'resize') {
         const size = selectingObject.value.size
-        await updateSelectingObjectInSelectingRoom( { size })
+        await updateSelectingObjectInSelectingRoom({ size })
       }
     }
     action.value = null
@@ -67,7 +63,7 @@ const EditableRoomEventHandlersFactory = () => {
     return {
       start: e => onMouseDown(e, item, 'move'),
       move: e => onMouseMove(e),
-      end: async(e) => { await onMouseUp(e) }
+      end: async (e) => { await onMouseUp(e) }
     }
   }
 

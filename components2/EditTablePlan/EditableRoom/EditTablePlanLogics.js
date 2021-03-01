@@ -1,17 +1,31 @@
-import { computed, ref, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import {
   addNewRoom,
-  objectsInSelectingRoom, onSelectRoom, removeSelectingRoom,
+  objectsInSelectingRoom,
+  onSelectRoom,
+  removeSelectingRoom,
+  roomsStates,
   selectingRoomStates,
-  roomsStates, updateSelectingRoomName, swapSelectingRoomOrderWithTheRoomBefore, swapSelectingRoomOrderWithTheRoomBehind
-} from '../RoomState';
+  swapSelectingRoomOrderWithTheRoomBefore,
+  swapSelectingRoomOrderWithTheRoomBehind,
+  updateSelectingRoomName
+} from '../../TablePlan/RoomState';
 import _ from 'lodash';
 import cms from 'cms';
-import { ObjectID} from 'bson';
-import { addRoomObject, removeRoomObject, updateRoomObject } from '../RoomLogics';
+import { ObjectID } from 'bson';
+import { addRoomObject, removeRoomObject, updateRoomObject } from '../../TablePlan/RoomLogics';
+import { useI18n } from 'vue-i18n';
 
 export const selectingObject = ref(null)
 
+export const tableNameExistedErrorMsg = ref('')
+export const showExistedTableNameError = ref(false)
+
+let t
+
+export function initI18n() {
+  ({ t } = useI18n())
+}
 
 export const onSelectObject = function (item) {
   selectingObject.value = _.find(objectsInSelectingRoom.value, i => i._id.toString() === item._id.toString())
@@ -112,21 +126,29 @@ export const removeSelectingObjectFromSelectingRoom = async function () {
 }
 
 export const updateSelectingObjectInSelectingRoom = async function (newObject) {
-
   //todo: validate new object 's name
   if (selectingRoomStates.value) {
-    await updateObjectInSelectingRoom(selectingObject.value, newObject)
+    const updatable = !newObject.name || (newObject.name === selectingObject.value.name) || !allObjectsName.value.includes(newObject.name)
+    if (updatable) await updateObjectInSelectingRoom(selectingObject.value, newObject)
+    else {
+      console.log(t('editablePlan.existedTableNameErrorMsg'))
+      tableNameExistedErrorMsg.value = t('editablePlan.existedTableNameErrorMsg', { tableName: newObject.name, suggestionName: newObjectName.value })
+      showExistedTableNameError.value = true
+    }
   }
 }
 
-const newObjectName = computed(() => {
+const allObjectsName = computed(() => {
   let allObjects = []
   roomsStates.value.forEach(r => {
     allObjects = allObjects.concat(r.room.roomObjects)
   })
-  const allObjectsName = allObjects.map(object => object.name)
+  return allObjects.map(object => object.name)
+})
+
+const newObjectName = computed(() => {
   let res = 1
-  while (allObjectsName.includes('' + res)) res++
+  while (allObjectsName.value.includes('' + res)) res++
   return '' + res
 })
 
@@ -138,7 +160,7 @@ export const tableColors = ['#FFFFFF', '#F8BBD0', '#D1C4E9', '#B3E5FC', '#FFF9C4
 
 export const wallColors = ['#FFFFFF', '#CCCCCC', '#4D0019', '#404040', '#86592D', '#A6A6A6', '#FFD480', '#E4E4E4']
 
-export const showAddNewRoomBtn = ref(false)
+export const showAddNewRoomBtn = ref(true)
 
 export const isSelectingARoom = computed(() => !!selectingRoomStates.value)
 export const isSelectingARoomObject = computed(() => !!selectingObject.value)
@@ -171,29 +193,29 @@ export const sidebarData = computed(() => [{
   }))
 }])
 
-export const toggle = function() {
+export const toggle = function () {
   showAddNewRoomBtn.value = !showAddNewRoomBtn.value
 }
 
-export const onUpdateSelectingRoomName = async function(newRoomName) {
+export const onUpdateSelectingRoomName = async function (newRoomName) {
   await updateSelectingRoomName(newRoomName)
 }
 
-export const onMoveRoomUp = async function() {
+export const onMoveRoomUp = async function () {
   await swapSelectingRoomOrderWithTheRoomBefore()
 }
 
-export const onMoveRoomDown = async function() {
+export const onMoveRoomDown = async function () {
   await swapSelectingRoomOrderWithTheRoomBehind()
 }
 
-export const dialog = ref({
-  showRoomNameKdb: false,
+export const dialog = reactive({
+  showRoomNameKbd: false,
   showTableNameKbd: false,
 })
 
 
-export const duplicateRoomObj = async function() {
+export const duplicateRoomObj = async function () {
   const newObj = _.cloneDeep(selectingObject.value)
   delete newObj._id
   newObj.name = newObjectName.value
@@ -204,21 +226,20 @@ export const duplicateRoomObj = async function() {
   await addNewRoomObjectToSelectingRoom(newObj)
 }
 
-export const onDuplicateRoomObj = async function() {
+export const onDuplicateRoomObj = async function () {
   await duplicateRoomObj(selectingObject.value)
 }
 
-export const onRemoveRoomObj = async function() {
+export const onRemoveRoomObj = async function () {
   await removeSelectingObjectFromSelectingRoom()
 }
 
-export const onAddNewWall = async function() {
+export const onAddNewWall = async function () {
   await createAndAddNewWallToSelectingRoom()
 }
 
-export const onAddNewTable = async function() {
+export const onAddNewTable = async function () {
   await createAndAddNewTableToSelectingRoom()
 }
 
-const tableNameExistedErrorMsg = ref('')
 

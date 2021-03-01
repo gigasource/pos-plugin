@@ -2,7 +2,7 @@
 import { GBtn, GSwitch, GTextFieldBs } from '../../../../backoffice/pos-vue-framework';
 import PosDashboardSidebar2 from '../Dashboard/DashboardSidebar/PosDashboardSidebar2';
 import { useI18n } from 'vue-i18n'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import {
   dialog,
   isSelectingARoom,
@@ -25,10 +25,10 @@ import {
   updateSelectingObjectInSelectingRoom,
   updateTableName,
   wallColors
-} from '../TablePlan/EditableRoom/EditTablePlanLogics';
-import { selectingRoomStates } from '../TablePlan/RoomState';
+} from './EditableRoom/EditTablePlanLogics';
+import { roomsStates, selectingRoomStates } from '../TablePlan/RoomState';
 import { isTable } from '../TablePlan/RoomShared';
-import { genScopeId } from '../utils';
+import { genScopeId, isSameId } from '../utils';
 import { useRouter } from 'vue-router'
 
 export default {
@@ -60,7 +60,8 @@ export default {
           {{
             'append-inner': () =>
                 <g-icon style="cursor: pointer"
-                        onClick="dialog.showRoomNameKbd = true">icon-keyboard</g-icon>
+                        onClick={() => dialog.showRoomNameKbd = true}>icon-keyboard
+                </g-icon>
           }}
       />
       <div style="display: flex; margin-left: 5px; margin-right: 5px; justify-content: space-between;">
@@ -72,7 +73,8 @@ export default {
         </g-btn>
         <g-btn onClick={onRemoveRoom} background-color="#FF4452" text-color="#FFF">
           <g-icon>delete</g-icon>
-          {t('ui.delete')}</g-btn>
+          {t('ui.delete')}
+        </g-btn>
       </div>
     </div>
     const objectToolbarRenderFn = () => isSelectingARoomObject.value &&
@@ -82,7 +84,7 @@ export default {
                     label="Table name: "
                     modelValue={selectingObject.value.name}
                     onUpdate:modelValue={updateTableName}
-                    onClick={dialog.showTableNameKbd = true}
+                    onClick={() => dialog.showTableNameKbd = true}
                     v-slots={{
                       'append-inner': () => <g-icon svg color="#F00">icon-keyboard-red</g-icon>
                     }}/>
@@ -141,11 +143,6 @@ export default {
       </div>
     </>
 
-    //   const dialogRenderFn = <>
-    //   <dialog-text-filter label="Room name" v-if="room" default-value={selectingRoom.value.name} v-model={dialog.showRoomNameKbd}  onSubmit={onUpdateSelectingRoomName}/>
-    //   <dialog-text-filter label="Table name" v-if="roomObj" default-value={roomObj.name} v-model="dialog.showTableNameKbd" onSubmit="changeTableName"/>
-    //   <g-snackbar v-model="showSnackBar" time-out="3000">{{ tableNameExistedErrorMsg }}</g-snackbar>
-    // </>
     const slots = {
       'above-spacer': genScopeId(() => <>
         {addRoomBtnRenderFn()}
@@ -156,6 +153,16 @@ export default {
     }
 
     const sidebarSelectingPath = ref('items.0.items.0') // select first foom
+
+    watch(() => [selectingRoomStates.value, roomsStates.value], () => {
+      if (selectingRoomStates.value) {
+        const idx = roomsStates.value.findIndex(i => isSameId(selectingRoomStates.value.room, i.room))
+        if (idx !== -1) {
+          sidebarSelectingPath.value = `items.0.items.${idx}`
+        }
+      }
+    }, { deep: true })
+
     return () =>
         <PosDashboardSidebar2 v-model={sidebarSelectingPath.value} onToggle={toggle} items={sidebarData.value} v-slots={slots}/>
   }

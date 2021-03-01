@@ -1,21 +1,20 @@
 <script>
-import {roomUiFactory} from '../RoomUi'
-import {computed} from 'vue'
+import { roomUiFactory } from '../../TablePlan/RoomUi'
+import { computed } from 'vue'
 import EditableRoomEventHandlersFactory from './EventHandlersForEditableRoom'
-import {isSelectingObject} from './EditTablePlanLogics';
-import {getScopeAttrs} from '../../../utils/helpers';
-import RoomStyleFactory from '../RoomStyles';
-import {selectingRoomStates, objectsInSelectingRoom} from '../RoomState';
-import {isTable} from '../RoomShared';
-import Touch from "../../../../../backoffice/pos-vue-framework/src/directives/touch/touch";
+import { isSelectingObject } from './EditTablePlanLogics';
+import RoomStyleFactory from '../../TablePlan/RoomStyles';
+import { objectsInSelectingRoom, selectingRoomStates } from '../../TablePlan/RoomState';
+import { isTable } from '../../TablePlan/RoomShared';
+import Touch from '../../../../../backoffice/pos-vue-framework/src/directives/touch/touch';
 
 export default {
   name: 'RestaurantRoom',
-  directives: {Touch},
+  directives: { Touch },
   setup() {
-    const {roomObjectContainerStyle, roomObjectStyle} = RoomStyleFactory(selectingRoomStates)
+    const { roomObjectContainerStyle, roomObjectStyle } = RoomStyleFactory(selectingRoomStates)
 
-    const {resizeRoomObjectEvenHandler, touchHandlers} = EditableRoomEventHandlersFactory({})
+    const { resizeRoomObjectEvenHandler, touchHandlers } = EditableRoomEventHandlersFactory({})
 
     const _roomObjectContainerStyle = (obj) => {
       const style = roomObjectContainerStyle(obj)
@@ -51,9 +50,7 @@ export default {
     }))
 
     const resizeButtonRenderFn = obj => isSelectingObject(obj) &&
-        <div style={style.value} {...getScopeAttrs()}
-             {...resizeRoomObjectEvenHandler(obj)}
-        >
+        <div style={style.value} {...resizeRoomObjectEvenHandler(obj)}>
           <img alt style={arrowStyle.value} src="/plugins/pos-plugin/assets/resize.svg" draggable="false"/>
         </div>
 
@@ -63,11 +60,11 @@ export default {
                   style={_roomObjectContainerStyle(obj)}
       >
         {objectRenderFn(obj)}
-        {resizeButtonRenderFn(obj, getScopeAttrs())}
+        {resizeButtonRenderFn(obj)}
       </div>
     }
 
-    const {renderRoom} = roomUiFactory(roomObjectRenderFn, selectingRoomStates, objectsInSelectingRoom);
+    const { renderRoom } = roomUiFactory(roomObjectRenderFn, selectingRoomStates, objectsInSelectingRoom);
     return () => renderRoom();
   }
 }
