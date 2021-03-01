@@ -70,7 +70,10 @@ const DashboardSidebarFactory = () => {
             icon: 'icon-services',
             title: t('sidebar.services'),
             feature: 'onlineOrdering',
-            key: 'Service'
+            key: 'Service',
+            onClick() {
+              dashboardHooks.emit('updateScreen', 'OnlineOrderServicesView')
+            }
           }
         ],
       },

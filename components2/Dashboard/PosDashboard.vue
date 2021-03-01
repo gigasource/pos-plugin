@@ -4,6 +4,7 @@ import EditableRoom from '../TablePlan/EditableRoom/EditableRoom';
 import PosDashboardSidebar from './DashboardSidebar/PosDashboardSidebar2';
 import OnlineOrderMain from '../OnlineOrder/OnlineOrderMain';
 import OnlineOrderList from '../OnlineOrder/OnlineOrderList'
+import OnlineOrderServices from '../OnlineOrder/OnlineOrderServices';
 import { computed, h, KeepAlive, ref } from 'vue';
 import { fetchRooms, roomsStates } from '../TablePlan/RoomState';
 import { appHooks } from '../AppSharedStates';
@@ -14,12 +15,13 @@ import PosDashboardFunction from './DashboardFunctions/PosDashboardFunction';
 import VirtualPrinterView from '../VirtualPrinter/VirtualPrinterView';
 import ReservationsList from '../Reservation/ReservationsList';
 
+
 export default {
   name: 'Dashboard',
   components: {
     VirtualPrinterView,
-    OnlineOrderList,
-    OnlineOrderMain, PosDashboardFunction, RestaurantRoom, EditableRoom, PosDashboardSidebar, PosOrderManualTable,
+    OnlineOrderList, OnlineOrderMain, OnlineOrderServices,
+    PosDashboardFunction, RestaurantRoom, EditableRoom, PosDashboardSidebar, PosOrderManualTable,
     ReservationsList
   },
   setup() {
@@ -61,6 +63,7 @@ export default {
     const OnlineOrderMainView = <OnlineOrderMain/>
     const OnlineOrderListDeclinedView = <OnlineOrderList status="declined"/>
     const OnlineOrderListCompletedView = <OnlineOrderList status="completed"/>
+    const OnlineOrderServicesView = <OnlineOrderServices/>
     const ReservationView = <ReservationsList/>
     const VirtualPrinter = <VirtualPrinterView/>
     const DashBoardViews = {
@@ -70,6 +73,7 @@ export default {
       OnlineOrderMainView,
       OnlineOrderListDeclinedView,
       OnlineOrderListCompletedView,
+      OnlineOrderServicesView,
       ReservationView,
       VirtualPrinter
     };
