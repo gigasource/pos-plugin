@@ -1,6 +1,7 @@
 //<editor-fold desc="declare">
 import {ObjectID} from "bson";
 import {v1} from "uuid";
+import {currentAppType} from "../AppType";
 
 const {reactive, computed, watch, watchEffect, h, nextTick, ref, isProxy} = require('vue');
 const _ = require('lodash');
@@ -55,7 +56,8 @@ export const createOrder = function (_order) {
     _id: new ObjectID(),
     items: [], cancellationItems: [], takeAway: false, status: 'inProgress',
     payment: [],
-    user: []
+    user: [],
+    appType: currentAppType.value
   });
   order = reactive(order);
 

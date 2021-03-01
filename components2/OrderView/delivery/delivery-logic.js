@@ -13,11 +13,6 @@ export const itemsWithQty = computed(() => {
   return []
 });
 
-// inc 1
-export function addItem(item) {
-  //fixme: refactore
-}
-
 // dec 1
 export function removeItem(item) {
   //fixme: refactore
@@ -28,6 +23,7 @@ export function removeModifier(item, index) {
   //fixme: refactore
 }
 
+// todo: Move these code to product logic
 // online-order products
 export const products = ref([])
 export async function loadProduct() {

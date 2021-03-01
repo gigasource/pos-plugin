@@ -1,8 +1,9 @@
 <script>
+//todo: !important move this to onlineOrder directory
 import {Touch} from "pos-vue-framework";
 import _ from "lodash";
 import {$filters, avatar, isIOS, isMobile, username} from "../../AppSharedStates";
-import {computed, withModifiers, ref} from "vue";
+import {computed, withModifiers, ref, onActivated} from "vue";
 import {useRouter} from 'vue-router';
 import {isItemDiscounted} from "../pos-ui-shared";
 import { execGenScopeId } from '../../utils';
@@ -22,7 +23,6 @@ import {
   currentOrder,
   itemsWithQty,
   keyboardConfig,
-  addItem,
   removeItem,
   loadProduct,
   removeModifier,
@@ -33,6 +33,7 @@ import cms from 'cms'
 import { deliveryCustomerUiFactory } from './delivery-customer-ui'
 import { genScopeId } from '../../utils';
 import PosOrderDeliveryKeyboard from '../Helper/posOrderDeliveryKeyboard2'
+import {createOrder, addItem, changeItemQuantity} from "../pos-logic"
 
 export default {
   name: "PosOrderDelivery",
@@ -45,17 +46,18 @@ export default {
     const selectedProduct = ref()
     const modifiers = ref([])
     const type = ref('')
-    const note = ref('')
-    const time = ref(30)
-
+    let order = createOrder()
     const enterPressed = ref(0)
+    const selectedProductQuantity = ref(0)
 
-
-    const quantity = ref(1)
     const paymentTotal = ref(0)
     // TODO: Refactor
 
     const user = ref({})
+
+    onActivated(() => {
+      order = createOrder()
+    })
 
     let debounceUpdatePrice, keyboardEventHandler
 
@@ -149,14 +151,11 @@ export default {
       const product = {
         ...selectedProduct.value,
         modifiers: modifiers.value,
-        quantity: quantity.value || 1,
       }
 
-      //refactore
-      addProductToOrder(product)
+      addItem(order, product, 1)
       selectedProduct.value = null
       modifiers.value = []
-      quantity.value = 1
       //focus product autocomplete
       if (!isMobile.value)
         document.querySelector('.g-autocomplete input').click()
@@ -164,8 +163,8 @@ export default {
     }
 
     function closeDialogConfirm() {
-      note.value = ''
-      time.value = 30
+      order.note = ''
+      order.prepareTime = 30
       dialog.value.order = false
     }
 
@@ -186,7 +185,7 @@ export default {
         phone: selectedCustomer.value.phone,
         zipCode: selectedCustomer.value.addresses[selectedAddress.value].zipcode
       }
-      await createCallInOrder(customer, time.value, note.value)
+      await createCallInOrder(customer) // todo: check whether this is send to kitchen or not
       dialog.value.order = false
       autocompleteAddresses.value = []
       router.push({
@@ -202,16 +201,15 @@ export default {
         if (!_quantity) _quantity = 1
         const product = products.value.find(p => p.id.toLowerCase() === productId.toLowerCase())
         if (product) {
+          selectedProductQuantity.value = +_quantity
           if (product.choices && product.choices.length > 0) {
-            quantity.value = +_quantity
             selectedProduct.value = product
             dialog.value.choice = true
           } else {
-            addProductToOrder({
+            addItem(order, {
               ...product,
-              quantity,
               modifiers: []
-            })
+            }, selectedProductQuantity.value)
           }
         }
       }
@@ -264,9 +262,17 @@ export default {
       return `${option.name} (${t('common.currency', locale)}${$filters.formatCurrency(option.price)})`
     }
 
-    function changeQuantity(value) {
-      if (quantity.value + value >= 0) {
-        quantity.value += value
+    function decreaseQty(item) {
+      changeItemQuantity(order, item, -1)
+    }
+
+    function increaseQty(item) {
+      changeItemQuantity(order, item, 1)
+    }
+
+    function changeQuantity(change) {
+      if (selectedProductQuantity.value + change >= 0) {
+        selectedProductQuantity.value += change
       }
     }
 
@@ -275,28 +281,28 @@ export default {
       console.warn('PosOrderDelivery2:resetOrderData was not implemented')
     }
 
-    function addProductToOrder(product) {
-      console.warn('PosOrderDelivery2:addProductToOrder was not implemented')
-      //fixme: OrderStore:addProductToOrder
-      // the code below is temporary logic to migrate ui
-      function genObjectId(id) {
-        const BSON = require('bson');
-        if (id) return new BSON.ObjectID(id)
-        return new BSON.ObjectID();
-      }
-      function mapProduct(p) {
-        return {
-          ...p,
-          ...!p.originalPrice && { originalPrice: p.price },
-          ...!p.quantity && { quantity: 1 },
-          ...!p.course && { course: 1 },
-          product: p._id,
-          _id: genObjectId(),
-          taxes: [p.tax, p.tax2]
-        }
-      }
-      currentOrder.value.items.push(mapProduct(product))
-    }
+    // function addProductToOrder(product) {
+    //   console.warn('PosOrderDelivery2:addProductToOrder was not implemented')
+    //   //fixme: OrderStore:addProductToOrder
+    //   // the code below is temporary logic to migrate ui
+    //   function genObjectId(id) {
+    //     const BSON = require('bson');
+    //     if (id) return new BSON.ObjectID(id)
+    //     return new BSON.ObjectID();
+    //   }
+    //   function mapProduct(p) {
+    //     return {
+    //       ...p,
+    //       ...!p.originalPrice && { originalPrice: p.price },
+    //       ...!p.quantity && { quantity: 1 },
+    //       ...!p.course && { course: 1 },
+    //       product: p._id,
+    //       _id: genObjectId(),
+    //       taxes: [p.tax, p.tax2]
+    //     }
+    //   }
+    //   currentOrder.value.items.push(mapProduct(product))
+    // }
 
     function removeProductModifier() {
       //fixme OrderStore:removeProductModifier
@@ -329,7 +335,7 @@ export default {
                                     ref="autocomplete" return-object
                                     filter={(itemText, text) => itemText.toLowerCase().includes(text.toLowerCase())}/>
                     {selectedProduct.value && <>
-                      <g-text-field-bs class="bs-tf__pos quantity" v-model={quantity.value} label="Quantity"/>
+                      <g-text-field-bs class="bs-tf__pos quantity" v-model={selectedProductQuantity.value} label="Quantity"/>
                       <g-text-field-bs class="bs-tf__pos" modelValue={selectedProduct.value.price} label="Price"
                                        onUpdate:modelValue={debounceUpdatePrice}/>
                       <g-text-field-bs class="bs-tf__pos" v-model={selectedProduct.value.note} label="Note"/>
@@ -378,7 +384,7 @@ export default {
             </div>
 
             <div class="delivery-detail__order">
-              {itemsWithQty.value.map((item, i) =>
+              {order.items.map((item, i) =>
                   <div key={i} class="item">
                     <div class="item-detail">
                       <div>
@@ -389,9 +395,9 @@ export default {
                         </p>
                       </div>
                       <div class="item-action">
-                        <g-icon onClick={withModifiers(() => removeItem(item), ['stop'])}>remove_circle_outline</g-icon>
+                        <g-icon onClick={withModifiers(() => decreaseQty(item), ['stop'])}>remove_circle_outline</g-icon>
                         <span>{item.quantity}</span>
-                        <g-icon onClick={withModifiers(() => addItem(item), ['stop'])}>add_circle_outline</g-icon>
+                        <g-icon onClick={withModifiers(() => increaseQty(item), ['stop'])}>add_circle_outline</g-icon>
                       </div>
                     </div>
                     {item.modifiers && <div> {
@@ -436,22 +442,22 @@ export default {
                   <div class="mx-2">
                     <b>Address: </b> {selectedCustomerAddress.value}
                   </div>
-                  <g-text-field-bs label="Delivery note:" v-model={note.value} v-slots={{
+                  <g-text-field-bs label="Delivery note:" v-model={order.note} v-slots={{
                     'append-inner': () => <g-icon onClick={() => dialog.value.note = true}>icon-keyboard</g-icon>
                   }}/>
                   <div class="ma-2">Time to complete (minute)</div>
                   <div class="mb-3">
-                    <g-btn-bs class="elevation-1" backgroundColor={time.value === 15 ? '#BBDEFB' : 'white'}
-                              onClick={() => time.value = 15}>15</g-btn-bs>
-                    <g-btn-bs class="elevation-1" backgroundColor={time.value === 30 ? '#BBDEFB' : 'white'}
-                              onClick={() => time.value = 30}>30</g-btn-bs>
-                    <g-btn-bs class="elevation-1" backgroundColor={time.value === 45 ? '#BBDEFB' : 'white'}
-                              onClick={() => time.value = 45}>45</g-btn-bs>
-                    <g-btn-bs class="elevation-1" backgroundColor={time.value === 60 ? '#BBDEFB' : 'white'}
-                              onClick={() => time.value = 60}>60</g-btn-bs>
+                    <g-btn-bs class="elevation-1" backgroundColor={order.prepareTime === 15 ? '#BBDEFB' : 'white'}
+                              onClick={() => order.prepareTime = 15}>15</g-btn-bs>
+                    <g-btn-bs class="elevation-1" backgroundColor={order.prepareTime === 30 ? '#BBDEFB' : 'white'}
+                              onClick={() => order.prepareTime = 30}>30</g-btn-bs>
+                    <g-btn-bs class="elevation-1" backgroundColor={order.prepareTime === 45 ? '#BBDEFB' : 'white'}
+                              onClick={() => order.prepareTime = 45}>45</g-btn-bs>
+                    <g-btn-bs class="elevation-1" backgroundColor={order.prepareTime === 60 ? '#BBDEFB' : 'white'}
+                              onClick={() => order.prepareTime = 60}>60</g-btn-bs>
                   </div>
                   <g-btn-bs disabled={disabledConfirm.value} block large background-color="#2979FF"
-                            onClick={confirmOrder.value}>
+                            onClick={confirmOrder}>
                     Confirm - {t('common.currency', locale)}{$filters.formatCurrency(paymentTotal.value)}
                   </g-btn-bs>
                 </div>)
@@ -496,7 +502,7 @@ export default {
               <div class="dialog-action">
                 <div class="row-flex align-items-center" style="line-height: 2">
                   <g-icon onClick={withModifiers(() => changeQuantity(-1), ['stop'])} color="#424242" size="28">remove_circle_outline</g-icon>
-                  <span style="margin-left: 4px; margin-right: 4px; min-width: 20px; text-align: center">{quantity.value}</span>
+                  <span style="margin-left: 4px; margin-right: 4px; min-width: 20px; text-align: center">{selectedProductQuantity.value}</span>
                   <g-icon onClick={withModifiers(() => changeQuantity(1), ['stop'])} color="#424242" size="28">add_circle</g-icon>
                 </div>
                 <g-spacer/>

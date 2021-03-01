@@ -8,6 +8,7 @@ import {
 	user
 } from '../AppSharedStates'
 import cms from 'cms'
+import { ObjectID } from 'bson'
 
 const Order = cms.getModel('Order')
 
@@ -88,9 +89,14 @@ export async function acceptOrder(order) {
 
 	Object.assign(order, orderStatus)
 
+	if (!order._id)
+		order._id = new ObjectID()
+	if (!order.online)
+		order.online = true
+
 	await Order.findOneAndUpdate({
 		_id: order._id
-	}, order)
+	}, order, { upsert: true })
 	_.remove(pendingOrders.value, _order => _order._id.toString() === order._id.toString())
 	kitchenOrders.value.unshift(order)
 }

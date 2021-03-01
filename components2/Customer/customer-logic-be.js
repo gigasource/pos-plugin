@@ -17,14 +17,6 @@ const Customer = cms.getModel('Customer')
 
 export async function loadCustomers() {
   customers.value = await Customer.find({ appType: currentAppType.value })
-  const __mock = [
-    { _id: '1', name: 'Mock -- Josh', phone: '123456789', addresses: [{ address: 'Address line 1' }, { address: 'Address line 2' }, { address: 'Address line 3' }] },
-    { _id: '2', name: 'shoj', phone: '123456789', addresses: [{ address: 'Address line 1' }, { address: 'Address line 2' }, { address: 'Address line 3' }] },
-    { _id: '3', name: 'jsoh', phone: '123456789', addresses: [{ address: 'Address line 1' }, { address: 'Address line 2' }, { address: 'Address line 3' }] },
-    { _id: '4', name: 'jhos', phone: '123456789', addresses: [{ address: 'Address line 1' }, { address: 'Address line 2' }, { address: 'Address line 3' }] },
-    { _id: '5', name: 'hsoj', phone: '123456789', addresses: [{ address: 'Address line 1' }, { address: 'Address line 2' }, { address: 'Address line 3' }] },
-  ]
-  customers.value = __mock
 }
 
 export async function deleteCustomer(customerId) {
