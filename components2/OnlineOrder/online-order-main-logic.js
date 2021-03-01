@@ -111,12 +111,49 @@ export function isRefunded(order) {
 		&& _.every(order.paypalOrderDetail.refundResponses, r => r.status === "COMPLETED"))
 }
 
+/**
+ * Single paypal payment transaction can be divided into multiple transactions (capture)
+ * For example paypal wallet doesn't have enough money so other payments from card will be use.
+ * For this payment, 2 transactions will be executed.
+ *
+ * @param captureResponses
+ * @return {{final_capture}|any}
+ */
+function getFinalTransaction(captureResponses) {
+	let finalCapture;
+	for(let purchase_unit of captureResponses.purchase_units) {
+		for (let capture of purchase_unit.payments.captures) {
+			if (capture.final_capture) {
+				finalCapture = capture
+				break;
+			}
+		}
+	}
+	return finalCapture
+}
+
+
+function isRefundExpired(captureResponses) {
+	let refundExpired = true
+	const finalTransaction = getFinalTransaction(captureResponses)
+	if (finalTransaction) {
+		const transactionTime = dayjs(finalTransaction.create_time)
+		const refundableTime = dayjs().subtract(3, 'hour')
+		refundExpired = transactionTime.isBefore(refundableTime)
+	}
+	return refundExpired
+}
+
+function isRefundFailed(refundResponses) {
+	return _.some(refundResponses, r => r.status !== "COMPLETED")
+}
+
 export function isRefundable(order) {
-	// refundable order is order paid via paypal and money has been captured
-	// and not refund yet or refund but some capture failed
-	return (order.paypalOrderDetail
-		&& order.paypalOrderDetail.captureResponses
-		&& order.paypalOrderDetail.captureResponses.status === "COMPLETED" && !this.isCaptureRefundExpired(order.paypalOrderDetail.captureResponses)
-		&& (!order.paypalOrderDetail.refundResponses || this.isRefundFailed(order.paypalOrderDetail.refundResponses)))
+	const paypalTransaction = order.paypalOrderDetail
+	return (paypalTransaction
+			&& paypalTransaction.captureResponses
+			&& paypalTransaction.captureResponses.status === "COMPLETED"
+			&& !isRefundExpired(paypalTransaction.captureResponses)
+			&& (!paypalTransaction.refundResponses || isRefundFailed(paypalTransaction.refundResponses)))
 }
 //</editor-fold>
