@@ -105,3 +105,7 @@ export async function getOnlineOrdersByLimit(page, limit) {
 	return await Order.find({ online: true }).sort({ date: -1 }).skip(page * limit).limit(limit)
 }
 
+cms.socket.on('updateOnlineOrders', async sentryTagString => {
+	console.debug(sentryTagString, '7. Restaurant frontend: received updateOnlineOrders signal')
+	await loadOrders()
+})
