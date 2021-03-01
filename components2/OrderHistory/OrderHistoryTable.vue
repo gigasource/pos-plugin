@@ -18,6 +18,7 @@ import {
   updateLimit,
   updatePagination
 } from './order-history-logics';
+import { $filters } from '../AppSharedStates';
 import { useI18n } from 'vue-i18n';
 
 export default {
@@ -135,7 +136,7 @@ export default {
             {order.table || ''}
           </td>
           <td class="ta-right sum" style="white-space: nowrap">
-            € {order.amount.toFixed(2)}
+            { $filters.formatCurrency(order.amount) }
           </td>
           <td class="ta-center">
             {
