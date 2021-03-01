@@ -6,15 +6,12 @@ import {
   createOrder,
   genSplitId,
   hooks, mergeSameItems,
-  updateOrderWithHooks
 } from './pos-logic';
 import {computed, ref, toRaw, watch, watchEffect} from "vue";
 import cms from 'cms';
 import _ from 'lodash';
 import rdiff from 'recursive-diff';
 import Hooks from "schemahandler/hooks/hooks";
-import {v1} from 'uuid';
-import { currentAppType } from '../AppType';
 import dayjs from "dayjs";
 import delay from "delay";
 import {socketEmit} from "../utils";
@@ -139,7 +136,6 @@ export function makeRefundOrder(order, newOrder = true) {
 
 export function orderBeFactory(id = 0) {
   let order = createOrder();
-  order.appType = currentAppType.value
   let _new, _split, _off;
   orderMap.set(order, id);
 
@@ -215,7 +211,6 @@ export function orderBeFactory(id = 0) {
     }
     clearOrder(clearActionList);
     order = createOrder(_.assign(order, __order));
-    order.appType = currentAppType.value
     hooks.emit(`pre:prepareOrder:${id}`, order);
     let _order = _.omit(_.cloneDeep(order), ['beforeSend']);
 
