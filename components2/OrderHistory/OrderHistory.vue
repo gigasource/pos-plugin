@@ -2,7 +2,7 @@
 import { computed, onActivated, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { dateFormat, genScopeId } from '../utils';
+import { datetimeFormat, genScopeId } from '../utils';
 import {
   dialog,
   getOrderHistory,
@@ -24,14 +24,13 @@ import OrderHistoryDetail from './OrderHistoryDetail';
 import DialogDateTimePicker from './dialogDateTimePicker';
 import { appHooks } from '../AppSharedStates';
 import { listPayments } from '../Settings/PaymentSetting/view-payment-logics';
-
 export default {
   components: { DialogDateTimePicker, OrderHistoryDetail, OrderHistoryTable },
   setup() {
     const { t } = useI18n()
     const orderHistoryPagination = ref({ limit: 15, currentPage: 1 })
     //fixme: this is hot fix, need a better solution
-    dateFormat.value
+    datetimeFormat.value
     initI18n()
     appHooks.emit('settingChange') // to update payment methods list
 

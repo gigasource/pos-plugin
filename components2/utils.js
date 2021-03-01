@@ -62,8 +62,8 @@ export const formatsFactory = () => {
 }
 
 export const dateFormat = computed(() => {
-  const {t} = useI18n();
-  return t('dates.dateFormat');
+  const {t, locale} = useI18n();
+  return t('dates.dateFormat', locale.value);
 });
 
 export const timeFormat = computed(() => {

@@ -5,7 +5,6 @@ import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router';
 import { isIOS } from '../AppSharedStates';
 import {
-  customers,
   selectingCustomer,
   onCreateCustomer,
   onRemoveAddress,
@@ -18,7 +17,8 @@ import {
   onDialogSubmit, customerHooks,
   onSelectCustomer,
   autocompleteAddresses
-} from './customer-logics';
+} from './customer-ui-logics';
+import { customers } from './customer-be-logics';
 import { v4 as uuidv4 } from 'uuid';
 import { useI18n } from 'vue-i18n';
 
@@ -40,7 +40,6 @@ export default {
     async function selectAutocompleteAddress(place_id, index) {
       if (autocompleteAddresses.value[index].places.find(item => item.value === place_id)) {
         cms.socket.emit('getPlaceDetail', place_id, token, data => {
-          customerDialogData
           if (!_.isEmpty(data)) {
             for (const component of data.address_components) {
               customerDialogData.addresses[index].house = component.types.includes('street_number') ? component.long_name : ''

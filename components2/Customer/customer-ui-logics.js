@@ -1,10 +1,10 @@
 import { CRUdDbFactory } from '../../utils/CRUD/crud-db';
+import { CUSTOMER_COLLECTION_NAME } from './customer-be-logics';
 import { ref, computed, reactive, toRaw } from 'vue'
 import { CRUdFactory } from '../../utils/CRUD/crud';
 import { ObjectID } from 'bson';
+import { customers, loadCustomers, createCustomer, removeCustomer, updateCustomer} from './customer-be-logics';
 
-export const CUSTOMER_COLLECTION_NAME = 'Customer'
-export const customers = ref([])
 export const selectingCustomer = ref(null)
 import Hooks from 'schemahandler/hooks/hooks'
 import { isSameId } from '../utils';
@@ -23,28 +23,19 @@ export function onSelectCustomer(customer) {
   selectingCustomer.value = customer
 }
 
-export async function fetchCustomers() {
-  return cms.getModel(CUSTOMER_COLLECTION_NAME).find({})
-}
-
 customerHooks.on('fetchCustomer', async () => {
-  customers.value = await fetchCustomers()
+  await loadCustomers()
 })
 
 export const showCustomerDialog = ref(false)
 
 export const currentAction = ref('')
 
-
 export async function onCreateCustomer(customer) {
-  const { create: createCustomer } = CRUdDbFactory(customers.value, '', CUSTOMER_COLLECTION_NAME)
-
   return await createCustomer(customer)
 }
 
 export async function onRemoveCustomer(customer) {
-  const { remove: removeCustomer } = CRUdDbFactory(customers.value, '', CUSTOMER_COLLECTION_NAME)
-
   await removeCustomer(customer)
   customerHooks.emit('fetchCustomer')
 }
@@ -55,11 +46,11 @@ export async function onRemoveSelectingCustomer() {
 }
 
 export async function onUpdateCustomer(oldId, newInfo) {
-  const { update: updateCustomer } = CRUdDbFactory(customers.value, '', CUSTOMER_COLLECTION_NAME)
   await updateCustomer({ _id: oldId }, newInfo)
 }
 
 export async function onUpdateSelectingCustomer(newInfo) {
+  console.log(newInfo)
   await onUpdateCustomer(selectingCustomer.value._id, newInfo)
 }
 
@@ -87,6 +78,7 @@ export async function onDialogSubmit() {
     await onCreateCustomer(toRaw(customerDialogData))
   }
   if (currentAction.value === 'edit') {
+    console.log('edit')
     await onUpdateSelectingCustomer(toRaw(customerDialogData))
   }
   customerHooks.emit('fetchCustomer')

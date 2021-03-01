@@ -11,6 +11,7 @@ module.exports = {
       german: 'German',
       vietnam: 'Vietnam',
       key: 'Login',
+      clearKey: 'Clear',
       loginMess: 'Enter your passcode to login',
     },
     //dashboard

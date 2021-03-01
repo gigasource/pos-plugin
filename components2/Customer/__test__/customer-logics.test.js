@@ -7,7 +7,7 @@ import {
   onSelectCustomer,
   onAddAddress,
   onRemoveAddress
-} from "../customer-logics";
+} from "../customer-ui-logics";
 import { ObjectID } from "bson";
 import { stringify } from "schemahandler/utils";
 import { toRaw } from "vue";

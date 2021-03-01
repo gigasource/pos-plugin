@@ -28,57 +28,68 @@ export const inventoryNotification = ref(0)
 export const posSetting = ref(null)
 
 export const DashboardFunctionFactory = () => {
-  const { messages, locale, fallbackLocale} = useI18n()
-  const {
-    dashboard: {
-      delivery, editMenuCard, editTablePlan, endOfDay, fastCheckout, monthlyReport,
-      orderHistory, printerSettings, settings, staffReport, support, onlineOrdering,
-      dineInMenu, deliveryMenu, inventory, customer
-    }
-  } = messages.value[locale.value] || messages.value[fallbackLocale.value]
-
-  const btnUp = {
+  const { t, locale, messages, fallbackLocale } = useI18n()
+  const dashboardTranslations = computed(() => {
+    return messages.value[locale.value].dashboard || message.value[fallbackLocale.value].dashboard
+  })
+  const delivery = computed(() => dashboardTranslations.value.delivery)
+  const editMenuCard = computed(() => dashboardTranslations.value.editMenuCard)
+  const editTablePlan = computed(() => dashboardTranslations.value.editTablePlan)
+  const endOfDay = computed(() => dashboardTranslations.value.endOfDay)
+  const fastCheckout= computed(() => dashboardTranslations.value.fastCheckout)
+  const monthlyReport = computed(() => dashboardTranslations.value.monthlyReport)
+  const orderHistory = computed(() => dashboardTranslations.value.orderHistory)
+  const printerSettings = computed(() => dashboardTranslations.value.printerSettings)
+  const settings = computed(() => dashboardTranslations.value.settings)
+  const staffReport = computed(() => dashboardTranslations.value.staffReport)
+  const support = computed(() => dashboardTranslations.value.support)
+  const onlineOrdering = computed(() => dashboardTranslations.value.onlineOrdering)
+  const dineInMenu = computed(() => dashboardTranslations.value.dineInMenu)
+  const deliveryMenu = computed(() => dashboardTranslations.value.deliveryMenu)
+  const inventory = computed(() => dashboardTranslations.value.inventory)
+  const customer = computed(() => dashboardTranslations.value.customer)
+  const btnUp = computed(() => ({
     [appType.POS_RESTAURANT] : [
-      { title: fastCheckout, feature: 'fastCheckout', icon: 'icon-fast-checkout', click: () => changePath('/pos-order') },
-      { title: delivery, feature: 'delivery', icon: 'icon-order-food', click: () => changePath('/pos-order-delivery') },
+      { title: fastCheckout.value, feature: 'fastCheckout', icon: 'icon-fast-checkout', click: () => changePath('/pos-order') },
+      { title: delivery.value, feature: 'delivery', icon: 'icon-order-food', click: () => changePath('/pos-order-delivery') },
       { title: 'Tutorial'/*TODO: i18n*/, feature: 'tutorial', icon: 'icon-tutorial', click: () => changePath('/pos-tutorial') },
     ],
     [appType.POS_RETAIL] : [
       { title: 'Cash Register' /*TODO: i18n*/, icon: 'icon-fast-checkout' /*TODO: update icon*/, click: () => changePath('/retail--order') },
-      { title: orderHistory, feature: 'orderHistory', icon: 'icon-history', click: () => changePath('/pos-order-history') },
+      { title: orderHistory.value, feature: 'orderHistory', icon: 'icon-history', click: () => changePath('/pos-order-history') },
     ]
-  }
-  const btnDown = {
+  }))
+  const btnDown = computed(() => ({
     [appType.POS_RESTAURANT] : [
-      { title: orderHistory, feature: 'orderHistory', icon: 'icon-history', click: () => changePath('/pos-order-history') },
-      { title: settings, feature: 'settings', icon: 'icon-dashboard', click: () => changePath('/pos-settings') },
-      { title: dineInMenu, feature: 'editMenuCard', icon: 'icon-menu1', click: () => changePath('/pos-edit-menu-card') },
-      // {title: deliveryMenu, feature: 'editMenuCard', icon: 'icon-menu2',  click: () => updateView('DeliveryConfig')},
-      { title: endOfDay, feature: 'eodReport', icon: 'icon-calendar', click: () => changePath('/pos-eod-report') },
-      { title: monthlyReport, feature: 'monthlyReport', icon: 'icon-month_report', click: () => changePath('/pos-month-report') },
-      { title: staffReport, feature: 'staffReport', icon: 'icon-staff-report', click: () => changePath('/pos-staff-report') },
-      { title: editTablePlan, feature: 'editTablePlan', icon: 'icon-edit-table-plan', click: () => changePath('/pos-edit-table-plan') },
-      { title: printerSettings, feature: 'printerSettings', icon: 'icon-printer-setting', click: () => changePath('/pos-printer-setting') },
-      { title: customer, feature: 'customerInfo', icon: 'icon-customer-info', click: () => changePath('/pos-customer') },
-      { title: inventory, feature: 'manageInventory', icon: 'icon-inventory', click: () => changePath('/pos-inventory') },
-      { title: onlineOrdering, feature: 'onlineOrdering', icon: 'icon-online-order-menu', click: openStoreSetting },
+      { title: orderHistory.value, feature: 'orderHistory', icon: 'icon-history', click: () => changePath('/pos-order-history') },
+      { title: settings.value, feature: 'settings', icon: 'icon-dashboard', click: () => changePath('/pos-settings') },
+      { title: dineInMenu.value, feature: 'editMenuCard', icon: 'icon-menu1', click: () => changePath('/pos-edit-menu-card') },
+      // {title: deliveryMenu.value, feature: 'editMenuCard', icon: 'icon-menu2',  click: () => updateView('DeliveryConfig')},
+      { title: endOfDay.value, feature: 'eodReport', icon: 'icon-calendar', click: () => changePath('/pos-eod-report') },
+      { title: monthlyReport.value, feature: 'monthlyReport', icon: 'icon-month_report', click: () => changePath('/pos-month-report') },
+      { title: staffReport.value, feature: 'staffReport', icon: 'icon-staff-report', click: () => changePath('/pos-staff-report') },
+      { title: editTablePlan.value, feature: 'editTablePlan', icon: 'icon-edit-table-plan', click: () => changePath('/pos-edit-table-plan') },
+      { title: printerSettings.value, feature: 'printerSettings', icon: 'icon-printer-setting', click: () => changePath('/pos-printer-setting') },
+      { title: customer.value, feature: 'customerInfo', icon: 'icon-customer-info', click: () => changePath('/pos-customer') },
+      { title: inventory.value, feature: 'manageInventory', icon: 'icon-inventory', click: () => changePath('/pos-inventory') },
+      { title: onlineOrdering.value, feature: 'onlineOrdering', icon: 'icon-online-order-menu', click: openStoreSetting },
       // { title: support, icon: 'icon-support-2',  click: () => changePath('/pos-support') },
     ],
     [appType.POS_RETAIL] : [
-      { title: staffReport, feature: 'staffReport', icon: 'icon-staff-report', click: () => changePath('/pos-staff-report') },
-      { title: settings, feature: 'settings', icon: 'icon-dashboard', click: () => changePath('/pos-settings') },
-      { title: endOfDay, feature: 'eodReport', icon: 'icon-calendar', click: () => changePath('/pos-eod-report') },
-      { title: support, icon: 'icon-support-2',  click: () => changePath('/pos-support') },
-      { title: monthlyReport, feature: 'monthlyReport', icon: 'icon-month_report', click: () => changePath('/pos-month-report') },
-      { title: inventory, feature: 'manageInventory', icon: 'icon-inventory', click: () => changePath('/pos-inventory') },
+      { title: staffReport.value, feature: 'staffReport', icon: 'icon-staff-report', click: () => changePath('/pos-staff-report') },
+      { title: settings.value, feature: 'settings', icon: 'icon-dashboard', click: () => changePath('/pos-settings') },
+      { title: endOfDay.value, feature: 'eodReport', icon: 'icon-calendar', click: () => changePath('/pos-eod-report') },
+      { title: support.value, icon: 'icon-support-2',  click: () => changePath('/pos-support') },
+      { title: monthlyReport.value, feature: 'monthlyReport', icon: 'icon-month_report', click: () => changePath('/pos-month-report') },
+      { title: inventory.value, feature: 'manageInventory', icon: 'icon-inventory', click: () => changePath('/pos-inventory') },
       { title: 'Product Setting' /*TODO: i18n*/, icon: 'icon-inventory' /*TODO: update icon*/, click: () => changePath('/pos-product-setting') },
-      { title: customer, feature: 'customerInfo', icon: 'icon-customer-info', click: () => changePath('/pos-customer') },
+      { title: customer.value, feature: 'customerInfo', icon: 'icon-customer-info', click: () => changePath('/pos-customer') },
     ]
-  }
+  }))
 
   const computedBtnGroup1 = computed(() => {
     if (!enabledFeatures.value || !enabledFeatures.value.length) return []
-    return btnUp[currentAppType.value].filter(item => {
+    return btnUp.value[currentAppType.value].filter(item => {
       if (!item.feature) return true
       if (item.feature === 'tutorial') {
         return !!(posSetting.value && posSetting.value.showTutorial)
@@ -89,7 +100,7 @@ export const DashboardFunctionFactory = () => {
   const computedBtnGroup2 = computed(() => {
     if (!enabledFeatures.value || !enabledFeatures.value.length) return []
     //todo: check this logic
-    const items = btnDown[currentAppType.value].filter(item => {
+    const items = btnDown.value[currentAppType.value].filter(item => {
       if (!user.value) return false
       if (!item.feature) return true
       if (user.value.role === 'admin')

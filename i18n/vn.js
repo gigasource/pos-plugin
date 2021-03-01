@@ -11,6 +11,7 @@ module.exports = {
       german: 'German',
       vietnam: 'Vietnam',
       key: 'Đăng nhập',
+      clearKey: 'Nhập lại',
       loginMess: 'Nhập mã để đăng nhập',
     },
     //dashboard
