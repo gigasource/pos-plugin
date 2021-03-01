@@ -7,28 +7,49 @@ import {
   getOrderTime,
   manualTables,
   textFieldRef,
-  showNumberOfCustomersDialog
+  showNumberOfCustomersDialog,
+  manualOrders
 } from './pos-order-manual-table-logics';
 import { getScopeAttrs } from '../../../../utils/helpers';
 
-import { onActivated, onMounted, ref, withModifiers } from 'vue'
+import { onActivated, onBeforeUnmount, onMounted, ref, withModifiers } from 'vue'
 import { initRouter, routeToOrder } from '../RestaurantRoomLogics';
+import { getDiffTime } from '../../../../utils/commons';
+import { useI18n } from 'vue-i18n';
+import { appHooks } from '../../../AppSharedStates';
 
 export default {
   setup() {
+    const { t, locale } = useI18n()
     initRouter()
     const roomRef = ref(null)
+    const now = ref(new Date())
+    const timerInterval = setInterval(() => {
+      now.value = new Date()
+    })
     onMounted(focusTextField)
-    onActivated(focusTextField)
+    onActivated(() => {
+      console.log('activated')
+      focusTextField()
+      appHooks.emit('orderChange')
+    })
+    appHooks.emit('orderChange')
+
+    onBeforeUnmount(() => {
+      if (timerInterval) clearInterval(timerInterval)
+    })
     return genScopeId(() =>
         <div class="wrapper col-flex">
           <div class="room-container flex-grow-1" ref={roomRef}>
-            {manualTables.value.map(table =>
+            {manualOrders.value.map(order =>
                 <div class="table waves-effect waves-red"
-                     onClick={withModifiers(() => routeToOrder(table), ['stop'])}>
-                  <div> {table} </div>
+                     onClick={withModifiers(() => routeToOrder(order.table), ['stop'])}>
+                  <div style={`font-size: 10px; position: absolute; top: 2px`}>
+                    {t('common.currency', locale.value)}{order.vSum}
+                  </div>
+                  <div> {order.table} </div>
                   <div style="font-size: 10px; position: absolute; bottom: 2px">
-                    {getOrderTime(table)} mins
+                    {getDiffTime(order.date, now.value)} mins
                   </div>
                 </div>
             )}

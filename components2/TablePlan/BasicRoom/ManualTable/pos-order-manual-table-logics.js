@@ -13,6 +13,10 @@ export const manualTables = computed(() => {
   return _(activeOrders.value).filter(o => o.manual).map(o => o.table).uniq().value()
 })
 
+export const manualOrders = computed(() => {
+  return _(activeOrders.value).filter(o => o.manual && o.table).value()
+})
+
 export function tableExists() {
   if (!tableNameInput.value) return
   return manualTables.value.includes(_.trim(tableNameInput.value));

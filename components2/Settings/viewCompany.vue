@@ -12,9 +12,13 @@ export default {
     const { t } = useI18n()
     const file = ref(null)
     const dialog = ref(false)
-    const companyInfo = computed(() => {
-      return (posSettings.value && posSettings.value.companyInfo) || {};
-    })
+    const companyInfo = ref({})
+    async function loadCompanyInfo() {
+      const posSetting = await cms.getModel('PosSetting').findOne({})
+      return posSetting.companyInfo
+    }
+    loadCompanyInfo().then(v => companyInfo.value = v)
+
     const name = attrComputed(companyInfo, 'name')
     const address = attrComputed(companyInfo, 'address')
     const address2 = attrComputed(companyInfo, 'address2')

@@ -71,7 +71,7 @@ module.exports = {
     {loader: {type: 'vue-singleton'}, path: 'components/Store/InventoryStore.vue',},
     {loader: {type: 'backend-api'}, path: 'backend/dayjs-utils.js', type: 'backend'},
     {loader: {type: 'backend-api'}, path: 'backend/modifier/index.js', type: 'backend'},
-    {loader: {type: 'backend-api'}, path: 'backend/customer/customerSchemaRegister.js', type: 'backend'},
+    // {loader: {type: 'backend-api'}, path: 'backend/customer/customerSchemaRegister.js', type: 'backend'},
     {loader: {type: 'backend-api'}, path: 'backend/rest-handler.js', type: 'backend'},
     {loader: {type: 'backend-api'}, path: 'backend/get-version/get-version.js', type: 'backend'},
     {loader: {type: 'backend-api'}, path: 'backend/print/print-report/report-index.js', type: 'backend'},
