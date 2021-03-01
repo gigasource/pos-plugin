@@ -560,7 +560,7 @@ export default {
 
     &__favorite {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       grid-gap: 8px;
 
       &-item {
@@ -944,6 +944,8 @@ export default {
   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.08);
   border-radius: 4px;
   width: calc(33vw - 16px);
+  max-height: 280px;
+  overflow: scroll;
 
   &__call {
     display: flex;

@@ -17,7 +17,7 @@ export async function getReservations(date = new Date(), status = 'all') {
 }
 
 
-export const todayPendingReservation = ref(null)
+export const todayPendingReservation = ref(0)
 /**
  * Update today pending reservations
  * @return {Promise<Number>} the number of pending reservations
@@ -52,3 +52,5 @@ export const selectedReservation = ref({})
 // object contain information whether reservation dialog will be shown or not, in edit mode or add
 export const showReservationDialog = ref(false)
 export const reservationDialogEditMode = ref(false)
+
+updatePendingReservationsLength()

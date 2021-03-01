@@ -281,7 +281,11 @@ export function renderPendingOrdersFactory () {
 							<p class="ml-2 mb-1">
 								{t('onlineOrder.settings.timeToComplete2')} (min)
 							</p>
-							<value-picker values={[15, 30, 45, 60]} defaultValue={defaultPrepareTime || 30} allow-custom v-model={order.prepareTime}></value-picker>
+							<value-picker
+									values={[15, 30, 45, 60]}
+									default-value={defaultPrepareTime.value || 30}
+									allow-custom
+							    v-model={order.prepareTime}/>
 						</div>
 					</g-card-actions>
 				}

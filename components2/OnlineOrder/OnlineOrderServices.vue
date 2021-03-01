@@ -2,6 +2,7 @@
 import { onBeforeMount, withModifiers } from 'vue';
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n';
+import { genScopeId } from '../utils';
 export default {
   setup(props, { emit }) {
     const { t } = useI18n()
@@ -52,7 +53,7 @@ export default {
     function changeNote(val) {
       note.value = val
     }
-    return () =>
+    return genScopeId(() =>
         <div class="online-order-services">
           <div class="row-flex">
             <div class="online-order-services__item">
@@ -76,6 +77,7 @@ export default {
           </div>
           <dialog-blogtext-input v-model={dialog.value.text} label="Note" defaultValue={note.value} onSubmit={changeNote}></dialog-blogtext-input>
         </div>
+    )
   }
 }
 </script>

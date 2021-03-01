@@ -34,7 +34,7 @@ export const totalOrder = computed(() => {
   return ordersListByStatus.length
 })
 export const totalIncome = computed(() => {
-  return _.sumBy(ordersListByStatus.value, order => order.vSum ? order.vSum : 0)
+  return _.sumBy(ordersListByStatus.value, order => order.vSum ? Number(order.vSum) : 0)
 })
 //</editor-fold>
 
@@ -149,7 +149,7 @@ export function onlineOrderListFactory(props) {
                       <p class="fw-700" style="white-space: nowrap">
                         {t('common.currency', locale.value)}{$filters.formatCurrency(order.payment[0].value)}
                       </p>
-                      <p> <img alt src={getImagePayment(order.payment[0].type)}> </img></p>
+                      <p> <img alt style="height: 18px" src={getImagePayment(order.payment[0].type)}> </img></p>
                     </div>
                   </td>
                   <td style="white-space: nowrap; text-align: center">{formatDate(order.date)}</td>
@@ -166,7 +166,7 @@ export function onlineOrderListFactory(props) {
                   </td>
                   <td>
                     {
-                      (user.role === 'admin' && isRefundable(order)) &&
+                      (user.value.role === 'admin' && isRefundable(order)) &&
                       <g-menu v-model={order.showMenu} nudgeBottom={10} close-on-content-click v-slots={{
                         default: () => (
                           <g-card background="white">
