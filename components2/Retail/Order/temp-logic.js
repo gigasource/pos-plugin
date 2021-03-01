@@ -1,6 +1,5 @@
 import { ref } from 'vue';
 
-export const showDialogSavedList = ref(false)
 export const showDialogProductSearchResult = ref(false)
 export const showDialogChangePrice = ref(false)
 export const showDialogProductLookup = ref(false)
