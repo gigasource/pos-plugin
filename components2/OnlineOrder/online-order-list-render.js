@@ -147,7 +147,7 @@ export function onlineOrderListFactory(props) {
                   <td>
                     <div class="col-flex align-items-center">
                       <p class="fw-700" style="white-space: nowrap">
-                        {t('common.currency', locale.value)}{$filters.formatCurrency(order.payment[0].value)}
+                        {t('common.currency', locale.value)}{$filters.formatCurrency(Number(order.payment[0].value))}
                       </p>
                       <p> <img alt src={getImagePayment(order.payment[0].type)}> </img></p>
                     </div>
