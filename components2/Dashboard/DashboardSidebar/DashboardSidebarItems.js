@@ -5,6 +5,8 @@ import { currentAppType, appType } from '../../AppType'
 import { roomsStates } from '../../TablePlan/RoomState'
 import { dashboardHooks } from '../DashboardSharedStates'
 import { useI18n } from 'vue-i18n'
+import { pendingOrders } from '../../OnlineOrder/online-order-main-logic';
+import { todayPendingReservation } from '../../Reservation/reservation-shared'
 
 const DashboardSidebarFactory = () => {
   const { t } = useI18n()
@@ -81,6 +83,7 @@ const DashboardSidebarFactory = () => {
         icon: 'icon-reservation',
         title: t('sidebar.reservation'),
         feature: 'reservation',
+        key: 'Reservation',
         onClick() {
           dashboardHooks.emit('updateScreen', 'ReservationView')
         }
@@ -143,14 +146,14 @@ const DashboardSidebarFactory = () => {
         case 'Reservation':
           return {
             ...item,
-            ...{ badge: '1' + '', badgeColor: '#FF5252' }
+            ...{ badge: todayPendingReservation.value + '', badgeColor: '#FF5252' }
           }
         case 'Dashboard':
           const items = item.items.map(i => {
             if (i.key === 'Orders') {
               return {
                 ...i,
-                ...{ badge: '2' + '', badgeColor: '#FF5252' }
+                ...{ badge: pendingOrders.value.length + '', badgeColor: '#FF5252' }
               }
             }
             return i
