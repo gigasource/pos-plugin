@@ -5,7 +5,7 @@ import {nextTick} from "vue";
 import {demoData} from "../../OrderView/__test__/demoData";
 import RestaurantRoom from "../BasicRoom/RestaurantRoom";
 import {fetchRooms, onSelectRoom, roomsStates} from "../RoomState";
-import EditableRoom from "../EditableRoom/EditableRoom";
+import EditableRoom from "../../EditTablePlan/EditableRoom/EditableRoom";
 
 const {stringify} = require("schemahandler/utils");
 

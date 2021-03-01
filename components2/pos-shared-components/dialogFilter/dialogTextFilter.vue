@@ -39,14 +39,14 @@
       }
 
       return genScopeId(() => (
-          <g-dialog v-model={internalValue.value} width="90%" eager={!isIOS} fullscreen={isMobile}>
+          <g-dialog v-model={internalValue.value} width="90%" eager={!isIOS.value} fullscreen={isMobile.value}>
             {genScopeId(() => (
               <div class="wrapper">
                 <g-icon onClick={() => internalValue.value = false} svg size="20" class="icon">icon-close</g-icon>
                   <div class="screen">
-                    <g-text-field-bs class="bs-tf__pos" v-model={screenValue.value} large label="label" ref={textField} virtual-event={isIOS}/>
+                    <g-text-field-bs class="bs-tf__pos" v-model={screenValue.value} large label="label" ref={textField} virtual-event={isIOS.value}/>
                     {
-                      isMobile &&
+                      isMobile.value &&
                       <div class="buttons">
                         <g-btn uppercase="false" text onClick={() => internalValue.value = false} outlined width="120" class="mr-2">
                           {t('ui.cancel')}
@@ -58,7 +58,7 @@
                     }
                   </div>
                   <div class="keyboard">
-                    <pos-keyboard-full v-model={screenValue} onEnter-pressed="submit"/>
+                    <pos-keyboard-full v-model={screenValue.value} onEnter-pressed="submit"/>
                   </div>
               </div>
             ))()}

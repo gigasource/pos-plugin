@@ -1,7 +1,7 @@
 <script>
 import {genScopeId, internalValueFactory} from '../../utils'
 import {computed, withModifiers, ref, watchEffect, KeepAlive} from 'vue';
-import {selectingObject} from '../../TablePlan/EditableRoom/EditTablePlanLogics';
+import {selectingObject} from '../../EditTablePlan/EditableRoom/EditTablePlanLogics';
 import {isTable, inProgressTables, isWall} from '../../TablePlan/RoomShared';
 import {useI18n} from 'vue-i18n';
 import {activeOrders, appHooks} from "../../AppSharedStates";

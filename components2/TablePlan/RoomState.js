@@ -61,8 +61,8 @@ export function roomsFactory(props) {
 
   const newRoomName = computed(() => {
     let res = 1
-    while (roomsName.value.includes('' + res)) res++
-    return "" + res
+    while (roomsName.value.includes('Room ' + res)) res++
+    return "Room " + res
   })
 
   const nextOrder = computed(() => {
