@@ -66,7 +66,7 @@ export function roomsFactory(props) {
   })
 
   const nextOrder = computed(() => {
-    return (_.maxBy(roomsStates.value, r => r.room.order).room.order + 1)
+    return (_.maxBy(roomsStates.value, r => r.room.order )|| { room: { order: 0 }}).room.order + 1
   })
 
   const addNewRoom = async function () {
