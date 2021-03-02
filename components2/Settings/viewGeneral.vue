@@ -133,6 +133,7 @@ export default {
   padding: 16px;
   font-size: 13px;
   line-height: 16px;
+  overflow-y: scroll;
 }
 
 .btn-fn-row {
