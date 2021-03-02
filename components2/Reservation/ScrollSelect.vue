@@ -78,6 +78,7 @@ export default {
     onUnmounted(() => resizeObserver.disconnect());
 
     watch(() => props.modelValue, async () => {
+      if (props.modelValue === 0) return
       await nextTick();
       scrollToValue();
     }, {
