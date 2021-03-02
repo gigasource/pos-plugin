@@ -145,11 +145,14 @@ export default {
             <g-menu v-model={showCtxMenu.value} close-on-content-click v-slots={{
               default: () => (
                   <g-expand-x-transition>{execGenScopeId(() =>
-                      <div style="background-color: #FFF;">
+                      <div style="background-color: #FFF;" class="col-flex">
                         <g-btn-bs icon="icon-blue-cog" onClick={() => {
                           loadRetailLayoutSetting()
                           showScreenSettingPanel.value = true
                         }}>Edit Screen
+                        </g-btn-bs>
+                        <g-btn-bs icon="icon-back" onClick={back}>
+                          Back
                         </g-btn-bs>
                       </div>
                   )}</g-expand-x-transition>
@@ -161,15 +164,35 @@ export default {
                     </g-avatar>
                   </div>
               )
-            }}>
-            </g-menu>
-            <span class="username">{username.value}</span>
+            }}/>
             <g-spacer/>
-            <g-btn-bs class="elevation-2" onClick={back} style={{ width: '36px', height: '36px', borderRadius: '50%' }}>
-              <g-icon>icon-back</g-icon>
-            </g-btn-bs>
+          </div>
+      )
+    }
+
+    const showFooterCtxMenu = ref(false)
+    function renderFooter() {
+      return (
+          <div class="row-flex mt-1" style="cursor: pointer">
+            <g-menu v-model={showFooterCtxMenu.value} close-on-content-click top v-slots={{
+              default: () => (
+                  <g-expand-x-transition>{execGenScopeId(() =>
+                      <div style="background-color: #FFF;" class="col-flex">
+                        <g-btn-bs icon="icon-blue-cog" onClick={() => {}}> Item A</g-btn-bs>
+                        <g-btn-bs icon="icon-blue-cog" onClick={() => {}}> Item B</g-btn-bs>
+                        <g-btn-bs icon="icon-blue-cog" onClick={() => {}}> Item C</g-btn-bs>
+                        <g-btn-bs icon="icon-blue-cog" onClick={() => {}}> Item D</g-btn-bs>
+                      </div>
+                  )}</g-expand-x-transition>
+              ),
+              activator: ({ on }) => (
+                  <div style="width: 40px; border: 2px solid #1271FF; border-radius: 4px;" class="row-flex justify-center align-items-center" onClick={on.click}>
+                    <g-icon>icon-functions</g-icon>
+                  </div>
+              )
+            }}/>
             <g-btn-bs
-                style="margin: 0" icon="icon-wallet" background-color="#1271FF"
+                style="flex: 1; margin-left: 5px; margin-right: 0" icon="icon-wallet" background-color="#1271FF"
                 disabled={!payable.value}
                 onClick={toPayment}>
               {t('common.currency', storeLocale.value)}{total.value}
@@ -182,6 +205,7 @@ export default {
         <div class="detail">
           {renderHeader()}
           {showScreenSettingPanel.value ? renderScreenSettingPanel() : renderCartItems()}
+          {renderFooter()}
         </div>
     ))
   }
