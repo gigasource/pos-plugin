@@ -235,10 +235,9 @@ export default {
     }
   }
 }
-
-@media screen and (max-width: 1023px) {
-  .g-toolbar {
-    .g-btn ::v-deep .g-btn__content {
+@media screen and (max-width: 667px) {
+  .g-toolbar :deep {
+    .g-btn .g-btn__content {
       font-size: 0;
 
       .g-icon {
