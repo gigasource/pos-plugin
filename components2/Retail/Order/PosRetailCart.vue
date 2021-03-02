@@ -139,9 +139,30 @@ export default {
       return order.items && order.items.length && _.some(order.items, i => i.quantity > 0)
     })
 
+    const customer = ref(null)
+    const showCustomerDialog = ref(false)
+    function openSelectCustomerDialog() {
+      showCustomerDialog.value = true
+    }
+    function renderCustomer() {
+      return <div style="cursor: pointer" onClick={openSelectCustomerDialog}>
+        { !customer.value
+            ? <div>
+                Select customer
+                <g-dialog v-model={showCustomerDialog.value}></g-dialog>
+              </div>
+            : <div>
+                <p style="color: #2979FF">{customer.value.name}</p>
+                <p style="color: #757575">{customer.value.phone}</p>
+              </div>
+        }
+      </div>
+    }
     function renderHeader() {
       return (
           <div class="detail-header">
+            { renderCustomer() }
+            <g-spacer/>
             <g-menu v-model={showCtxMenu.value} close-on-content-click v-slots={{
               default: () => (
                   <g-expand-x-transition>{execGenScopeId(() =>
@@ -158,14 +179,11 @@ export default {
                   )}</g-expand-x-transition>
               ),
               activator: ({ on }) => (
-                  <div onClick={on.click}>
-                    <g-avatar size="40">
-                      <g-img src={avatar.value}></g-img>
-                    </g-avatar>
-                  </div>
+                  <g-btn rounded outlined flat onClick={on.click} style="border-radius: 50%; width: 30px; height: 30px; text-align: center; min-width: 30px; padding: 0">
+                    <b>&#183; &#183; &#183;</b>
+                  </g-btn>
               )
             }}/>
-            <g-spacer/>
           </div>
       )
     }
@@ -214,7 +232,6 @@ export default {
 
 <style scoped lang="scss">
 .detail {
-  padding: 8px 8px 8px 0;
   background-color: white;
   display: flex;
   flex-direction: column;

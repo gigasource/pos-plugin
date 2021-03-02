@@ -59,6 +59,10 @@ export default {
       dialog.productInfo = true
     }
 
+    function openDialogTextFilter() {
+      dialog.showTextKbd = true
+    }
+
     watch(() => dialog.popupModifiers, async (val) => {
       appHooks.emit('updateModifiers');
       //await loadPopupModifierGroups()
@@ -108,7 +112,7 @@ export default {
             onUpdate:modelValue={e => debounceUpdateTextLayout('text', e)}
             v-slots={{
               'append-inner': () => <g-icon style="cursor: pointer"
-                                            onClick={withModifier(() => { dialog.showTextKbd = true}, ['stop'])}>icon-keyboard</g-icon>
+                                            onClick={() => openDialogTextFilter()}>icon-keyboard</g-icon>
             }}/>
       </>
     }
@@ -328,13 +332,13 @@ export default {
           {renderColor()}
           {renderPopupModifier()}
           {renderDialogProductInfo()}
-          {renderTextFilter()}
           {renderPopupModifierDialog()}
         </> : <>
           <div class="product-editor__prop-grid">
             {renderLayoutType()}
             {renderTextLayout()}
           </div>
+          {renderTextFilter()}
           {renderPopupModifier()}
         </>
         }

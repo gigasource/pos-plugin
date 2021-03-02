@@ -48,10 +48,10 @@
                     {
                       isMobile.value &&
                       <div class="buttons">
-                        <g-btn uppercase="false" text onClick={() => internalValue.value = false} outlined width="120" class="mr-2">
+                        <g-btn uppercase={false} text onClick={() => internalValue.value = false} outlined width="120" class="mr-2">
                           {t('ui.cancel')}
                         </g-btn>
-                        <g-btn uppercase="false" text onClick={submit} backgroundColor="#2979FF" text-color="#FFFFFF" width="120">
+                        <g-btn uppercase={false} text onClick={submit} backgroundColor="#2979FF" text-color="#FFFFFF" width="120">
                           {t('ui.ok')}
                         </g-btn>
                       </div>
