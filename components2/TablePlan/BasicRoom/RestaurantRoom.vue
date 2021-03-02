@@ -1,6 +1,6 @@
 <script>
 
-import {roomUiFactory} from '../RoomUi'
+import { roomUiFactory } from '../RoomUi'
 import {
   initRouter,
   isTransferringTable,
@@ -8,33 +8,34 @@ import {
   showNumberOfCustomersDialog,
   chooseTable
 } from './RestaurantRoomLogics'
-import {getDiffTime} from '../../../utils/commons'
-import {onActivated, onBeforeUnmount, onDeactivated, ref, watch} from 'vue';
+import { getDiffTime } from '../../../utils/commons'
+import { onActivated, onBeforeUnmount, onDeactivated, ref, watch } from 'vue';
 import RoomStyleFactory from '../RoomStyles'
-import {roomsFactory} from '../RoomState';
-import {getTableOrderInfo, isBusyTable, isTable} from '../RoomShared';
+import { roomsFactory } from '../RoomState';
+import { getTableOrderInfo, isBusyTable, isTable } from '../RoomShared';
 import Touch from '../../../../../backoffice/pos-vue-framework/src/directives/touch/touch';
-import {useI18n} from 'vue-i18n';
+import { useI18n } from 'vue-i18n';
 import RestaurantRoomEventHandlers from './EventHandlersForRestaurantRoom'
-import {appHooks, user} from '../../AppSharedStates';
+import { appHooks, user } from '../../AppSharedStates';
 import NumberOfCustomersDialog from './NumberOfCustomersDialog';
 import { computed } from 'vue'
 import { viewH, viewW } from '../RoomLogics';
+import { transferTableFrom } from './RestaurantRoomLogics';
 
 export default {
   name: 'RestaurantRoom',
-  components: {NumberOfCustomersDialog},
+  components: { NumberOfCustomersDialog },
   props: {
     roomId: String,
     chooseTable: Function
   },
-  directives: {Touch},
-  setup(props, {emit}) {
+  directives: { Touch },
+  setup(props, { emit }) {
     initRouter()
-    const {t, locale} = useI18n()
-    const {touchHandlers} = RestaurantRoomEventHandlers(props)
-    const {selectingRoomStates, objectsInSelectingRoom} = roomsFactory(props);
-    const {roomObjectContainerStyle, roomObjectStyle} = RoomStyleFactory(selectingRoomStates)
+    const { t, locale } = useI18n()
+    const { touchHandlers } = RestaurantRoomEventHandlers(props)
+    const { selectingRoomStates, objectsInSelectingRoom } = roomsFactory(props);
+    const { roomObjectContainerStyle, roomObjectStyle } = RoomStyleFactory(selectingRoomStates)
     const curTime = ref(new Date())
     const zoom = computed(() => {
       return selectingRoomStates.value ? selectingRoomStates.value.zoom : 1
@@ -82,7 +83,7 @@ export default {
 
     const _roomObjectContainerStyle = (obj) => {
       const style = roomObjectContainerStyle(obj)
-      if (isBusyTable(obj)) Object.assign(style, {background: '#fec8c8', border: '1px solid #d2691e'})
+      if (isBusyTable(obj)) Object.assign(style, { background: '#fec8c8', border: '1px solid #d2691e' })
       return style
     }
 
@@ -90,14 +91,16 @@ export default {
       return <div key={obj._id} id={obj.name}
                   style={_roomObjectContainerStyle(obj)}
                   class={classes(obj)}
-                  // onClick={() => props.chooseTable ? props.chooseTable(obj) : chooseTable(obj)
+                  onClick={() => {
+                    if (!transferTableFrom.value) (props.chooseTable ? props.chooseTable(obj) : chooseTable(obj))
+                  }}
                   v-touch={touchHandlers(obj)}
       >
         {objectContentRender(obj)}
       </div>
     }
 
-    const {renderRoom} = roomUiFactory(objectRender, selectingRoomStates, objectsInSelectingRoom);
+    const { renderRoom } = roomUiFactory(objectRender, selectingRoomStates, objectsInSelectingRoom);
     // const numberOfCustomersDialog = () =>
     //     <NumberOfCustomersDialog v-model={showNumberOfCustomersDialog.value}
     //                              onSubmit={({ numberOfCustomers, tseMethod }) => onCustomerDialogSubmit({ numberOfCustomers, tseMethod }, emit)}
