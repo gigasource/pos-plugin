@@ -13,6 +13,7 @@ export default {
     newValueEditable: false
   },
   components: {DiscountInput2},
+  emits: ['update:modelValue', 'submit'],
   setup(props, { emit }) {
     const order = getCurrentOrder()
     const changeType = ref(null)

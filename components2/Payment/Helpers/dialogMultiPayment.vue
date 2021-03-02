@@ -1,7 +1,7 @@
 <script>
 import {useI18n} from 'vue-i18n';
 import {genScopeId, internalValueFactory, VModel_number} from '../../utils'
-import {computed, ref} from 'vue';
+import { computed, onActivated, onMounted, ref, watch } from 'vue';
 import {onCLick_Stop} from '../../../utils/helpers';
 
 import _ from 'lodash'
@@ -11,8 +11,12 @@ export default {
   name: 'dialogMultiPayment',
   props: {
     total: Number,
-    rotate: Boolean
+    rotate: Boolean,
+    cashValue: Number,
+    cardValue: Number,
+    modelValue: Number
   },
+  emits: ['update:cardValue','update:cashValue', 'submit', 'update:modelValue'],
   setup(props, {emit}) {
     const {t, locale} = useI18n()
     const internalValue = internalValueFactory(props, {emit})
@@ -48,8 +52,8 @@ export default {
       {type: 'cash', icon: 'icon-cash'},
       {type: 'card', icon: 'icon-credit_card'},
     ])
-    const cashEditValue = ref(0)
-    const cardEditValue = ref(0)
+    const cashEditValue = internalValueFactory(props, { emit}, 'cashValue')
+    const cardEditValue = internalValueFactory(props, { emit}, 'cardValue')
 
     const cardTextfieldRef = ref(null)
     const cashTextfieldRef = ref(null)
@@ -64,10 +68,21 @@ export default {
 
     const getRemainingValue = function () {
       if (cashEditValue.value && cardEditValue.value) return 0
+      if (!cashEditValue.value && !cardEditValue.value) return 0
       if (cashEditValue.value > props.total || cardEditValue.value > props.total) return 0
       if (cashEditValue.value) return cardEditValue.value = _.round(props.total - cashEditValue.value, 3)
       cashEditValue.value = _.round(props.total - cardEditValue.value, 3)
     }
+    watch(() => internalValue.value, (v) => {
+      if (v) {
+        setTimeout(() => {
+          if (cashTextfieldRef.value) {
+            click('cash-textfield')
+          }
+        }, 200)
+      }
+    })
+
     const submit = function () {
       emit('submit', {
         card: cardEditValue.value,
@@ -110,23 +125,23 @@ export default {
                     {item.icon && <g-icon size="20">{item.icon}</g-icon>}
                     <span class="ml-2" style="text-transform: capitalize">{item.type}</span>
                   </g-btn-bs>
-                  {item.type === "card" ?
-                      <pos-textfield-new clearable ref={cardTextfieldRef}
-                                         v-model={VModel_number(cardEditValue).value}
-                                         onClick={onCLick_Stop(getRemainingValue)}/> :
+                  {item.type === "cash" ?
                       <pos-textfield-new clearable ref={cashTextfieldRef}
                                          v-model={VModel_number(cashEditValue).value}
+                                         onClick={onCLick_Stop(getRemainingValue)}/> :
+                      <pos-textfield-new clearable ref={cardTextfieldRef}
+                                         v-model={VModel_number(cardEditValue).value}
                                          onClick={onCLick_Stop(getRemainingValue)}/>}
                 </div>)}
           </div>}
           {isMobile.value && <div class="dialog-multi-payment__screen--mobile">
-            <g-text-field clearable ref={cardTextfieldRef} outlined label={t('payment.cash')} class="mr-1"
-                          v-model_number={cardEditValue.value} onClick={getRemainingValue} v-slots={{
+            <g-text-field clearable ref={cashTextfieldRef} outlined label={t('payment.cash')} class="mr-1"
+                          v-model_number={cashEditValue.value} onClick={getRemainingValue} v-slots={{
               'prepend-inner': () => <g-icon>icon-cash</g-icon>
             }}/>
 
-            <g-text-field clearable ref={cashTextfieldRef} outlined label={t('payment.card')}
-                          v-model_number={cashEditValue.value} onClick={getRemainingValue} v-slots={{
+            <g-text-field clearable ref={cardTextfieldRef} outlined label={t('payment.card')}
+                          v-model_number={cardEditValue.value} onClick={getRemainingValue} v-slots={{
               'prepend-inner': () => <g-icon>icon-credit_card</g-icon>
             }}/>
           </div>}

@@ -1,20 +1,17 @@
 <script>
-import {$filters, avatar, username} from '../../AppSharedStates';
-import {getCurrentOrder} from '../../OrderView/pos-logic-be';
-import {GAvatar, GChip, GSpacer} from 'pos-vue-framework';
-import {genScopeId} from '../../utils';
-import {useI18n} from 'vue-i18n';
-import {itemsRenderFactory} from "../../OrderView/pos-ui-shared";
+import { $filters, avatar, username } from '../../AppSharedStates';
+import { getCurrentOrder } from '../../OrderView/pos-logic-be';
+import { GAvatar, GChip, GSpacer } from 'pos-vue-framework';
+import { genScopeId } from '../../utils';
+import { useI18n } from 'vue-i18n';
+import { itemsRenderFactory } from '../../OrderView/pos-ui-shared';
 
 export default {
   name: 'PosRestaurantPaymentOrderDetail2',
   components: [GAvatar, GSpacer, GChip],
   setup() {
-    const {t} = useI18n()
+    const { t } = useI18n()
     const order = getCurrentOrder()
-    const isItemDiscounted = function (item) {
-      return item.originalPrice !== item.price
-    }
 
     const itemsRender = itemsRenderFactory();
 
@@ -22,7 +19,7 @@ export default {
         <div class="order-detail">
           <div class="order-detail__header">
             <g-avatar size="36">
-              <img src={avatar.value} alt> </img>
+              <img src={avatar.value} alt/>
             </g-avatar>
             <div class="ml-2">
               <span class="order-detail__header-username">{username.value} </span>
@@ -36,7 +33,7 @@ export default {
                 </div>
               }
             </div>
-            <g-spacer></g-spacer>
+            <g-spacer/>
             <span class="order-detail__header-title"> Total </span>
             <span class="order-detail__header-value text-red">
               €{$filters.formatCurrency(order.vSum, 2)}
