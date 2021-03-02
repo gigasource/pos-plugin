@@ -75,4 +75,6 @@ export const FnBtns = [
 ]
 
 export const FnNames = computed(() => Object.keys(FnBtns))
-export const fnButtonSetting = ref([])
+export const fnBtnSetting = ref([
+  { "rows": [5, 7], "cols": [1, 1], "backgroundColor": "#7BB872", "textColor": "#FFFFFF", "fn": "Refund" },
+])
