@@ -71,7 +71,7 @@ export default {
 
     &__keyboard {
       grid-area: 2/1/3/2;
-      padding: 8px 4px 8px 8px;
+      padding: 4px 2px 4px 4px;
     }
 
     &__buttons {
@@ -81,6 +81,7 @@ export default {
 
   &__detail {
     grid-area: 1/3/2/4;
+    padding: 4px 4px 4px 0;
   }
 }
 </style>

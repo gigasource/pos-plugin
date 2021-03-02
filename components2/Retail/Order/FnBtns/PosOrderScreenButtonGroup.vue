@@ -96,7 +96,7 @@ export default {
                 text: btn.text
               }
               return (
-                  <component {...{btnInput}} key={i} style={{
+                  <component {...{ btnInput }} key={i} style={{
                     gridRow: btn.rows[0] + '/' + btn.rows[1],
                     gridColumn: btn.cols[0] + '/' + btn.cols[1],
                     backgroundColor: btn.backgroundColor,
@@ -105,10 +105,9 @@ export default {
                     pointerEvents: !isActiveBtn(btn) ? 'none' : 'auto', //disabled
                     opacity: !isActiveBtn(btn) ? '0.4' : '1', //disabled
                     cursor: !isActiveBtn(btn) ? 'none' : 'pointer'
-                  }} class="btn"/>
+                  }} className="btn"/>
               )
             })}
-            { !isRefundMode.value && <dialog-retail-refund-search v-model={showRefundSearch.value}/> }
           </div>
       ))
     }
@@ -128,7 +127,7 @@ export default {
   }
 
   .buttons {
-    padding: 8px 8px 8px 4px;
+    padding: 4px 4px 4px 2px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;

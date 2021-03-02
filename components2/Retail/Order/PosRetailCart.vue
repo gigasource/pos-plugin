@@ -232,7 +232,6 @@ export default {
 
 <style scoped lang="scss">
 .detail {
-  padding: 8px 8px 8px 0;
   background-color: white;
   display: flex;
   flex-direction: column;
