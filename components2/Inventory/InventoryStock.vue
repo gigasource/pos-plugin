@@ -6,7 +6,10 @@ import DialogChangeStock from './helpers/dialogChangeStock';
 import cms from 'cms'
 import _ from 'lodash';
 import { useI18n } from 'vue-i18n'
-import { updateInventoryHistory } from './inventory-logic-be';
+import { updateInventoryAction } from './inventory-logic-be';
+import {
+  detailInventories
+} from './inventory-logic-ui'
 import { genScopeId } from '../utils';
 import { $filters } from '../AppSharedStates';
 
@@ -32,12 +35,11 @@ export default {
     const showKeyboard = ref(false)
 
     onActivated(async () => {
-      const _inventories = await cms.getModel('Inventory').find();
-      const _categories = await cms.getModel('InventoryCategory').find();
+      const _inventories = await cms.getModel('Inventory').find()
       inventories.value = _inventories.map(item => ({
         ...item,
-        text: item.name,
-        category: _categories.find(cate => cate._id.toString() === item.category)
+        text: item.product.name,
+        category: item.product.category
       }))
       items.value = []
       selectedItem.value = null
@@ -61,19 +63,11 @@ export default {
       dialog.value.inventory = true
     }
     const changeStock = function () {
-      if (isNaN(added.value)) return
-      const item = inventories.value.find(item => item._id === itemId.value)
-      const index = items.value.findIndex(i => i._id === item.value._id)
-      if (index.value === -1)
-        this.items.push({
-          ...item.value,
-          added: +added.value
-        })
-      else
-        this.items.splice(index.value, 1, {
-          ...item.value,
-          added: +added.value
-        })
+      if (isNaN(added.value))
+        added.value = 0
+      const item = inventories.value.find(item => item._id.toString() === itemId.value.toString())
+      Object.assign(item, { added: added.value})
+      items.value.push(item)
       dialog.value.inventory = false
     }
     const openDialogAdd = function (item) {
@@ -89,25 +83,14 @@ export default {
       dialog.value.add = true
     }
     const updateStock = function ({change}) {
-      const item = inventories.value.find(item => item._id === itemId.value)
+      const item = items.value.find(item => item._id.toString() === itemId.value.toString())
       const index = items.value.findIndex(i => i._id === item._id)
-      if (index === -1) {
-        items.value.push({
-          ...item,
-          added: +change
-        })
-        selectedItem.value = _.last(items.value)
-      } else {
-        items.value.splice(index, 1, {
-          ...item,
-          added: +change
-        })
-        selectedItem.value = items.value[index]
-      }
+      Object.assign(item, { added: +change })
+      selectedItem.value = item
     }
     const chooseItem = function (_id) {
-      const item = inventories.value.find(item => item._id === _id)
-      category.value = _.cloneDeep(item.category.name)
+      const item = inventories.value.find(item => item._id.toString() === _id.toString())
+      category.value = getCategoryText(item.product.category)
       unit.value = _.cloneDeep(item.unit)
       stock.value = item.stock && +(_.cloneDeep(item.stock)).toFixed(2)
       added.value = ''
@@ -124,7 +107,7 @@ export default {
       items.value.splice(index, 1)
     }
     const getLowStockItems = function (value) {
-      const _items = inventories.value.filter(item => item.stock <= value && !items.value.find(i => i._id === item._id)).map(item => ({
+      const _items = inventories.value.filter(item => item.stock <= value && !items.value.find(i => i._id.toString() === item._id.toString())).map(item => ({
         ...item,
         added: 0
       }))
@@ -189,6 +172,14 @@ export default {
       }
     }
 
+    const getCategoryText = function (categoryList) {
+      return categoryList.reduce((result, category) => {
+        if (result.length) result += ', '
+        result += category.name
+        return result
+      }, '')
+    }
+
     return genScopeId(() => <>
       <div class="inventory-stock">
         <div class="inventory-stock__header">
@@ -218,8 +209,8 @@ export default {
             {items.value.map((inventory, i) =>
                 <tr key={i} class={selectedItem.value && selectedItem.value._id === inventory._id && 'row--selected'}>
                   <td onClick={() => openDialogAdd(inventory)}> {inventory.id} </td>
-                  <td onClick={() => openDialogAdd(inventory)}> {inventory.name} </td>
-                  <td onClick={() => openDialogAdd(inventory)}> {inventory.category.name} </td>
+                  <td onClick={() => openDialogAdd(inventory)}> {inventory.product.name} </td>
+                  <td onClick={() => openDialogAdd(inventory)}> {getCategoryText(inventory.category)} </td>
                   <td onClick={() => openDialogAdd(inventory)}> {inventory.unit} </td>
                   <td onClick={() => openDialogAdd(inventory)}> {$filters.formatCurrency(inventory.stock)} </td>
                   <td class="fw-700 text-blue" onClick={() => openDialogAdd(inventory)}> {inventory.added} </td>
@@ -252,7 +243,7 @@ export default {
                                 class="inventory-stock-select"
                                 key={dialog.value.inventory}
                                 items={inventories.value}
-                                item-text="name" item-value="_id"
+                                item-text="text" item-value="_id"
                                 keep-menu-on-blur
                                 menu-class="menu-select-inventory"
                                 onUpdate:modelValue={chooseItem}/>
