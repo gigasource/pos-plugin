@@ -67,13 +67,12 @@
   import { getProvided } from '../logic/commonUtils';
   import * as jsonfn from 'json-fn';
   import _ from 'lodash';
-  import DialogProductLookup from '../Order/components/dialogProductLookup';
   const socketIntervals = {}
 
   export default {
     name: 'OrderStore',
     domain: 'OrderStore',
-    components: { DialogProductLookup, dialogCommon, dialogOrderTransactionRefundConfirm, dialogOrderTransactionRefundFailed, dialogChangeValue},
+    components: { dialogCommon, dialogOrderTransactionRefundConfirm, dialogOrderTransactionRefundFailed, dialogChangeValue},
     injectService: ['PosStore:(user, timeFormat, dateFormat, device, storeLocale)'],
     data() {
       return {

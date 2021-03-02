@@ -1,5 +1,5 @@
 <script>
-  import { nextTick } from 'vue';
+  import { nextTick, ref } from 'vue';
   import { genScopeId } from '../../../utils';
   import { addProductToOrder } from '../temp-logic';
   import DialogProductSearchResult from './dialogProductSearchResult';
@@ -89,7 +89,7 @@
       const productIdQuery = ref('')
       const productIdQueryResults = ref([])
 
-      export const queryProductsById = () => {
+      const queryProductsById = () => {
         let quantity;
         if (productIdQuery.value.includes('x')) {
           const queryStrArr = productIdQuery.value.split(' ')

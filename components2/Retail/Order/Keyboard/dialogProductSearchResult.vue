@@ -33,10 +33,11 @@ export default {
         emit('update:modelValue', value);
       }
     })
+
     const formattedQueryResults = computed({
       get() {
-        if (productIdQueryResults.value) {
-          queryResults.value = productIdQueryResults.value.map(result => {
+        if (props.productIdQueryResults) {
+          queryResults.value = props.productIdQueryResults.map(result => {
             let hasAttributes = result.attributes && result.attributes.length;
             const computedAttributes = hasAttributes && _.groupBy(result.attributes, 'key')
             let selectedAttributes = {};
@@ -78,7 +79,7 @@ export default {
     }
 
     function _addProductToOrder(product) {
-      const _product = _.clone(productIdQueryResults.value.find(i => i._id === product._id))
+      const _product = _.clone(props.productIdQueryResults.find(i => i._id === product._id))
       _product.unit = product.selectedUnit
       _product.attributes = _.values(product.selectedAttributes)
       if (_product.isModifier) {
@@ -97,7 +98,7 @@ export default {
       return (
           <g-card-title>
             { execGenScopeId(() => <>
-              {formattedQueryResults.value.length} {formattedQueryResults.value.length > 1 ? 'results' : 'result'} for product id "{productIdQuery.value}"
+              {formattedQueryResults.value.length} {formattedQueryResults.value.length > 1 ? 'results' : 'result'} for product id "{props.productIdQuery}"
               <g-spacer/>
               <g-btn uppercase={false} onClick={closeDialog} icon>
                 <g-icon>close</g-icon>

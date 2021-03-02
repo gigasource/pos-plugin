@@ -1,5 +1,5 @@
 <script>
-import dialogProductSearchResult from '../../components/Order/components/dialogProductSearchResult';
+import dialogProductSearchResult from '../Retail/Order/Keyboard/dialogProductSearchResult';
 import {computed, onActivated, onBeforeMount, onBeforeUnmount, onDeactivated, watch} from "vue";
 import {useRoute} from "vue-router";
 import {category, showOverlay,} from "./order-layout-setting-logic";
