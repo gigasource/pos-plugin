@@ -29,10 +29,16 @@ export default {
       !isRefundMode.value ? prepareOrder(0) : prepareOrder(makeRefundOrder(refundOrder.value))
     })
 
+    const inEditScreenMode = ref(true)
+
     onBeforeMount(async () => {
       await loadCategories()
       await loadProducts()
     })
+
+    function renderTopRightToolbar() {
+      return <div>Top Right Toolbar</div>
+    }
 
     return genScopeId(() => (
         <div class="por">
@@ -40,9 +46,15 @@ export default {
           <div class="por__main">
             <pos-order-screen-scroll-window is-refund-mode={isRefundMode.value} class="por__main__window"/>
             <pos-order-screen-number-keyboard class="por__main__keyboard"/>
-            <pos-order-screen-button-group is-refund-mode={isRefundMode.value} class="por__main__buttons"/>
+            <pos-order-screen-button-group
+                class="por__main__buttons"
+                in-refund-mode={isRefundMode.value}
+                in-edit-mode={inEditScreenMode.value}/>
           </div>
-          <pos-retail-cart is-refund-mode={isRefundMode.value} class="por__detail"/>
+          <div class="por__detail">
+            { renderTopRightToolbar() }
+            <pos-retail-cart is-refund-mode={isRefundMode.value}/>
+          </div>
         </div>
     ))
   }
