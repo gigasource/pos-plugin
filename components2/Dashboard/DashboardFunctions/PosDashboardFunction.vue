@@ -189,4 +189,24 @@ export default {
     }
   }
 }
+
+/*Iphone 6/7/8*/
+@media screen and (max-width: 667px) {
+  .function {
+    &--up,
+    &--down {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+
+/*Iphone 6/7/8 Plus*/
+@media screen and (max-width: 736px) {
+  .function {
+    &--up,
+    &--down {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+}
 </style>
