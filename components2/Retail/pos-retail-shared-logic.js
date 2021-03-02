@@ -66,18 +66,18 @@ export function renderDisplayOrderItemsTable(order, t) {
   )
 }
 
-export function chooseFunction(functionName) {
-  if (!functionName || !configFunctionList[functionName]) return
-  return configFunctionList[functionName]
-}
-
-//<editor-fold desc="List function to config with button">
-export const configFunctionList = {
-  payOrder(order) {
-
-  },
-  openRefundSearch() {
-    retailHook.emit('openRefundSearch')
-  }
-}
-//</editor-fold>
+// export function chooseFunction(functionName) {
+//   if (!functionName || !configFunctionList[functionName]) return
+//   return configFunctionList[functionName]
+// }
+//
+// //<editor-fold desc="List function to config with button">
+// export const configFunctionList = {
+//   payOrder(order) {
+//
+//   },
+//   openRefundSearch() {
+//     retailHook.emit('openRefundSearch')
+//   }
+// }
+// //</editor-fold>
