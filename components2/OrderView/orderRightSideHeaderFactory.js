@@ -112,7 +112,7 @@ export function orderRightSideHeader(props, {emit}) {
               </p>}
             </div>
             {isMobile.value && <g-spacer/>}
-            {isMobile.value && <g-btn-bs class="elevation-1 btn-back" onClick={back}>
+            {isMobile.value && <g-btn-bs class="elevation-1 btn-back" style="padding: 4px" onClick={back}>
               <g-icon>icon-back</g-icon>
             </g-btn-bs>}
           </div>
