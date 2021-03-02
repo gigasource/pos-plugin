@@ -58,7 +58,7 @@
                     }
                   </div>
                   <div class="keyboard">
-                    <pos-keyboard-full v-model={screenValue.value} onEnter-pressed="submit"/>
+                    <pos-keyboard-full v-model={screenValue.value} onEnterPressed={submit}/>
                   </div>
               </div>
             ))()}
