@@ -89,7 +89,7 @@ export default {
                         Upload demo data
                       </g-btn>
                     }
-                    <g-switch class="ml-3" label="Template Data" v-model={isTemplateData.value}></g-switch>
+                    <g-switch style="margin: 0 !important;" class="ml-3" label="Template Data" v-model={isTemplateData.value}></g-switch>
                   </div>
                   <g-btn class="mt-2" flat background-color="#1271ff" text-color="#fff" uppercase={false} disabled={disableDataBtn.value} onClick={downloadData}>
                     Import demo data
