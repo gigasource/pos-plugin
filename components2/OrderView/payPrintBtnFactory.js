@@ -45,7 +45,7 @@ export function payPrintBtnFactory() {
   const renderPayBtn = () => {
     const btnAttrs = {
       width: 75,
-      style: 'font-size: 14px; padding: 0; border: none',
+      style: 'font-size: 14px; border: none',
       'text-color': "#FFF",
       'background-color': "#1271FF",
       disabled: !payBtnClickable.value,
