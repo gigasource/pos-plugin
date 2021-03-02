@@ -30,6 +30,7 @@ export function getOrderTime(tableName) {
 export async function addTable() {
   if (!tableNameInput.value || tableExists()) return
   routeToOrder(tableNameInput.value, true)
+  tableNameInput.value = ''
 }
 
 export function focusTextField() {
