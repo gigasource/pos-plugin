@@ -1,10 +1,10 @@
 <script>
 import { ref, onActivated } from 'vue'
-import { genScopeId } from '../../utils';
-import { appHooks, posSettings } from '../../AppSharedStates';
+import { genScopeId } from '../../../utils';
+import { appHooks, posSettings } from '../../../AppSharedStates';
 import {
-  chooseFunction
-} from '../pos-retail-shared-logic'
+  chooseFunction, retailHook
+} from '../../pos-retail-shared-logic'
 import {
   useRouter
 } from 'vue-router'
@@ -16,6 +16,11 @@ export default {
     },
     setup(props) {
       const { isRefundMode } = props
+      const showRefundSearch = ref(false)
+
+      retailHook.on('openRefundSearch', () => {
+        showRefundSearch.value = true
+      })
       const listBtn = ref([])
 
       const fixedBtnOrder = [
@@ -89,7 +94,9 @@ export default {
                 }} onClick={() => onClick(btn)}>
                   {btn && btn.text}
                 </div>
-            )} </div>
+            )}
+            { !isRefundMode.value && <dialog-retail-refund-search v-model={showRefundSearch.value}/> }
+          </div>
       ))
     }
   }

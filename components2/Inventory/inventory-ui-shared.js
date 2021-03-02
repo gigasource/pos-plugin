@@ -1,12 +1,44 @@
 import { ref, watch, computed } from 'vue'
-import { detailInventories, filter } from './inventory-logic-ui'
+import {detailInventories, filter, inventories} from './inventory-logic-ui'
 import { categories, categoriesWithParentName } from '../Product/product-logic'
 import { createInventory, deleteInventory, loadInventoryActions, updateInventory } from './inventory-logic-be';
 import dayjs from 'dayjs'
 import { genScopeId } from '../utils';
 import _ from 'lodash'
 import { appType, currentAppType } from '../AppType';
+import {
+  hooks as posLogicHook
+} from "../OrderView/pos-logic";
+import {
+  getCurrentOrder,
+  genMaxId
+} from "../OrderView/pos-logic-be";
 
+export const reason = {
+  PURCHASE_NEW_STOCK: 'Purchase new stock',
+  UPDATE_BY_USER: 'Update by user',
+  RETURN_FROM_CUSTOMER: 'Returned from customers (Order No.)', //todo: must fix this
+  SALES: (order) => `Sales (Order No. ${order})`,
+  RETURN_TO_PROVIDER: 'Return to provider',
+  ITEMS_ARE_DISCARDED: 'Items are discarded'
+}
+
+posLogicHook.on('pay', -1, async () => {
+  // todo: group item to calculate
+  const order = _.cloneDeep(getCurrentOrder())
+  await genMaxId(order)
+  for (let item of order.items) {
+    if (!item.ingredients) continue
+    for (let ingredient of item.ingredients) {
+      const consumedIngredient = ingredient.amount * item.quantity
+      const foundInventory = _.cloneDeep(inventories.value.find(inventory => inventory._id.toString() === ingredient.inventory.toString()))
+      if (foundInventory) {
+        foundInventory.stock = foundInventory.stock - consumedIngredient
+        await updateInventory(foundInventory, reason.SALES(order.id))
+      }
+    }
+  }
+})
 /**
  * This variable control the state
  * of each dialog in Inventory view

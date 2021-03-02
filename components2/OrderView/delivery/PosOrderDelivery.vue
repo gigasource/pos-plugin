@@ -16,7 +16,8 @@ import {
   selectedAddress,
   selectedCustomer,
   showKeyboard,
-  dialog
+  dialog,
+  name, phone, address, house, street, city, placeId
 } from "./delivery-shared";
 import {
   products,
@@ -28,12 +29,18 @@ import {
   removeModifier,
   loadKeyboard,
 } from './delivery-logic'
+import {
+  renderCustomerSection,
+  renderCustomerDialogs,
+  orderType
+} from "./delivery-customer-ui";
 
 import cms from 'cms'
-import { deliveryCustomerUiFactory } from './delivery-customer-ui'
 import { genScopeId } from '../../utils';
 import PosOrderDeliveryKeyboard from '../Helper/posOrderDeliveryKeyboard2'
 import {createOrder, addItem, changeItemQuantity} from "../pos-logic"
+import { advanceUpdateCustomer } from "../../Customer/customer-be-logics";
+import {acceptOrder} from "../../OnlineOrder/online-order-main-logic-be";
 
 export default {
   name: "PosOrderDelivery",
@@ -46,17 +53,23 @@ export default {
     const selectedProduct = ref()
     const modifiers = ref([])
     const type = ref('')
-    let order = createOrder()
+    const order = ref(createOrder())
     const enterPressed = ref(0)
     const selectedProductQuantity = ref(0)
 
-    const paymentTotal = ref(0)
+    let paymentTotal = computed(() => {
+      return order.value.items.reduce((totalPrice, item) => {
+        totalPrice += item.price * item.quantity
+        return totalPrice
+      }, 0)
+    })
     // TODO: Refactor
 
     const user = ref({})
 
     onActivated(() => {
-      order = createOrder()
+      order.value = createOrder()
+      order.value.type = orderType.value
     })
 
     let debounceUpdatePrice, keyboardEventHandler
@@ -153,7 +166,7 @@ export default {
         modifiers: modifiers.value,
       }
 
-      addItem(order, product, 1)
+      addItem(order.value, product, 1)
       selectedProduct.value = null
       modifiers.value = []
       //focus product autocomplete
@@ -163,29 +176,17 @@ export default {
     }
 
     function closeDialogConfirm() {
-      order.note = ''
-      order.prepareTime = 30
+      order.value.note = ''
+      order.value.prepareTime = 30
       dialog.value.order = false
     }
 
     async function confirmOrder() {
-      if (!selectedCustomer.value._id) {
-        //todo: factory
-        await createCustomer(selectedCustomer.value)
-      } else {
-        await updateCustomer(selectedCustomer.value._id, {
-          name: selectedCustomer.value.name,
-          addresses: selectedCustomer.value.addresses,
-          phone: selectedCustomer.value.phone,
-        })
-      }
-      const customer = {
-        name: selectedCustomer.value.name,
-        address: selectedCustomer.value.addresses[selectedAddress.value].address,
-        phone: selectedCustomer.value.phone,
-        zipCode: selectedCustomer.value.addresses[selectedAddress.value].zipcode
-      }
-      await createCallInOrder(customer) // todo: check whether this is send to kitchen or not
+      await advanceUpdateCustomer(selectedCustomer.value)
+      order.value.customer = selectedCustomer.value
+      order.value.date = dayjs().toDate() //todo: check why this using js date in render
+      order.value.payment = [{ value: paymentTotal.value, type: 'cash' }]
+      await acceptOrder(order)
       dialog.value.order = false
       autocompleteAddresses.value = []
       router.push({
@@ -206,7 +207,7 @@ export default {
             selectedProduct.value = product
             dialog.value.choice = true
           } else {
-            addItem(order, {
+            addItem(order.value, {
               ...product,
               modifiers: []
             }, selectedProductQuantity.value)
@@ -263,11 +264,11 @@ export default {
     }
 
     function decreaseQty(item) {
-      changeItemQuantity(order, item, -1)
+      changeItemQuantity(order.value, item, -1)
     }
 
     function increaseQty(item) {
-      changeItemQuantity(order, item, 1)
+      changeItemQuantity(order.value, item, 1)
     }
 
     function changeQuantity(change) {
@@ -319,7 +320,6 @@ export default {
       console.warn('PosOrderDelivery2:removeItemQuantity was not implemented')
     }
 
-    const { customerUiRender : renderCustomerSection, renderDialogs : renderCustomerDialogs, orderType } =  deliveryCustomerUiFactory()
     const renderSelectCartItemSection = () => {
       return (
           <div class="delivery-order">
@@ -384,7 +384,7 @@ export default {
             </div>
 
             <div class="delivery-detail__order">
-              {order.items.map((item, i) =>
+              {order.value.items.map((item, i) =>
                   <div key={i} class="item">
                     <div class="item-detail">
                       <div>
@@ -442,19 +442,19 @@ export default {
                   <div class="mx-2">
                     <b>Address: </b> {selectedCustomerAddress.value}
                   </div>
-                  <g-text-field-bs label="Delivery note:" v-model={order.note} v-slots={{
+                  <g-text-field-bs label="Delivery note:" v-model={order.value.note} v-slots={{
                     'append-inner': () => <g-icon onClick={() => dialog.value.note = true}>icon-keyboard</g-icon>
                   }}/>
                   <div class="ma-2">Time to complete (minute)</div>
                   <div class="mb-3">
-                    <g-btn-bs class="elevation-1" backgroundColor={order.prepareTime === 15 ? '#BBDEFB' : 'white'}
-                              onClick={() => order.prepareTime = 15}>15</g-btn-bs>
-                    <g-btn-bs class="elevation-1" backgroundColor={order.prepareTime === 30 ? '#BBDEFB' : 'white'}
-                              onClick={() => order.prepareTime = 30}>30</g-btn-bs>
-                    <g-btn-bs class="elevation-1" backgroundColor={order.prepareTime === 45 ? '#BBDEFB' : 'white'}
-                              onClick={() => order.prepareTime = 45}>45</g-btn-bs>
-                    <g-btn-bs class="elevation-1" backgroundColor={order.prepareTime === 60 ? '#BBDEFB' : 'white'}
-                              onClick={() => order.prepareTime = 60}>60</g-btn-bs>
+                    <g-btn-bs class="elevation-1" backgroundColor={order.value.prepareTime === 15 ? '#BBDEFB' : 'white'}
+                              onClick={() => order.value.prepareTime = 15}>15</g-btn-bs>
+                    <g-btn-bs class="elevation-1" backgroundColor={order.value.prepareTime === 30 ? '#BBDEFB' : 'white'}
+                              onClick={() => order.value.prepareTime = 30}>30</g-btn-bs>
+                    <g-btn-bs class="elevation-1" backgroundColor={order.value.prepareTime === 45 ? '#BBDEFB' : 'white'}
+                              onClick={() => order.value.prepareTime = 45}>45</g-btn-bs>
+                    <g-btn-bs class="elevation-1" backgroundColor={order.value.prepareTime === 60 ? '#BBDEFB' : 'white'}
+                              onClick={() => order.value.prepareTime = 60}>60</g-btn-bs>
                   </div>
                   <g-btn-bs disabled={disabledConfirm.value} block large background-color="#2979FF"
                             onClick={confirmOrder}>

@@ -1,13 +1,14 @@
 <script>
 import _ from 'lodash'
 import { computed, ref, withModifiers } from 'vue'
-import { execGenScopeId, genScopeId } from '../../utils';
-import { productIdQuery, productIdQueryResults } from './temp-logic';
+import { execGenScopeId, genScopeId } from '../../../utils';
 
 export default {
   name: 'dialogProductSearchResult',
   props: {
-    modelValue: null
+    modelValue: null,
+    productIdQuery: String,
+    productIdQueryResults: Array
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
@@ -71,7 +72,8 @@ export default {
           if (selectedAttributes.hasOwnProperty(key) && !selectedAttributes[key]) return false
         }
       }
-      if (unit) return !!selectedUnit;
+      if (unit)
+        return !!selectedUnit;
       return true
     }
 
@@ -84,13 +86,11 @@ export default {
       } else {
         addProductToOrder(_product)
       }
-      dialogProductSearch.value = false
-      productIdQuery.value = ''
+      closeDialog()
     }
 
     function closeDialog() {
       dialogProductSearch.value = false
-      productIdQuery.value = ''
     }
 
     function renderHeader() {

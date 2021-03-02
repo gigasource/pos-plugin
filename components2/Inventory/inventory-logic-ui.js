@@ -10,7 +10,6 @@ export const hooks = new (require('schemahandler/hooks/hooks'))();
 export const detailInventories = computed(() => {
   return inventories.value.map(inventory => {
     const product = products.value.find(product => product._id.toString() === inventory.productId.toString())
-    const a = products.value
     if (!product) return inventory
     inventory.product = _.cloneDeep(product)
     inventory.product.category = inventory.product.category.map(categoryId => {

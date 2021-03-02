@@ -2,7 +2,8 @@
 import { getInternalValue, Intersect } from 'pos-vue-framework';
 import { computed, getCurrentInstance, onMounted, ref, watch } from 'vue';
 import _ from 'lodash'
-import { genScopeId, execGenScopeId } from '../../utils';
+import { genScopeId, execGenScopeId } from '../../../utils';
+import { addProductToOrder } from '../temp-logic'
 
 export default {
   name: 'dialogProductLookup',
@@ -26,18 +27,15 @@ export default {
       { name: 'v-intersect', arg: lastRowIntersectArgs.value, value: lastRowIntersectValue.value }
     ])
 
-    /*OrderStore*/ const productNameQuery = ref('')
-    /*OrderStore*/ const productNameQueryResults = ref([])
-    /*OrderStore*/ async function queryProductsByName() {
+    const productNameQuery = ref('')
+    const productNameQueryResults = ref([])
+    async function queryProductsByName() {
       const results = await cms.getModel('Product').filter(product =>
           product.name.toLowerCase().includes(productNameQuery.value.trim().toLowerCase()))
       productNameQueryResults.value = Object.freeze(results.map(product => ({
         ...product,
         originalPrice: product.price
       })))
-    }
-    /*OrderStore*/ function addProductToOrder() {
-      console.error('OrderStore::addProductToOrder not impl')
     }
 
     const dialogContentRef = ref()
