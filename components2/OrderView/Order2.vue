@@ -52,6 +52,7 @@ export default {
   .order-main {
     flex: 1;
     display: flex;
+    max-height: 100%;
   }
 
   .g-toolbar {

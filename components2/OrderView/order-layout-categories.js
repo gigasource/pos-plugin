@@ -104,7 +104,7 @@ export function orderLayoutCategoriesFactory() {
 
   const renderCategories = () => (
     <div
-      style={{padding: '4px', 'background-color': 'rgb(224, 224, 224, 0.7)', ...!editable.value && {position: 'sticky', top: 0, 'z-index': 1}}}>
+      style={{padding: '4px', 'background-color': 'rgb(224, 224, 224)', ...!editable.value && {position: 'sticky', top: 0, 'z-index': 1}}}>
       <div style={categoryContainerStyle.value}>
         {categories.value.map((_category, index) => (
           <div class='pol__cate'

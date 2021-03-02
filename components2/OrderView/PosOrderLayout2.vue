@@ -87,7 +87,7 @@ export default {
         <div class="pol" style={{
           'flex-direction': category.value && category.value.type === 'vertical' ? 'row' : 'column',
           'background': 'url(/plugins/pos-plugin/assets/out.png)',
-          'background-size': 'contain', 'overflow': displayOverlay ? 'hidden' : 'auto',
+          'background-size': 'contain', 'overflow': displayOverlay.value ? 'scroll' : 'auto',
         }}>
           {renderCategories()}
           {renderProducts()}
