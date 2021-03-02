@@ -1,14 +1,22 @@
 import {viewH, viewW} from './RoomLogics'
-import {onMounted, ref, withModifiers} from 'vue'
+import { nextTick, onMounted, ref, withModifiers } from 'vue'
 import RoomStyleFactory from './RoomStyles';
 import {genScopeId} from "../utils";
 
 export function roomUiFactory(roomObjectRenderFn, selectingRoomStates, objectsInSelectingRoom) {
   const {roomContainerStyle} = RoomStyleFactory(selectingRoomStates)
   const roomContainer = ref(null)
-  onMounted(() => {
-    viewW.value = roomContainer.value ? roomContainer.value.offsetWidth * 0.9 : 1200
-    viewH.value = roomContainer.value ? roomContainer.value.offsetHeight * 0.9 : 800
+  onMounted(async() => {
+    await nextTick()
+    if (!roomContainer.value || roomContainer.value.offsetWidth === 0) {
+      setTimeout(() => {
+        viewW.value = roomContainer.value ? roomContainer.value.offsetWidth * 0.9 : 1200
+        viewH.value = roomContainer.value ? roomContainer.value.offsetHeight * 0.9 : 800
+      }, 250)
+    } else {
+      viewW.value = roomContainer.value ? roomContainer.value.offsetWidth * 0.9 : 1200
+      viewH.value = roomContainer.value ? roomContainer.value.offsetHeight * 0.9 : 800
+    }
   })
   const preventStop = withModifiers(() => null, ['prevent', 'stop'])
   //fixme: fix code for preventStop to prevent side effect
