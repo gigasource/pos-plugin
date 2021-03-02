@@ -90,7 +90,7 @@ export default {
       return <div key={obj._id} id={obj.name}
                   style={_roomObjectContainerStyle(obj)}
                   class={classes(obj)}
-                  onClick={() => props.chooseTable ? props.chooseTable(obj) : chooseTable(obj)}
+                  // onClick={() => props.chooseTable ? props.chooseTable(obj) : chooseTable(obj)
                   v-touch={touchHandlers(obj)}
       >
         {objectContentRender(obj)}
