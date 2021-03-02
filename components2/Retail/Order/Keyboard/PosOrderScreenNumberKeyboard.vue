@@ -126,6 +126,7 @@
           <g-number-keyboard
               v-model={productIdQuery.value}
               items={numpad_1}
+              style="height: 100%"
               onSubmit={openDialogProductSearchResults}
               v-slots={{
                 screen: () => (

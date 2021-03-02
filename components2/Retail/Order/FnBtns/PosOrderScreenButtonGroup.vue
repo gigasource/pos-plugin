@@ -1,5 +1,5 @@
 <script>
-import { ref, onActivated } from 'vue'
+import { ref, onActivated, resolveComponent } from 'vue'
 import { genScopeId } from '../../../utils';
 import { appHooks, posSettings } from '../../../AppSharedStates';
 import {
@@ -8,6 +8,9 @@ import {
 import {
   useRouter
 } from 'vue-router'
+import {
+  FnBtns
+} from './FnBtn'
 
 export default {
     name: 'PosOrderScreenButtonGroup',
@@ -30,7 +33,7 @@ export default {
       ]
 
       const fixedBtnRefund = [
-        { "rows": [5, 7], "cols": [1, 1], "backgroundColor": "#1271FF", "textColor": "#FFFFFF", "text": "Refund", buttonFunction: toPayment },
+        { "rows": [5, 7], "cols": [1, 1], "backgroundColor": "#1271FF", "textColor": "#FFFFFF", "text": "Refund" },
         { "rows": [5, 5], "cols": [2, 2], "backgroundColor": "#F9A825", "textColor": "#FFFFFF", "text": "Save" },
         { "rows": [4, 4], "cols": [1, 3], "backgroundColor": "#FFFFFF", "textColor": "#000000", "text": "Change refund fee" }
       ]
@@ -79,22 +82,32 @@ export default {
         }
       }
 
+      const defaultButtonComponent =  FnBtns.find(btn => btn.name === 'Default').component
+
       return genScopeId(() => (
-          <div class="buttons" area="buttons">
-            {listBtn.value.map((btn, i) =>
-                <div class="btn" key={i} style={btn && {
-                  gridRow: btn.rows[0] + '/' + btn.rows[1],
-                  gridColumn: btn.cols[0] + '/' + btn.cols[1],
-                  backgroundColor: btn.backgroundColor,
-                  color: btn.backgroundColor !== '#FFFFFF' ? btn.textColor : '#000d',
-                  border: btn.backgroundColor && btn.backgroundColor !== '#FFFFFF' ? null : '1px solid #979797',
-                  pointerEvents: !isActiveBtn(btn) ? 'none' : 'auto', //disabled
-                  opacity: !isActiveBtn(btn) ? '0.4' : '1', //disabled
-                  cursor: !isActiveBtn(btn) ? 'none' : 'pointer'
-                }} onClick={() => onClick(btn)}>
-                  {btn && btn.text}
-                </div>
-            )}
+          <div class="buttons">
+            {listBtn.value.map((btn, i) => {
+              let component = FnBtns.find(_btn => _btn.fn === btn.buttonFunction)
+              if (!component || !btn.buttonFunction)
+                component = defaultButtonComponent
+              else
+                component = component.component
+              const btnInput = {
+                text: btn.text
+              }
+              return (
+                  <component {...{btnInput}} key={i} style={{
+                    gridRow: btn.rows[0] + '/' + btn.rows[1],
+                    gridColumn: btn.cols[0] + '/' + btn.cols[1],
+                    backgroundColor: btn.backgroundColor,
+                    color: btn.backgroundColor !== '#FFFFFF' ? btn.textColor : '#000d',
+                    border: btn.backgroundColor && btn.backgroundColor !== '#FFFFFF' ? null : '1px solid #979797',
+                    pointerEvents: !isActiveBtn(btn) ? 'none' : 'auto', //disabled
+                    opacity: !isActiveBtn(btn) ? '0.4' : '1', //disabled
+                    cursor: !isActiveBtn(btn) ? 'none' : 'pointer'
+                  }} class="btn"/>
+              )
+            })}
             { !isRefundMode.value && <dialog-retail-refund-search v-model={showRefundSearch.value}/> }
           </div>
       ))
@@ -120,5 +133,6 @@ export default {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
     grid-gap: 4px;
+    height: 100%;
   }
 </style>
