@@ -205,7 +205,7 @@ export default {
     }
 
     return genScopeId(() => <>
-      <g-dialog v-model={dialogProductSearch} eager fullscreen>
+      <g-dialog v-model={dialogProductSearch.value} eager fullscreen>
         {execGenScopeId(() =>
             <g-card style="height: 568px">
               {execGenScopeId(() =>

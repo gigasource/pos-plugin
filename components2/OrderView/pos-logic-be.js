@@ -222,7 +222,6 @@ export function orderBeFactory(id = 0) {
   }
 
   watch(order, () => {
-    console.log('change')
     cms.socket.emit('update-customer-order', order)
   }, {
     deep: true

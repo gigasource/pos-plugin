@@ -83,7 +83,7 @@ export default {
           reader.readAsDataURL(file.value);
         }
       }
-    }, { onTrigger: () => console.log('trigger') })
+    })
 
     async function update() {
       dialog.value = false
@@ -102,7 +102,6 @@ export default {
 
 
     async function updateCompanyInfo(_companyInfo) {
-      console.log('update', _companyInfo)
       const newCompanyInfo = Object.assign(companyInfo.value, _companyInfo)
       await cms.getModel('PosSetting').findOneAndUpdate(
           {},
