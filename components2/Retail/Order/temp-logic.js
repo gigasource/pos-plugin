@@ -1,8 +1,6 @@
 import { ref } from 'vue';
 
 export const showDialogProductSearchResult = ref(false)
-export const showDialogChangePrice = ref(false)
-export const showDialogProductLookup = ref(false)
 
 export function /*PosStore::*/ updateNewPrice(val) {
   console.error('PosStore:updateNewPrice not impl', val)
@@ -43,25 +41,11 @@ export const /*OrderStore::*/ paymentSubTotal = ref(null)
 export const /*OrderStore::*/ paymentTotal = ref(40)
 export const /*OrderStore::*/ paymentAmountTendered = ref(100)
 export const /*OrderStore::*/ paymentChange = ref(60)
-export const /*OrderStore::*/ productIdQuery = ref('')
-export const /*OrderStore::*/ queryProductsById = () => {
-  console.error('OrderStore::queryProductsById not impl')
-  // let quantity;
-  // if (this.productIdQuery.includes('x')) {
-  //   const queryStrArr = this.productIdQuery.split(' ')
-  //   quantity = parseInt(queryStrArr[2]);
-  //   this.productIdQuery = queryStrArr[0]
-  // }
-  // const results = cms.getList('Product').filter(item => item.id === this.productIdQuery)
-  // if (results) {
-  //   this.productIdQueryResults = results.map(product => ({
-  //     ...product,
-  //     originalPrice: product.price,
-  //     ...quantity && { quantity }
-  //   }))
-  // }
+
+export function addProductToOrder(product) {
+  console.log('addProductToOrder not impl')
 }
-export const /*OrderStore::*/ productIdQueryResults = ref('')
+
 export const /*OrderStore::*/ getScrollWindowProducts = () => {
   console.error('OrderStore::getScrollWindowProducts not impl')
   // const products = {}

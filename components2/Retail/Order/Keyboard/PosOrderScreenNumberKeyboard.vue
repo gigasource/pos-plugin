@@ -1,17 +1,12 @@
 <script>
   import { nextTick } from 'vue';
-  import { genScopeId } from '../../utils';
-  import {
-    productIdQuery,
-    queryProductsById,
-    productIdQueryResults,
-    addProductToOrder,
-
-    showDialogProductSearchResult
-  } from './temp-logic';
+  import { genScopeId } from '../../../utils';
+  import { addProductToOrder } from '../temp-logic';
+  import DialogProductSearchResult from './dialogProductSearchResult';
 
   export default {
     name: 'PosOrderScreenNumberKeyboard',
+    components: { DialogProductSearchResult },
     setup() {
       const numpad_1 = [
         {
@@ -90,6 +85,27 @@
         { img: 'delivery/key_enter', classes: 'white', type: 'enter', action: () => null, style: 'grid-area: Enter; border: 1px solid #979797' }
       ]
 
+      const showDialogProductSearchResult = ref(false)
+      const productIdQuery = ref('')
+      const productIdQueryResults = ref([])
+
+      export const queryProductsById = () => {
+        let quantity;
+        if (productIdQuery.value.includes('x')) {
+          const queryStrArr = productIdQuery.value.split(' ')
+          quantity = parseInt(queryStrArr[2]);
+          productIdQuery.value = queryStrArr[0]
+        }
+        const results = cms.getList('Product').filter(item => item.id === productIdQuery.value)
+        if (results) {
+          productIdQueryResults.value = results.map(product => ({
+            ...product,
+            originalPrice: product.price,
+            ...quantity && { quantity }
+          }))
+        }
+      }
+
       async function openDialogProductSearchResults() {
         if (productIdQuery.value.trim()) {
           await queryProductsById()
@@ -106,7 +122,7 @@
         }
       }
 
-      return genScopeId(() => (
+      return genScopeId(() => (<div>
           <g-number-keyboard
               v-model={productIdQuery.value}
               items={numpad_1}
@@ -120,8 +136,15 @@
                            v-model={productIdQuery.value}/>
                   </div>
                 )
-              }}>
-          </g-number-keyboard>
+              }}/>
+
+              <dialog-product-search-result
+                  v-model={showDialogProductSearchResult.value}
+                  productIdQuery={productIdQuery.value}
+                  productIdQueryResults={productIdQueryResults.value}
+                  onUpdate:modelValue={() => productIdQuery.value = '' }
+              />
+           </div>
       ))
 
     }
