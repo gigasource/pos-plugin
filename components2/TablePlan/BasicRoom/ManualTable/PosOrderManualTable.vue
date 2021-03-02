@@ -54,9 +54,9 @@ export default {
                 </div>
             )}
           </div>
-          <div class="keyboard" {...getScopeAttrs()}>
-            <pos-textfield-new label="Table" v-model={tableNameInput.value} ref={textFieldRef}></pos-textfield-new>
-            <pos-keyboard-full onEnterPressed={addTable}></pos-keyboard-full>
+          <div class="keyboard">
+            <pos-textfield-new label="Table" v-model={tableNameInput.value} ref={textFieldRef}/>
+            <pos-keyboard-full onEnterPressed={addTable}/>
           </div>
         </div>
     )

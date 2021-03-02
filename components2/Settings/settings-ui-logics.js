@@ -6,32 +6,36 @@ import { appType, currentAppType } from '../AppType';
 
 export const SettingsSidebarFactory = () => {
   const { messages, locale, fallbackLocale } = useI18n()
-  const { sidebar, dashboard: { deliveryMenu } } = messages.value[locale.value] || messages.value[fallbackLocale.value]
-
+  const sidebar = computed(() => {
+    return (messages.value[locale.value] && messages.value[locale.value].sidebar) || messages.value[fallbackLocale.value].sidebar
+  })
+  const deliveryMenu = computed(() => {
+    return (messages.value[locale.value] && messages.value[locale.value].dashboard.deliveryMenu) || messages.value[fallbackLocale.value].dashboard.deliveryMenu
+  })
   const sidebarData = computed(() => {
     const _sidebarData = [
-      { title: sidebar.user, icon: 'person', isView: true, key: 'user', target: 'UserSettingView' },
-      { title: sidebar.general, icon: 'icon-general_setting', isView: true, key: 'general', target: 'GeneralSettingView' },
+      { title: sidebar.value.user, icon: 'person', isView: true, key: 'user', target: 'UserSettingView' },
+      { title: sidebar.value.general, icon: 'icon-general_setting', isView: true, key: 'general', target: 'GeneralSettingView' },
       {
-        title: sidebar.advancedSettings, icon: 'icon-switch', svgIcon: true, key: 'advancedSettings',
+        title: sidebar.value.advancedSettings, icon: 'icon-switch', svgIcon: true, key: 'advancedSettings',
         items: [
-          { title: sidebar.companyInfo, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'companyInfo', target: 'CompanyInfoSettingView' },
-          { title: sidebar.payment, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'payment', target: 'PaymentSettingView' },
-          { title: sidebar.tax, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'tax', target: 'TaxSettingView' },
+          { title: sidebar.value.companyInfo, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'companyInfo', target: 'CompanyInfoSettingView' },
+          { title: sidebar.value.payment, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'payment', target: 'PaymentSettingView' },
+          { title: sidebar.value.tax, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'tax', target: 'TaxSettingView' },
         ]
       },
     ]
 
     if (appType.POS_RESTAURANT === currentAppType.value) {
       _sidebarData.push({
-        title: sidebar.onlineOrderSettings, icon: 'icon-general_setting',
+        title: sidebar.value.onlineOrderSettings, icon: 'icon-general_setting',
         items: [
-          { title: sidebar.settings, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'onlineOrderSettings', target: 'OnlineOrderSettingView' },
-          { title: deliveryMenu, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'deliveryConfig', target: 'DeliverySettingView' },
+          { title: sidebar.value.settings, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'onlineOrderSettings', target: 'OnlineOrderSettingView' },
+          { title: deliveryMenu.value, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'deliveryConfig', target: 'DeliverySettingView' },
         ]
       })
-      _sidebarData.push({ title: sidebar.callSystem, icon: 'icon-telephone', isView: true, key: 'callSystem', target: 'CallSystemSettingView' })
-      _sidebarData.push({ title: sidebar.customerScreen, icon: 'icon-screen', isView: true, key: 'customerScreen', target: 'CustomerScreenSettingView' })
+      _sidebarData.push({ title: sidebar.value.callSystem, icon: 'icon-telephone', isView: true, key: 'callSystem', target: 'CallSystemSettingView' })
+      _sidebarData.push({ title: sidebar.value.customerScreen, icon: 'icon-screen', isView: true, key: 'customerScreen', target: 'CustomerScreenSettingView' })
     }
 
     return _sidebarData
