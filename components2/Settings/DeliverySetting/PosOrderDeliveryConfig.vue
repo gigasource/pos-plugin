@@ -6,9 +6,10 @@ import { computed, ref } from 'vue'
 import Snackbar from '../../../components/Store/Snackbar';
 import { genScopeId } from '../../utils';
 import { prepareMockData } from './delivery-mock-data'
+import posOrderDeliveryKeyboard from '../../OrderView/Helper/posOrderDeliveryKeyboard2';
 
 export default {
-  components: { Snackbar },
+  components: { Snackbar, posOrderDeliveryKeyboard },
   setup() {
     appHooks.emit("settingChange")
     const keyboardDeliveryConfig = computed(() => (posSettings.value && posSettings.value.keyboardDeliveryConfig) || [])
@@ -60,19 +61,19 @@ export default {
         Configuration
       </div>
       <div class="row-flex flex-grow-1">
-        <div class="col-6">
-          <div class="row-flex align-items-center mb-2">
+        <div>
+          <div class="mb-2">
             <p class="fw-600">Delivery Menu</p>
-            <g-btn-bs background-color="#1271FF" onClick={fetchMenu}>Fetch</g-btn-bs>
-            <g-btn-bs background-color="#1271FF" onClick={prepareMockData}>Mock Data</g-btn-bs>
+            <div>
+              <g-btn-bs style="margin: 0" background-color="#1271FF" onClick={fetchMenu}>Fetch</g-btn-bs>
+              <g-btn-bs style="width: 80px" background-color="#1271FF" onClick={prepareMockData}>Fake</g-btn-bs>
+            </div>
           </div>
           <div class="mb-2 fw-600">Delivery keyboard</div>
           <div class="row-flex align-items-center mb-2">
             <p class="mr-2">External rows</p>
             <input-number width="148" modelValue={keyboardDeliveryConfig.value.length} onUpdate:modelValue={changeExtraRows}/>
           </div>
-        </div>
-        <div class="col-6 col-flex h-100">
           <g-spacer/>
           {keyboardRender()}
         </div>
@@ -90,6 +91,7 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow-y: scroll;
 
   &__title {
     font-size: 18px;
