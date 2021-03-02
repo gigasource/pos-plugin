@@ -177,24 +177,26 @@ export function renderInventoryDialog(t) {
 
   const renderDialog = {
     [appType.POS_RESTAURANT]: () => (
-        <div class="row-flex flex-wrap justify-around" key={dialog.value.inventory}>
-          <pos-textfield-new style="width: 48%" label="Name" v-model={selectedInventory.value.product.name}/>
-          <pos-textfield-new disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
-                             style="width: 48%" label={t('inventory.stock')} v-model={selectedInventory.value.stock}/>
+        <div class="row-flex flex-wrap justify-around mt-3" key={dialog.value.inventory}>
+          <div style={{display:'grid', gridTemplateColumns: '3fr 1fr 1fr' }}>
+            <pos-textfield-new label="Name" v-model={selectedInventory.value.product.name}/>
+            <pos-textfield-new disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
+                               label={t('inventory.stock')} v-model={selectedInventory.value.stock}/>
+            <g-select menu-class="menu-select-inventory" outlined label={t('inventory.unit')}
+                      items={units.value} v-model={selectedInventory.value.unit}/>
+          </div>
           <g-select
             label={t('article.category')}
             required
             multiple
             chips
             deletableChips
-            style={{gridColumn:'span 3'}}
+            style="width: 100%"
             text-field-component="g-text-field-bs"
             menu-class="menu-select-inventory" outlined
             items={categoriesWithParentName.value} item-text="name" return-object
             modelValue={selectedInventory.value.product.category}
             onUpdate:modelValue={updateSelectedInventoryCategory}/>
-          <g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={t('inventory.unit')}
-                    items={units.value} v-model={selectedInventory.value.unit}/>
         </div>
     ),
     [appType.POS_RETAIL]: () => {
