@@ -1,6 +1,6 @@
 <script>
 import DialogSavedList from '../../../components/Order/components/dialogSavedList'
-import DialogProductLookup from '../../../components/Order/components/dialogProductLookup';
+import DialogProductLookup from './dialogProductLookup2';
 import DialogChangeValue from "../../pos-shared-components/dialogChangeValue";
 import PosOrderScreenNumberKeyboard from './PosOrderScreenNumberKeyboard';
 import PosOrderScreenButtonGroup from './PosOrderScreenButtonGroup';
@@ -14,11 +14,13 @@ import DialogRetailRefundSearch from './Refund/dialogRetailRefundSearch';
 import { genScopeId } from '../../utils';
 import { refundOrder, retailHook} from '../pos-retail-shared-logic'
 import {makeRefundOrder, prepareOrder} from '../../OrderView/pos-logic-be'
+import DialogProductSearchResult from '../../../components/Order/components/dialogProductSearchResult';
 
 export default {
   name: 'PosOrderRetail',
   props: {},
   components: {
+    DialogProductSearchResult,
     DialogRetailRefundSearch,
     PosOrderScreenScrollWindow,
     PosOrderScreenButtonGroup,
@@ -32,6 +34,7 @@ export default {
   setup() {
     const showRefundSearch = ref(false)
     const dialogProductSearchResult = ref(false)
+    const dialogSavedList = ref(false)
     const dialogChangePrice = ref(false)
     const dialogProductLookup = ref(false)
     const isRefundMode = ref(false)
@@ -67,8 +70,9 @@ export default {
           {
             !isRefundMode.value && <dialog-retail-refund-search v-model={showRefundSearch.value}/>
           }
-          <dialog-saved-list v-model={dialogProductSearchResult.value}/>
-          <dialog-change-value v-model={dialogChangePrice.value} new-value-editable onSubmit={submit}/>
+          <dialog-product-search-result v-model={dialogProductSearchResult.value}></dialog-product-search-result>
+          <dialog-saved-list v-model={dialogSavedList.value}/>
+          <dialog-change-value v-model={dialogChangePrice.value} new-value-editable onSubmit={updateNewPrice}/>
           <dialog-product-lookup v-model={dialogProductLookup.value}/>
         </div>
     ))

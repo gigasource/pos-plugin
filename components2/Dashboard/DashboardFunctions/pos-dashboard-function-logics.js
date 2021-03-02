@@ -56,7 +56,7 @@ export const DashboardFunctionFactory = () => {
     ],
     [appType.POS_RETAIL] : [
       { title: 'Cash Register' /*TODO: i18n*/, icon: 'icon-fast-checkout' /*TODO: update icon*/, click: () => changePath('/retail--order') },
-      { title: orderHistory.value, feature: 'orderHistory', icon: 'icon-history', click: () => changePath('/pos-order-history') },
+      { title: orderHistory.value, /*feature: 'orderHistory',*/ icon: 'icon-history', click: () => changePath('/pos-order-history') },
     ]
   }))
   const btnDown = computed(() => ({

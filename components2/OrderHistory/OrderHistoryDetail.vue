@@ -4,6 +4,9 @@ import { $filters } from '../AppSharedStates';
 import { OrderHistoryDetailFactory } from './order-history-logics';
 import { useI18n } from 'vue-i18n';
 
+// TODO: i18n & formatCurrency.
+// ATM, we hard-code with € symbol
+
 export default {
   props: {
     order: Object
@@ -34,31 +37,22 @@ export default {
         </div>
     const renderTableNo = () => (order.value.table) &&
         <div class="pl-2 flex-grow-1">
-          <div class="order-title">
-            Table No
-          </div>
-          <div class="order-id">
-            {order.value.table} </div>
+          <div class="order-title">Table No</div>
+          <div class="order-id">{order.value.table}</div>
         </div>
     const renderCreatedTime = () =>
         <div class="row-flex">
-          <div class="flex-grow-1" style="opacity: 0.5">
-            Created time
-          </div>
+          <div class="flex-grow-1" style="opacity: 0.5">Created time</div>
           <div> {formatDate(order.value.date)} </div>
         </div>
     const renderStaff = () => (staffs.value.length) &&
         <>
           <div class="row-flex">
-            <div class="flex-grow-1" style="opacity: 0.5">
-              Created by
-            </div>
+            <div class="flex-grow-1" style="opacity: 0.5">Created by</div>
             <span class="ta-right"> {createdUser.value} </span>
           </div>
           <div class="row-flex">
-            <div class="flex-grow-1" style="opacity: 0.5">
-              Cashier
-            </div>
+            <div class="flex-grow-1" style="opacity: 0.5">Cashier</div>
             <span class="ta-right"> {cashierUser.value} </span>
           </div>
         </>
@@ -67,9 +61,7 @@ export default {
       {genScopeId(() => <>
         {items.value.map(product =>
             <tr>
-              <td>
-                {product.quantity}x
-              </td>
+              <td>{product.quantity}x</td>
               <td>
                 {product.id && `${product.id}.`} {product.name}
                 <span class="i text-grey-darken-1">
@@ -97,7 +89,7 @@ export default {
     const renderPromotions = () => <div class="order-info my-2">
       <span class="fw-700"> {t('orderHistory.promotionalApplied')} </span>
       <span class="order-info-number">
-        -{promotionTotal.value > 0 ? (' € ' + promotionTotal.value.toFixed(2)) : ''}
+        -{promotionTotal.value > 0 ? (' € ' + $filters.formatCurrency(promotionTotal.value)) : ''}
       </span>
     </div>
 
@@ -116,24 +108,17 @@ export default {
 
     const renderPayment = () =>
         <div class="row-flex align-items-center" style="justify-content: space-between; text-transform: capitalize">
-          <span>
-            Payment
-          </span>
+          <span>Payment</span>
           {
             (payment.value.length > 1) ?
                 <div class="row-flex">
-                  <g-icon size="24" class="mr-2">
-                    icon-multi_payment
-                  </g-icon>
+                  <g-icon size="24" class="mr-2">icon-multi_payment</g-icon>
                   {payment.value.map((p, index) =>
                       <div class="row-flex align-items-center">
                         <span style={{ color: p.type === 'cash' ? '#25D778' : '#FFCB3A' }}>
-                          {$filters.formatCurrency(p.value)}
+                          { $filters.formatCurrency(p.value) }
                         </span>
-                        {
-                          (!index) &&
-                          <g-divider vertical class="ml-1 mr-1"/>
-                        }
+                        { (!index) && <g-divider vertical class="ml-1 mr-1"/>}
                       </div>
                   )}
                 </div>
@@ -141,12 +126,8 @@ export default {
                 (
                     (payment.value.length === 1) &&
                     <div class="row-flex align-items-center">
-                      {
-                        (payment.value[0].icon) &&
-                        <img src={payment.value[0].icon} style="height: 16px" class="mr-2"> </img>
-                      }
-                      <span>
-                        {$filters.formatCurrency(payment.value[0].value)} </span>
+                      { (payment.value[0].icon) && <img src={payment.value[0].icon} style="height: 16px" class="mr-2"> </img> }
+                      <span>{ $filters.formatCurrency(payment.value[0].value) }</span>
                     </div>
                 )
           }
@@ -159,9 +140,7 @@ export default {
         </div>
     const renderTotal = () => <div class="total">
       <div class="row-flex align-items-center" style="justify-content: space-between">
-        <span>
-          {t('common.total')}
-        </span>
+        <span>{t('common.total')}</span>
         <span class="total__important">
           € {$filters.formatCurrency(order.value.amount)}
         </span>
