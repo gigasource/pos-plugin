@@ -80,21 +80,23 @@ export default {
       }
 
       return genScopeId(() => (
-          <div class="buttons" area="buttons">
-            {listBtn.value.map((btn, i) =>
-                <div class="btn" key={i} style={btn && {
-                  gridRow: btn.rows[0] + '/' + btn.rows[1],
-                  gridColumn: btn.cols[0] + '/' + btn.cols[1],
-                  backgroundColor: btn.backgroundColor,
-                  color: btn.backgroundColor !== '#FFFFFF' ? btn.textColor : '#000d',
-                  border: btn.backgroundColor && btn.backgroundColor !== '#FFFFFF' ? null : '1px solid #979797',
-                  pointerEvents: !isActiveBtn(btn) ? 'none' : 'auto', //disabled
-                  opacity: !isActiveBtn(btn) ? '0.4' : '1', //disabled
-                  cursor: !isActiveBtn(btn) ? 'none' : 'pointer'
-                }} onClick={() => onClick(btn)}>
-                  {btn && btn.text}
-                </div>
-            )}
+          <div>
+            <div class="buttons">
+              {listBtn.value.map((btn, i) =>
+                  <div class="btn" key={i} style={btn && {
+                    gridRow: btn.rows[0] + '/' + btn.rows[1],
+                    gridColumn: btn.cols[0] + '/' + btn.cols[1],
+                    backgroundColor: btn.backgroundColor,
+                    color: btn.backgroundColor !== '#FFFFFF' ? btn.textColor : '#000d',
+                    border: btn.backgroundColor && btn.backgroundColor !== '#FFFFFF' ? null : '1px solid #979797',
+                    pointerEvents: !isActiveBtn(btn) ? 'none' : 'auto', //disabled
+                    opacity: !isActiveBtn(btn) ? '0.4' : '1', //disabled
+                    cursor: !isActiveBtn(btn) ? 'none' : 'pointer'
+                  }} onClick={() => onClick(btn)}>
+                    {btn && btn.text}
+                  </div>
+              )}
+            </div>
             { !isRefundMode.value && <dialog-retail-refund-search v-model={showRefundSearch.value}/> }
           </div>
       ))
@@ -120,5 +122,6 @@ export default {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
     grid-gap: 4px;
+    height: 100%;
   }
 </style>
