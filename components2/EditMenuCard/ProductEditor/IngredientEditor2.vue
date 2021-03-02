@@ -1,7 +1,7 @@
 <script>
 import _ from 'lodash';
 import { Touch } from 'pos-vue-framework'
-import { onActivated, ref, computed, watch } from 'vue'
+import { onActivated, ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { genScopeId } from '../../utils'
 import {
@@ -38,7 +38,7 @@ export default {
         if (!selectedProduct.value.ingredients)
           selectedProduct.value.ingredients = []
         ingredients.value = selectedProduct.value.ingredients.map(item => ({
-          inventory: item.inventory,
+          name: item.name,
           amount: '' + item.amount
         }))
       } else {
@@ -49,16 +49,18 @@ export default {
     // reload ingredients each time product changed
     watch(selectedProduct, () => loadIngredients())
 
-    /*onCreated*/ loadIngredients();
-    loadCategories()
-    loadProducts()
-    loadInventories()
+    onMounted(async () => {
+      /*onCreated*/ loadIngredients();
+      await loadCategories()
+      await loadProducts()
+      await loadInventories()
+    })
 
     const rules = computed(() => {
       let rules = []
       const _inventories = ingredients.value.map(item => {
-        const inventory = detailInventories.value.find(invt => invt.value === item.inventory)
-        return inventory ? inventory.text : ''
+        const inventory = detailInventories.value.find(invt => invt.product.name === item.name)
+        return inventory ? inventory.product.name : ''
       })
       rules.push(val => _inventories.filter(item => item.toString() === val.toString()).length <= 1 || '')
       return rules
@@ -71,7 +73,8 @@ export default {
 
     async function  updateProductIngredient() {
       const _ingredients = ingredients.value.map(item => ({
-        inventory: item.inventory,
+        inventory: detailInventories.value.find(inventory => inventory.product.name === item.name)._id,
+        name: item.name,
         amount: Number(item.amount)
       }))
       if(_.some(_.countBy(_ingredients, 'inventory'), item => item > 1))
@@ -102,7 +105,7 @@ export default {
                       rules={rules.value}
                       items={productInventoryName.value}
                       arrow={false}
-                      v-model={ingredient.inventory}
+                      v-model={ingredient.name}
                       onInputClick={() => showKeyboard.value = true}
                       onUpdate:modelValue={updateProductIngredient}/>
                   <g-text-field-bs

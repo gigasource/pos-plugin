@@ -106,7 +106,8 @@ function mapProduct(p) {
     groupPrinter: _.get(p, 'groupPrinter.name', ''),
     ..._.pick(p, ['id', 'name', 'price']),
     product: p._id,
-    taxes: [p.tax, p.tax2]
+    taxes: [p.tax, p.tax2],
+    ingredients: p.ingredients ? p.ingredients : []
   }
 }
 
@@ -534,7 +535,7 @@ hooks.on('printOrder', async () => {
   clearOrder();
 });
 
-async function genMaxId(order) {
+export async function genMaxId(order) {
   //fixme: run only in master process to prevent missed data
   const order0 = await Order.findOne({id: {$exists: true}}).sort({id: '-1'})
   order.id = order0 ? order0.id + 1 : 1;

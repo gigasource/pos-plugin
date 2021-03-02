@@ -1,10 +1,10 @@
 <script>
 import { convertToUnit } from 'pos-vue-framework';
-import { computed, ref, withModifiers, watch } from 'vue'
+import { computed, reactive, ref, toRaw, watch, withModifiers } from 'vue'
 import _ from 'lodash'
 import { attrComputed, genScopeId } from '../utils';
 import { useI18n } from 'vue-i18n';
-import { appHooks, posSettings } from '../AppSharedStates';
+import { appHooks } from '../AppSharedStates';
 
 export default {
   setup() {
@@ -13,21 +13,55 @@ export default {
     const file = ref(null)
     const dialog = ref(false)
     const companyInfo = ref({})
+    const companyInfoDialogData = reactive({
+      name: '',
+      address: '',
+      address2: '',
+      zipCode: '',
+      city: '',
+      telephone: '',
+      taxNumber: '',
+      ustId: '',
+    })
+    const companyInfoModel = reactive({
+      name: '',
+      address: '',
+      address2: '',
+      zipCode: '',
+      city: '',
+      telephone: '',
+      taxNumber: '',
+      ustId: '',
+    })
+
     async function loadCompanyInfo() {
       const posSetting = await cms.getModel('PosSetting').findOne({})
-      return posSetting.companyInfo
+      companyInfo.value = posSetting.companyInfo
+      sync()
     }
-    loadCompanyInfo().then(v => companyInfo.value = v)
 
-    const name = attrComputed(companyInfo, 'name')
-    const address = attrComputed(companyInfo, 'address')
-    const address2 = attrComputed(companyInfo, 'address2')
-    const zipCode = attrComputed(companyInfo, 'zipCode')
-    const city = attrComputed(companyInfo, 'city')
-    const telephone = attrComputed(companyInfo, 'telephone')
-    const taxNumber = attrComputed(companyInfo, 'taxNumber')
-    const ustId = attrComputed(companyInfo, 'ustId')
-    const logo = attrComputed(companyInfo, 'logo')
+    function sync() {
+      companyInfoModel.name = companyInfo.value.name
+      companyInfoModel.address = companyInfo.value.address
+      companyInfoModel.address2 = companyInfo.value.address2
+      companyInfoModel.zipCode = companyInfo.value.zipCode
+      companyInfoModel.city = companyInfo.value.city
+      companyInfoModel.telephone = companyInfo.value.telephone
+      companyInfoModel.taxNumber = companyInfo.value.taxNumber
+      companyInfoModel.ustId = companyInfo.value.ustId
+    }
+
+    loadCompanyInfo()
+
+    const name = attrComputed(companyInfo, 'name', '')
+    const address = attrComputed(companyInfo, 'address', '')
+    const address2 = attrComputed(companyInfo, 'address2', '')
+    const zipCode = attrComputed(companyInfo, 'zipCode', '')
+    const city = attrComputed(companyInfo, 'city', '')
+    const telephone = attrComputed(companyInfo, 'telephone', '')
+    const taxNumber = attrComputed(companyInfo, 'taxNumber', '')
+    const ustId = attrComputed(companyInfo, 'ustId', '')
+    const logo = attrComputed(companyInfo, 'logo', '')
     const logoSize = attrComputed(companyInfo, 'logoSize', 1)
     const imgStyle = computed(() => {
       const base = 20;
@@ -41,60 +75,84 @@ export default {
       if (JSON.stringify(val) !== JSON.stringify(oldV)) {
         const reader = new FileReader();
         reader.onload = async () => {
-          logo.value = reader.result
-          await updateCompanyInfo();
+          await updateCompanyInfo({
+            logo: reader.result
+          });
         }
         if (file.value) {
           reader.readAsDataURL(file.value);
         }
       }
-    }, { onTrigger: () => console.log('trigger')})
+    }, { onTrigger: () => console.log('trigger') })
 
     async function update() {
       dialog.value = false
-      await updateCompanyInfo()
+      await updateCompanyInfo(toRaw(companyInfoDialogData))
+    }
+
+    async function directUpdate() {
+      await updateCompanyInfo(toRaw(companyInfoModel))
     }
 
     async function changeLogoSize(size) {
-      logoSize.value = size;
-      await updateCompanyInfo();
+      await updateCompanyInfo({
+        logoSize: size
+      });
     }
 
-    async function getCompanyInfo() {
 
-    }
-
-    async function updateCompanyInfo() {
+    async function updateCompanyInfo(_companyInfo) {
+      console.log('update', _companyInfo)
+      const newCompanyInfo = Object.assign(companyInfo.value, _companyInfo)
       await cms.getModel('PosSetting').findOneAndUpdate(
           {},
           {
-            companyInfo: companyInfo.value
-          }
+            companyInfo: newCompanyInfo
+          }, { upsert: true }
       );
-      appHooks.emit('settingChange')
+      await appHooks.emit('settingChange')
+      Object.keys(_companyInfo).forEach(key => {
+        companyInfo.value[key] = _companyInfo[key]
+        companyInfoModel[key] = _companyInfo[key]
+      })
     }
 
-    const inputRender = (field, model, require = false) => genScopeId(() =>
+    function openDialog() {
+      dialog.value = true
+      companyInfoDialogData.name = name.value
+      companyInfoDialogData.address = address.value
+      companyInfoDialogData.address2 = address2.value
+      companyInfoDialogData.zipCode = zipCode.value
+      companyInfoDialogData.city = city.value
+      companyInfoDialogData.telephone = telephone.value
+      companyInfoDialogData.taxNumber = taxNumber.value
+      companyInfoDialogData.ustId = ustId.value
+    }
+
+    const debounceDirectUpdate = _.debounce(directUpdate, 500)
+
+    const inputRender = (i18nField, field, model, required = false) =>
         <div class="main__item">
-          <g-text-field-bs label={t(`settings.${field}`)} v-model={model.value} required={require} v-slots={{
+          <g-text-field-bs label={t(`settings.${i18nField}`)} v-model={companyInfoModel[field]} onUpdate:modelValue={debounceDirectUpdate} required={required} v-slots={{
             'append-inner': () =>
-                <g-icon style="cursor: pointer" onClick={withModifiers(() => dialog.value = true, ['stop'])}>
+                <g-icon style="cursor: pointer" onClick={withModifiers(openDialog, ['stop'])}>
                   icon-keyboard
                 </g-icon>
-          }}></g-text-field-bs>
-        </div>)
+          }}/>
+        </div>
+
 
     //todo: should auto focus on textfield which user want to modify
-    const leftSideRender = genScopeId(() => <>
-      {inputRender('companyName', name, true)()}
-      {inputRender('address', address, true)()}
-      {inputRender('address2', address2)()}
-      {inputRender('zipCode', zipCode, true)()}
-      {inputRender('city', city, true)()}
-      {inputRender('tel', telephone, true)()}
-      {inputRender('taxNo', taxNumber, true)()}
-      {inputRender('ustId', ustId)()}
-    </>)
+    const leftSideRender = () => <>
+      {inputRender('companyName', 'name', true)}
+      {inputRender('address', 'address', true)}
+      {inputRender('address2', 'address2')}
+      {inputRender('zipCode', 'zipCode', true)}
+      {inputRender('city', 'city', true)}
+      {inputRender('tel', 'telephone', true)}
+      {inputRender('taxNo', 'taxNumber', true)}
+      {inputRender('ustId', 'ustId')}
+    </>
 
     const rightSideRender = genScopeId(() => <>
           <div class="main__item">
@@ -124,14 +182,14 @@ export default {
     const dialogRender = genScopeId(() => <dialog-form-input v-model={dialog.value} onSubmit={update} v-slots={{
       'input': genScopeId(() =>
           <div class="row-flex flex-wrap justify-around">
-            <pos-textfield-new style="width: 48%" label={t('settings.companyName')} v-model={name.value} required/>
-            <pos-textfield-new style="width: 48%" label={t('settings.address')} v-model={address.value} required/>
-            <pos-textfield-new style="width: 48%" label={t('settings.address2')} v-model={address2.value}/>
-            <pos-textfield-new style="width: 48%" label={t('settings.zipCode')} v-model={zipCode.value} required/>
-            <pos-textfield-new style="width: 48%" label={t('settings.city')} v-model={city.value} required/>
-            <pos-textfield-new style="width: 48%" label={t('settings.tel')} v-model={telephone.value} required/>
-            <pos-textfield-new style="width: 48%" label={t('settings.taxNo')} v-model={taxNumber.value} required/>
-            <pos-textfield-new style="width: 48%" label={t('settings.ustId')} v-model={ustId.value}/>
+            <pos-textfield-new style="width: 48%" label={t('settings.companyName')} v-model={companyInfoDialogData.name} required/>
+            <pos-textfield-new style="width: 48%" label={t('settings.address')} v-model={companyInfoDialogData.address} required/>
+            <pos-textfield-new style="width: 48%" label={t('settings.address2')} v-model={companyInfoDialogData.address2}/>
+            <pos-textfield-new style="width: 48%" label={t('settings.zipCode')} v-model={companyInfoDialogData.zipCode} required/>
+            <pos-textfield-new style="width: 48%" label={t('settings.city')} v-model={companyInfoDialogData.city} required/>
+            <pos-textfield-new style="width: 48%" label={t('settings.tel')} v-model={companyInfoDialogData.telephone} required/>
+            <pos-textfield-new style="width: 48%" label={t('settings.taxNo')} v-model={companyInfoDialogData.taxNumber} required/>
+            <pos-textfield-new style="width: 48%" label={t('settings.ustId')} v-model={companyInfoDialogData.ustId}/>
           </div>)
     }}>
     </dialog-form-input>)
