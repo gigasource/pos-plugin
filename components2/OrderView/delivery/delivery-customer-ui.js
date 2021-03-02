@@ -1,5 +1,4 @@
-import {useI18n} from "vue-i18n";
-import {ref} from "vue";
+import {ref, computed} from "vue";
 import {isIOS} from "../../AppSharedStates";
 import { calls, missedCalls } from '../../Settings/CallSystem/call-system-calls'
 import {
@@ -19,9 +18,6 @@ import { execGenScopeId } from '../../utils';
 //  3. render new customer for table
 
 export function deliveryCustomerUiFactory() {
-  let {t, locale} = useI18n();
-
-  const isNewCustomer = ref(false)
 
   function getRandomColor(i) {
     const colors = ['#FBE4EC', '#84FFFF', '#80D8FF', '#FFF59D', '#B2FF59', '#E1BEE7', '#FFAB91', '#B39DDB', '#BCAAA4', '#1DE9B6']
@@ -36,13 +32,14 @@ export function deliveryCustomerUiFactory() {
     })
   }
 
-  isNewCustomer.value = !(selectedCustomer.value && selectedCustomer.value.addresses && selectedCustomer.value.addresses.length > 0)
+  const isNewCustomer = computed(() => {
+    return !(selectedCustomer.value && selectedCustomer.value.addresses && selectedCustomer.value.addresses.length > 0)
+  })
 
   function removeAddress(index) {
     selectedCustomer.value.addresses.splice(index, 1) // remove customer address
 
     if (selectedCustomer.value.addresses.length === 0) { // if no address then set new customer flag
-      isNewCustomer.value = true
       selectedAddress.value = -1
     } else if (selectedAddress.value >= index) { // otherwise, correct selected address index
       selectedAddress.value -= 1
@@ -82,7 +79,6 @@ export function deliveryCustomerUiFactory() {
   function chooseCustomer(type) {
     orderType.value = type
     selectedCustomer.value = calls.value[0].customer
-    isNewCustomer.value = !(selectedCustomer.value && selectedCustomer.value.addresses && selectedCustomer.value.addresses.length > 0)
     name.value = selectedCustomer.value.name === 'New customer' ? '' : selectedCustomer.value.name
     phone.value = selectedCustomer.value.phone
   }
@@ -96,7 +92,6 @@ export function deliveryCustomerUiFactory() {
     calls.value.unshift(call)
     missedCalls.value.splice(index, 1)
     selectedCustomer.value = call.customer
-    isNewCustomer.value = !(selectedCustomer.value && selectedCustomer.value.addresses && selectedCustomer.value.addresses.length > 0)
     name.value = selectedCustomer.value.name === 'New customer' ? '' : selectedCustomer.value.name
     phone.value = selectedCustomer.value.phone
   }
@@ -143,7 +138,6 @@ export function deliveryCustomerUiFactory() {
         ]
       })
       selectedAddress.value = selectedCustomer.value.addresses.length - 1
-      isNewCustomer.value = false
     }
     if (dialogMode.value === 'edit') {
       selectedCustomer.value['name'] = name.value
@@ -202,7 +196,6 @@ export function deliveryCustomerUiFactory() {
       }
       selectedCustomer.value = customer
       selectedAddress.value = customer.addresses.length - 1
-      isNewCustomer.value = false
     }
     hideKeyboard()
   }
@@ -258,7 +251,7 @@ export function deliveryCustomerUiFactory() {
                         virtualEvent={isIOS.value}/>
         </div>
         <div style="flex: 1; margin-left: 2px">
-          <g-text-field outlined dense v-model={name} label="Name"
+          <g-text-field outlined dense v-model={name.value} label="Name"
                         onClick={() => showKeyboard.value = true}
                         virtualEvent={isIOS.value}/>
         </div>
@@ -472,3 +465,5 @@ export function deliveryCustomerUiFactory() {
     customerUiRender
   }
 }
+
+export const { customerUiRender : renderCustomerSection, renderDialogs : renderCustomerDialogs, orderType } =  deliveryCustomerUiFactory()

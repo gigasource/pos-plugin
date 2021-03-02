@@ -35,7 +35,6 @@ export const paymentIcon = ref({})
 export const timeoutProgress = ref({})
 export const kitchenOrders = ref([])
 export const sortedKitchenOrders = computed(() => {
-	//todo: fill this
 	return kitchenOrders.value.sort((orderA, orderB) => {
 		return getPendingOrderKitchenTime(orderA) - getPendingOrderKitchenTime(orderB)
 	})

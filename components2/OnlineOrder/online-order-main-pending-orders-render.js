@@ -21,6 +21,11 @@ import {
 } from './online-order-main-logic'
 
 import { acceptOrder } from './online-order-main-logic-be'
+//<editor-fold desc="delivery">
+import { selectedCustomer as deliverySelectedCustomer } from "../OrderView/delivery/delivery-shared";
+import { orderType } from "../OrderView/delivery/delivery-customer-ui";
+//</editor-fold>
+
 import {$filters} from "../AppSharedStates";
 
 export const selectedCustomer = ref({})
@@ -31,8 +36,8 @@ export function navigateToDeliveryScreen({ customer, callId }, type, missedCallI
 		calls.unshift({ ...missedCalls.value[missedCallIndex], type: 'missed' })
 		deleteMissedCall(missedCallIndex)
 	}
-	selectedCustomer.value = customer
-	// orderType.value = type // TODO: selecgted order type
+	selectedCustomer.value = deliverySelectedCustomer.value = customer
+	orderType.value = type
 	router.push({ path: '/pos-order-delivery' })
 }
 export function openReservationDialog({ customer, callId }) {

@@ -116,7 +116,7 @@ export function dialogCompleteOrderFactory(props, { emit }) {
 	}
 
 	const renderContentDiscount = function () {
-		return dialogOrder.value.discounts.map(discount =>
+		return dialogOrder.value.discounts && dialogOrder.value.discounts.map(discount =>
 			<div class="row-flex justify-between">
 				<div>
           <span>{discount.coupon ? 'Coupon ' : discount.name}</span>

@@ -11,6 +11,10 @@ import cms from 'cms'
 import { ObjectID } from 'bson'
 
 const Order = cms.getModel('Order')
+const displayTextType = {
+	'pickup': 'Pick up',
+	'delivery': 'Delivery'
+}
 
 /**
  * Recognize timeout order
@@ -67,12 +71,14 @@ export async function loadOrders() {
 
 export async function acceptOrder(order) {
 	let deliveryDateTime
-	if (order.deliveryTime === 'asap') {
-		deliveryDateTime = dayjs().add(order.prepareTime, 'minute')
-		order.deliveryTime = deliveryDateTime.format('HH:mm')
-	} else {
-		deliveryDateTime = dayjs(order.deliveryTime, 'HH:mm')
-	}
+	deliveryDateTime = dayjs().add(order.prepareTime, 'minute')
+	order.deliveryTime = deliveryDateTime.format('HH:mm')
+	// if (order.deliveryTime === 'asap') {
+	// 	deliveryDateTime = dayjs().add(order.prepareTime, 'minute')
+	// 	order.deliveryTime = deliveryDateTime.format('HH:mm')
+	// } else {
+	// 	deliveryDateTime = dayjs(order.deliveryTime, 'HH:mm')
+	// }
 	const status = 'kitchen'
 	let _isPrepaidOrder = isPrepaidOrder(order);
 
@@ -84,7 +90,8 @@ export async function acceptOrder(order) {
 
 	const orderStatus = {
 		status: status,
-		user
+		user,
+		responseMessage: `${displayTextType[order.type]} in ${order.prepareTime} minutes`
 	}
 
 	Object.assign(order, orderStatus)
@@ -98,7 +105,9 @@ export async function acceptOrder(order) {
 		_id: order._id
 	}, order, { upsert: true })
 	_.remove(pendingOrders.value, _order => _order._id.toString() === order._id.toString())
-	kitchenOrders.value.unshift(order)
+	kitchenOrders.value.push(order)
+
+	cms.socket.emit('updateOrderStatus', order)
 }
 
 export async function getOnlineOrdersByLimit(page, limit) {
