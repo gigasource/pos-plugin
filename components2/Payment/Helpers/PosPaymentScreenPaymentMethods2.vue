@@ -1,17 +1,17 @@
 <script>
 import PaymentLogicsFactory from '../payment-logics';
-import { ref, watch, withModifiers } from 'vue'
+import { onActivated, ref, watch, withModifiers } from 'vue'
 import { useI18n } from 'vue-i18n';
-import { isMobile} from '../../AppSharedStates';
+import { isMobile } from '../../AppSharedStates';
 import { GBadge, GBtn, GIcon } from 'pos-vue-framework';
 import dialogMultiPayment from './dialogMultiPayment';
 import { genScopeId, VModel_number } from '../../utils';
-import PosTextfieldNew from "../../pos-shared-components/POSInput/PosTextfieldNew";
+import PosTextfieldNew from '../../pos-shared-components/POSInput/PosTextfieldNew';
 
 //todo: ref-tip-textfield
 export default {
   name: 'PosPaymentScreenPaymentMethods2',
-  components: {GBtn, GIcon, GBadge, dialogMultiPayment, PosTextfieldNew},
+  components: { GBtn, GIcon, GBadge, dialogMultiPayment, PosTextfieldNew },
   setup() {
     const {
       defaultPaymentList,
@@ -27,7 +27,12 @@ export default {
       currentOrder,
       onSaveMulti,
       onSaveTip,
+        resetStates
     } = PaymentLogicsFactory()
+
+    onActivated(() => {
+      resetStates()
+    })
     const tipTextfield = ref(null)
     const { t, locale } = useI18n()
     const extraPaymentItems = ref([
@@ -46,30 +51,25 @@ export default {
         }, 500)
       }
     })
-    return genScopeId(() => <div class="pos-payment-method column-flex flex-wrap align-items-start pl-4 pt-4">
-      <div class="row-flex">
-        {defaultPaymentList.value.map(item =>
-            <>
-              <g-btn elevation="3"
-                     uppercase={false}
-                     x-large style="flex-basis: 20%"
-                     class={['payment-method-btn', selectedPayment.value === item.type && 'payment-method-btn--selected']}
-                     textColor={selectedPayment.value === item.type ? '#fff' : '#1D1D26'}
-                     onClick={withModifiers(() => onAddPaymentMethod(item), ['stop'])}>
-                {
-                  (item.icon) &&
-                  <g-icon size="20">
-                    {item.icon} </g-icon>
-                }
-                <span class="ml-2" style="text-transform: capitalize"> {t(`payment.${item.type}`)} </span>
-              </g-btn>
-            </>
-        )}
-      </div>
-      <div class="row-flex">
-        {extraPaymentItems.value.map(item =>
-            <>
-              {
+    return genScopeId(() =>
+        <div class="pos-payment-method column-flex flex-wrap align-items-start pl-4 pt-4">
+          <div class="row-flex">
+            {defaultPaymentList.value.map(item =>
+                <g-btn elevation="3"
+                       uppercase={false}
+                       x-large style="flex-basis: 20%"
+                       class={['payment-method-btn', selectedPayment.value === item.type && 'payment-method-btn--selected']}
+                       textColor={selectedPayment.value === item.type ? '#fff' : '#1D1D26'}
+                       onClick={withModifiers(() => onAddPaymentMethod(item), ['stop'])}>
+                  {
+                    (item.icon) && <g-icon size="20"> {item.icon} </g-icon>
+                  }
+                  <span class="ml-2" style="text-transform: capitalize"> {t(`payment.${item.type}`)} </span>
+                </g-btn>
+            )}
+          </div>
+          <div class="row-flex">
+            {extraPaymentItems.value.map(item =>
                 (getBadgeCount(item)) ?
                     <g-btn elevation="3"
                            uppercase={false}
@@ -77,8 +77,7 @@ export default {
                            class="payment-method-btn"
                            onClick={withModifiers(() => onAddFixedItem(item), ['stop'])}>
                       {
-                        (item.icon) &&
-                        <g-icon size="20"> {item.icon} </g-icon>
+                        (item.icon) && <g-icon size="20"> {item.icon} </g-icon>
                       }
                       <span class="mr-2" style="text-transform: capitalize">
                         {`${item.type}${item.value ? ` ${t('common.currency', locale.value)}${item.value}` : ''}`}
@@ -97,35 +96,34 @@ export default {
                         class="payment-method-btn"
                         onClick={withModifiers(() => onAddFixedItem(item), ['stop'])}>
                       {
-                        (item.icon) &&
-                        <g-icon size="20">
-                          {item.icon} </g-icon>
+                        (item.icon) && <g-icon size="20"> {item.icon} </g-icon>
                       }
                       <span style="text-transform: capitalize">
                         {`${item.type}${item.value ? ` ${t('common.currency', locale.value)}${item.value}` : ''}`}
                       </span>
                     </g-btn>
-              }
-            </>
-        )} </div>
-      <dialog-multi-payment v-model={showMultiPaymentDialog.value}
-                             total={currentOrder.vSum}
-                             cardValue={cardEditValue.value}
-                             cashValue={cashEditValue.value}
-                             isMobile={isMobile.value}
-                             onSubmit={onSaveMulti}>
-      </dialog-multi-payment>
-      <dialog-form-input width="40%"
-                         v-model={showAddTipDialog.value}
-                         keyboard-type="numeric" onSubmit={onSaveTip} keyboard-width="100%" v-slots={{
-        'input': () => <>
-          <pos-textfield-new ref={tipTextfield}
-                             label="Card Payment"
-                             v-model={VModel_number(tipEditValue).value} clearable>
-          </pos-textfield-new>
-        </>
-      }}></dialog-form-input>
-    </div>)
+            )}
+          </div>
+          <dialog-multi-payment v-model={showMultiPaymentDialog.value}
+                                total={currentOrder.vSum}
+                                cardValue={cardEditValue.value}
+                                cashValue={cashEditValue.value}
+                                isMobile={isMobile.value}
+                                onSubmit={onSaveMulti}
+          />
+          <dialog-form-input width="40%"
+                             v-model={showAddTipDialog.value}
+                             keyboard-type="numeric" onSubmit={onSaveTip} keyboard-width="100%" v-slots=
+                                 {{
+                                   'input': () =>
+                                       <pos-textfield-new ref={tipTextfield}
+                                                          label="Card Payment"
+                                                          v-model={VModel_number(tipEditValue).value}
+                                                          clearable
+                                       />
+                                 }}
+          />
+        </div>)
   }
 }
 </script>

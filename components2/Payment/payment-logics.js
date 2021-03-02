@@ -1,13 +1,11 @@
-import { ref, computed } from 'vue'
-import _ from 'lodash';
+import { computed, ref } from 'vue'
 import { getCurrentOrder } from '../OrderView/pos-logic-be';
 import {
   addMultiPayment,
   addPayment,
   addSinglePayment,
-  clearPayment, getPaymentTotal,
-  updateOrderWithHooks,
-  updatePayment,
+  clearPayment,
+  getPaymentTotal,
   updateSinglePayment
 } from '../OrderView/pos-logic';
 
@@ -22,8 +20,13 @@ const PaymentLogicsFactory = () => {
   const defaultPaymentList = ref([
     { type: 'cash', icon: 'icon-cash' },
     { type: 'card', icon: 'icon-credit_card' },
-    { type: 'multi', icon: 'icon-multi_payment'}
+    { type: 'multi', icon: 'icon-multi_payment' }
   ])
+
+  function resetStates() {
+    cashEditValue.value = 0
+    cardEditValue.value = 0
+  }
 
   const paidValue = computed(() => {
     return getPaymentTotal(currentOrder)
@@ -49,15 +52,15 @@ const PaymentLogicsFactory = () => {
     return diff;
   })
 
-  const onOpenMultiPaymentDialog = function() {
+  const onOpenMultiPaymentDialog = function () {
     showMultiPaymentDialog.value = true
   }
 
-  const onOpenTipDialog = function() {
+  const onOpenTipDialog = function () {
     showAddTipDialog.value = true
   }
 
-  const onSaveTip = function() {
+  const onSaveTip = function () {
     if (tipEditValue.value < currentOrder.vSum) {
       return
     }
@@ -70,7 +73,7 @@ const PaymentLogicsFactory = () => {
     tipEditValue.value = 0
   }
 
-  const onSaveMulti = function({ card, cash }) {
+  const onSaveMulti = function ({ card, cash }) {
     cardEditValue.value = card
     cashEditValue.value = cash
     addMultiPayment(currentOrder, {
@@ -82,13 +85,13 @@ const PaymentLogicsFactory = () => {
     showMultiPaymentDialog.value = false
   }
 
-  const getBadgeCount = function(item) {
+  const getBadgeCount = function (item) {
     if (item.type === 'tip') return 0
     if (!currentOrderPaymentList.value) return 0
     return currentOrderPaymentList.value.filter(i => i.type === item.type).length
   }
 
-  const onAddPaymentMethod = function(item) {
+  const onAddPaymentMethod = function (item) {
     clearPayment(currentOrder)
     if (item.type === 'multi') {
       onOpenMultiPaymentDialog()
@@ -101,14 +104,27 @@ const PaymentLogicsFactory = () => {
     addSinglePayment(currentOrder, newItem)
   }
 
-  const onAddFixedItem = function(item) {
+  const onAddFixedItem = function (item) {
     if (item.type === 'tip') {
       return onOpenTipDialog()
     }
-    addPayment(currentOrder, item)
+    if (currentOrderPaymentList.value && currentOrderPaymentList.value.length > 0) {
+      const mainPayment = currentOrderPaymentList.value[0]
+      console.log(mainPayment)
+      if (mainPayment.value > item.value) {
+        updateSinglePayment(currentOrder, {
+          type: mainPayment.type,
+          value: mainPayment.value - item.value
+        })
+        addPayment(currentOrder, item)
+      }
+    }
+  }
+  const onRemoveFixedItem = function (index) {
+    currentOrder.payment.splice(index, 1)
   }
 
-  const getRemainingValue = function() {
+  const getRemainingValue = function () {
     if (cashEditValue.value && cardEditValue.value) return 0
     if (+cashEditValue.value > currentOrder.vSum || +cardEditValue.value > currentOrder.vSum) return 0
     if (cashEditValue.value && !isNaN(+cashEditValue.value)) return cardEditValue.value = currentOrder.vSum - (+cashEditValue.value)
@@ -139,7 +155,9 @@ const PaymentLogicsFactory = () => {
     onAddPaymentMethod,
     getRemainingValue,
     showAddTipDialog,
-    moreDiscount
+    moreDiscount,
+    onRemoveFixedItem,
+    resetStates
   }
 }
 
