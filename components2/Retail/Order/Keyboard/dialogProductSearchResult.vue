@@ -116,7 +116,7 @@ export default {
                   <p>{index + 1}</p>
                 </div>
                 <div style="display: flex; justify-content: center; align-items: center; flex: 1">
-                  <div style="padding: 20px;">
+                  <div style="padding: 5px;">
                     <div><p>#{product.id}</p></div>
                     <div><p><b>{product.name}</b></p></div>
                   </div>
@@ -176,15 +176,25 @@ export default {
           </tr>
       )
     }
+
+    const thStyle =  {
+      'background-color': '#E0E0E0',
+      'font-size': '14px !important',
+      'color': '#000000 !important',
+      'font-weight': 'normal',
+      'line-height': '18px',
+      height: '30px',
+    }
+
     function renderSearchResult() {
       return (<g-simple-table fixed-header height="500px" striped>
         {execGenScopeId(() => <>
           <thead>
           <tr class="search-table-row">
-            <th class="text-left">Product</th>
-            <th class="text-left">Unit</th>
-            <th class="text-left">Attribute</th>
-            <th></th>
+            <th class="text-left" style={thStyle}>Product</th>
+            <th class="text-left" style={thStyle}>Unit</th>
+            <th class="text-left" style={thStyle}>Attribute</th>
+            <th style={thStyle}></th>
           </tr>
           </thead>
           <tbody>
@@ -195,7 +205,7 @@ export default {
     }
 
     return genScopeId(() => <>
-      <g-dialog v-model={dialogProductSearch} eager>
+      <g-dialog v-model={dialogProductSearch} eager fullscreen>
         {execGenScopeId(() =>
             <g-card style="height: 568px">
               {execGenScopeId(() =>
@@ -262,14 +272,6 @@ export default {
 .g-card {
   width: 88vw;
   overflow-y: hidden !important;
-}
-
-th {
-  background-color: #E0E0E0;
-  font-size: 14px !important;
-  color: #000000 !important;
-  font-weight: normal;
-  line-height: 18px;
 }
 
 td {
