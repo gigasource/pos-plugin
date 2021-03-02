@@ -60,12 +60,11 @@ export default {
 
     function renderFnBtnInEditMode() {
       const uniqueBtns = {}
-      for (let row = 0; row < rows; row++) {
-        for (let column = 0; column < columns; column++) {
+      for (let row = 1; row <= rows; row++) {
+        for (let column = 1; column <= columns; column++) {
           let componentKey
           const fnBtn = _.find(fnBtnSetting.value, fnBtn => isBtnOverlapAnArea(fnBtn, row, column))
-          if (fnBtn) {
-            console.log('fnBtn', fnBtn)
+          if (fnBtn && fnBtn.fn) {
             componentKey = fnBtn.fn
             const compNotAddedYet = !_.has(uniqueBtns, componentKey)
             if (compNotAddedYet) {
@@ -83,8 +82,8 @@ export default {
                 key={componentKey}
                 onClick={() => showSetBtnFnDialog(row, column)}
                 style={{
-                  gridRow: row + '/' + (row + 1),
-                  gridColumn: column + '/' + (column + 1),
+                  gridRow: row + '/' + row,
+                  gridColumn: column + '/' + column,
                 }}> + </div>
           }
         }
