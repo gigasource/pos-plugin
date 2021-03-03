@@ -67,6 +67,9 @@ export default {
 
   &__content {
     grid-area: 1 / 2 / 2 / 3;
+    height: 100%;
+    max-height: 100%;
+    overflow: scroll;
   }
 
 }
