@@ -34,7 +34,7 @@ export function createEmptyLayout(row, column) {
 
 export function createEmptyCategoryLayout() {
   return {
-    rows: 10,
+    rows: 6,
     columns: 6,
     color: '#FFFFFF'
   }
