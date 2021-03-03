@@ -1,7 +1,6 @@
 import { computed, ref } from 'vue'
 import { appHooks, posSettings } from '../../../AppSharedStates';
 import DialogProductLookup from './dialogProductLookup'
-import DialogSavedList from './dialogSavedList'
 import DialogRefundSearchResult from '../Refund/dialogRetailRefundSearch'
 import {genScopeId} from "../../../utils";
 
@@ -72,12 +71,9 @@ export const FnBtns = {
   'SavedList': {
     name: 'FnBtn_SavedList',
     text: 'Save list',
-    components: { DialogSavedList },
     setup() {
-      const showSavedListDialog = ref(false)
       return () => <div class='row-flex'>
         <div style={[btnStyle, "background-color: #FFA726; color: #FFF"]} class="elevation-0">Save</div>
-        <dialog-saved-list v-model={showSavedListDialog.value}/>
       </div>
     }
   },
