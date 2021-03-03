@@ -105,7 +105,6 @@ export default {
             <div style="margin: 5px;" class="row-flex">
               <g-btn-bs style="margin: 0; background-color: #FFF; flex: 1" onClick={goBack}>
                 <g-icon>icon-back</g-icon>
-                <span class="por__category__back__content">Back</span>
               </g-btn-bs>
               <g-menu v-model={showMoreSettingCtxMenu.value} close-on-content-click top nudge-top={5} v-slots={{
                 default: () => (
@@ -217,11 +216,6 @@ export default {
 
   &__category {
     grid-area: 0/0/1/1;
-
-    &__back__content {
-      margin-left: 4px;
-      font-size: 12px;
-    }
   }
 
   &__main {
@@ -247,13 +241,6 @@ export default {
   &__detail {
     grid-area: 1/3/2/4;
     padding: 4px 4px 4px 0;
-  }
-}
-
-@media screen and (max-width: 667px) {
-  .por__category__back__content {
-    margin-left: 0;
-    font-size: 0;
   }
 }
 </style>
