@@ -112,7 +112,7 @@ export default {
                         <div style="background-color: #FFF;" class="col-flex">
                           <g-btn-bs icon="icon-blue-cog" onClick={() => {
                             loadRetailLayoutSetting()
-                            inEditScreenMode.value = true
+                            inEditScreenMode.value = !inEditScreenMode.value
                           }}>Edit Screen
                           </g-btn-bs>
                         </div>
