@@ -21,7 +21,7 @@ export const FnBtns = {
     props: {
       btnInput: Object
     },
-    components: {},
+    components: { DialogRefundSearchResult },
     setup(props) {
       const showRefundDialog = ref(false)
       return () => <div>
