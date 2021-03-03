@@ -60,7 +60,6 @@ export default {
             </div>
         )
       }
-
       function renderBooleanPropSetting(title, prop) {
         const propStyle = { fontSize: '12px' }
         return (
@@ -71,8 +70,7 @@ export default {
             </div>
         )
       }
-
-      const sectionStyle = { marginTop: '10px', position: 'relative', border: '1px solid #444', paddingBottom: '10px' }
+      const sectionStyle = { marginTop: '6px', position: 'relative', border: '1px solid #444', paddingBottom: '10px' }
       const sectionTitleStyle = { paddingLeft: '5px', backgroundColor: '#ddd', marginBottom: '8px' }
       const propSectionStyle = { marginLeft: '5px' }
 
@@ -186,12 +184,12 @@ export default {
           <div class="por__detail">
             {inEditScreenMode.value
                 ? renderScreenSettingPanel()
-                : <>
-                  {renderTopRightToolbar()}
-                  <pos-retail-cart
-                      is-refund-mode={isRefundMode.value}
-                      style={`max-height: calc(100% - ${topRightToolbarHeight}); height: calc(100% - ${topRightToolbarHeight});`}/>
-                </>
+                : <div style="height: 100%">
+                    {renderTopRightToolbar()}
+                    <pos-retail-cart
+                        is-refund-mode={isRefundMode.value}
+                        style={`max-height: calc(100% - ${topRightToolbarHeight}); height: calc(100% - ${topRightToolbarHeight});`}/>
+                  </div>
             }
           </div>
       )
