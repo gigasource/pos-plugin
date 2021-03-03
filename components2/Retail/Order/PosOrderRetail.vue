@@ -162,7 +162,7 @@ export default {
     }
     const showSavedListDialog = ref(false)
     function renderSavedList() {
-      return <div>
+      return savedOrders.value.length > 0 && <div>
         <g-btn style="padding: 0 12px; min-width: initial;" onClick={() => showSavedListDialog.value = true}>
           <g-badge badge-size={20} nudge-top={-10} nudge-right={-10} color="red" v-slots={{
             badge: () => <div>{savedOrders.value.length}</div>,
