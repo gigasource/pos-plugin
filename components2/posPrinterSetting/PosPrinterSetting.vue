@@ -87,7 +87,9 @@ export default {
               {t('settings.thermalPrinter')} </p>
             <div class="row-flex flex-wrap">
               {printerTypes.map((type, i) =>
-                  <div key={i} class={['printer', selectingPrinter.value.printerType === type && 'printer__active']} onClick={() => onSelectPrinterType(type.value)}>
+                  <div key={i}
+                       class={['printer', selectingPrinter.value.printerType === type.value && 'printer__active']}
+                       onClick={() => onSelectPrinterType(type.value)}>
                     {t(`settings.${type.name}`, type.name)}
                   </div>
               )}
