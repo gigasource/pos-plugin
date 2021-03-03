@@ -21,10 +21,11 @@ export default {
         const hasCashPayment = currentOrderPaymentList.value.some(i => i.type === 'cash')
         if (hasCashPayment) {
           setTimeout(() => {
-            cashTextfield.value.$el.click()
-            const input = cashTextfield.value.$el.querySelector('input')
-            input && input.select()
-
+            if (cashTextfield.value) {
+              cashTextfield.value.$el.click()
+              const input = cashTextfield.value.$el.querySelector('input')
+              input && input.select()
+            }
           }, 500)
         }
       }, { deep: true })

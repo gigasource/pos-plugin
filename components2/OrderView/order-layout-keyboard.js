@@ -55,11 +55,11 @@ function openDialogEdit(position) {
   dialog.value = true
 }
 
-export function orderLayoutKeyboardFactory() {
+export function orderLayoutKeyboardFactory(editable) {
   const renderKeyboard = () => (
     <>
       {showCalculator.value && <pos-order-keyboard2 keyboard-config={keyboardConfig.value}
-                           mode={editable.value ? 'edit' : 'active'}
+                           mode={editable ? 'edit' : 'active'}
                            onEdit:keyboard={e => openDialogEdit(e)}
                            onOpenDialogSearch={() => dialog.search = true}/>}
       <dialog-text-filter v-model={dialog.value} onSubmit={e => changeKeyboardExtension(e)}/>

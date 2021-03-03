@@ -13,15 +13,15 @@ import {
   getGridTemplateFromNumber, highlightSelectedProduct,
   selectedCategoryLayout,
   selectedProductLayout,
-  editable, productDblClicked, products, updateView, selectProductLayout, isSameArea
+  productDblClicked, products, updateView, selectProductLayout, isSameArea
 } from './pos-ui-shared';
 
 import {addProduct, getCurrentOrder} from "./pos-logic-be";
 import {addModifier} from "./pos-logic";
 import {orderLayoutKeyboardFactory} from "./order-layout-keyboard";
 
-export function orderLayoutProductFactory() {
-  const {renderKeyboard} = orderLayoutKeyboardFactory();
+export function orderLayoutProductFactory(editable) {
+  const {renderKeyboard} = orderLayoutKeyboardFactory(editable);
 
   const order = getCurrentOrder();
   const isTouchEventHandled = ref();
@@ -123,7 +123,7 @@ export function orderLayoutProductFactory() {
 
   function getProductListeners(productLayout) {
     //todo: manual test here
-    return editable.value
+    return editable
       ? {
         onClick: () => onClick(productLayout),
         onTouchstart: () => onTouchStart(productLayout)
@@ -163,7 +163,7 @@ export function orderLayoutProductFactory() {
   }
 
   function onProductSelect(productLayout) {
-    if (editable.value) {
+    if (editable) {
       selectProduct(productLayout);
 
       // Known issues:
@@ -191,12 +191,12 @@ export function orderLayoutProductFactory() {
   }
 
   function highlightProduct(productLayout) {
-    if (!editable.value && productLayout.type === 'Text')
+    if (!editable && productLayout.type === 'Text')
       return
 
     highlightSelectedProduct.value = true
 
-    if (!editable.value) {
+    if (!editable) {
       // flash in view mode
       setTimeout(() => {
         highlightSelectedProduct.value = false
@@ -205,7 +205,7 @@ export function orderLayoutProductFactory() {
   }
 
   async function selectProduct(productLayout) {
-    if (editable.value) {
+    if (editable) {
       if (selectedCategoryLayout.value._id) {
         updateView('ProductEditor')
         selectProductLayout(productLayout)
@@ -253,7 +253,7 @@ export function orderLayoutProductFactory() {
           {
             products.value.map(productLayout => (
               <div
-                class={['pol__prod', !editable.value && 'darken-effect', isMobile.value && collapseText.value && 'collapsed']}
+                class={['pol__prod', !editable && 'darken-effect', isMobile.value && collapseText.value && 'collapsed']}
                 style={[getAreaStyle(productLayout), getProductItemStyle(productLayout)]}
                 {...getProductListeners(productLayout)}>
                 {productLayout.icon && <g-icon class="mr-1">{productLayout.icon}</g-icon>}

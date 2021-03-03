@@ -73,6 +73,7 @@ export default {
     address: String,
     phone: [String,Number],
   },
+  emits: ['update:modelValue'],
   data() {
     return {
       step: 1,

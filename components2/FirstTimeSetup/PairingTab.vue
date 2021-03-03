@@ -29,8 +29,6 @@ export default {
     function onConnect() {
       pairing.value = true
       connect(code.value, (_error, deviceId, isFirstDevice) => {
-        console.log(code.value)
-        console.log(_error)
         if (_error) {
           signedInFailed.value = true
           errorMessage.value = 'Pair failed. Please try again.'

@@ -81,7 +81,7 @@ export default {
     )
 
     const {renderCategories} = orderLayoutCategoriesFactory();
-    const {renderProducts} = orderLayoutProductFactory();
+    const {renderProducts} = orderLayoutProductFactory(props.editable);
 
     return genScopeId(() => orderLayout && (
         <div class="pol" style={{
