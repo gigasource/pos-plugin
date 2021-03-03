@@ -1,9 +1,18 @@
 import { computed, ref } from 'vue'
-import { appHooks, isMobile, posSettings } from '../../../AppSharedStates';
+import { appHooks, posSettings } from '../../../AppSharedStates';
 import DialogProductLookup from './dialogProductLookup'
 import DialogSavedList from './dialogSavedList'
+import DialogRefundSearchResult from '../Refund/dialogRetailRefundSearch'
 import {genScopeId} from "../../../utils";
 
+const btnStyle = {
+  width: '100%',
+  height: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: '12px'
+}
 
 export const FnBtns = {
   'Refund': {
@@ -16,7 +25,7 @@ export const FnBtns = {
     setup(props) {
       const showRefundDialog = ref(false)
       return () => <div>
-        <div onClick={() => showRefundDialog.value = true}>Refund</div>
+        <div style={btnStyle} onClick={() => showRefundDialog.value = true}>Refund</div>
         <dialog-retail-refund-search v-model={showRefundDialog.value}/>
       </div>
     }
@@ -31,7 +40,7 @@ export const FnBtns = {
     setup(props) {
       const showProductLookUp = ref(false)
       return () => <div>
-        <div onClick={() => showProductLookUp.value = true}>Product Lookup</div>
+        <div style={btnStyle} onClick={() => showProductLookUp.value = true}>Product Lookup</div>
         <dialog-product-lookup v-model={showProductLookUp.value}></dialog-product-lookup>
       </div>
     }
@@ -42,7 +51,7 @@ export const FnBtns = {
     setup() {
       const showDiscountDialog = ref(false)
       return () => <div>
-        <g-btn>Discount</g-btn>
+        <div style={[btnStyle, "width: 100%; height: 100%; border-radius: 0px"]}>Discount</div>
         <div v-model={showDiscountDialog.value}></div>
       </div>
     }
@@ -53,8 +62,10 @@ export const FnBtns = {
     setup() {
       const showChangePriceDialog = ref(false)
       return () => <div>
-        <div onClick={() => showChangePriceDialog.value = true}>Change Price</div>
-        <dialog-change-value v-model={showChangePriceDialog.value} new-value-editable onSubmit={updateNewPrice}></dialog-change-value>
+        <div style={btnStyle} onClick={() => showChangePriceDialog.value = true}>Change Price</div>
+        <dialog-change-value v-model={showChangePriceDialog.value} new-value-editable onSubmit={() => {
+          // TODO:
+        }}></dialog-change-value>
       </div>
     }
   },
@@ -65,8 +76,7 @@ export const FnBtns = {
     setup() {
       const showSavedListDialog = ref(false)
       return () => <div class='row-flex'>
-        <g-btn>Save</g-btn>
-        <g-btn onClick={() => showSavedListDialog.value = true}>...</g-btn>
+        <div style={[btnStyle, "background-color: #FFA726; color: #FFF"]} class="elevation-0">Save</div>
         <dialog-saved-list v-model={showSavedListDialog.value}/>
       </div>
     }
@@ -79,7 +89,7 @@ export const FnBtns = {
     },
     setup(props) {
       const { btnInput } = props
-      return () => <div>
+      return () => <div style={btnStyle}>
         {btnInput && btnInput.text}
       </div>
     }
