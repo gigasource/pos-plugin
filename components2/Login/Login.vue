@@ -65,30 +65,34 @@ export default {
       return <img onClick={toggleApp} src={imgSrc} style={{position: 'absolute', top: '20px', right: '20px', width: '50px'}}/>
     }
 
+
     return genScopeId(() =>
         <div class="login">
           <div class={currentAppType.value === appType.POS_RESTAURANT ? "login-bg" : "login-bg-retail"}></div>
-          <div class="login-main">
+          <div class="login-main" style="height: 100%; display: grid; grid-template-rows: 3fr 5fr 10px 1fr; grid-template-columns: 1fr">
             { renderAppSwitch() }
             <div class="login-logo">
               <img alt src="/plugins/pos-plugin/assets/image/logo.svg"/>
             </div>
-            <div class="login-input">
-              <div class="login-input__title">
-                Enter your passcode to login
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+              <div class="login-input">
+                <div class="login-input__title">
+                  Enter your passcode to login
+                </div>
+                <div class="login-input__textfield">
+                  <PosLoginTextfield v-model={loginPassword.value} incorrectPasscode={incorrectPasscode.value}/>
+                </div>
               </div>
-              <div class="login-input__textfield">
-                <PosLoginTextfield v-model={loginPassword.value} incorrectPasscode={incorrectPasscode.value}/>
+              <div class="login-keyboard">
+                <PosLoginKeyboard v-model={loginPassword.value}
+                                  onLogin={onLogin}
+                                  onClear={resetIncorrectPasscodeFlag}
+                                  onDelete={resetIncorrectPasscodeFlag}
+                                  onAppend={resetIncorrectPasscodeFlag}
+                />
               </div>
             </div>
-            <div class="login-keyboard">
-              <PosLoginKeyboard v-model={loginPassword.value}
-                                onLogin={onLogin}
-                                onClear={resetIncorrectPasscodeFlag}
-                                onDelete={resetIncorrectPasscodeFlag}
-                                onAppend={resetIncorrectPasscodeFlag}
-              />
-            </div>
+            <div></div>
             <div class="login-btn">
               <ConnectionStatusBtn/>
               <PosLoginBtnLanguage locale={locale.value} onChangeLocale={changeLocale}/>
@@ -123,8 +127,8 @@ export default {
 
   &-main {
     flex: 0 0 60%;
-    display: flex;
-    flex-direction: column;
+    //display: flex;
+    //flex-direction: column;
   }
 
   &-logo {
@@ -139,7 +143,6 @@ export default {
   }
 
   &-input {
-    flex: 0 0 30%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -156,8 +159,7 @@ export default {
   }
 
   &-keyboard {
-    flex: 0 0 40%;
-    padding: 16px 15%;
+    padding: 0 15%;
 
     & > div {
       height: 100%;
@@ -165,9 +167,7 @@ export default {
   }
 
   &-btn {
-    flex: 0 0 15%;
     display: flex;
-    padding-top: 16px;
 
     & > div {
       flex: 0 0 20%;
