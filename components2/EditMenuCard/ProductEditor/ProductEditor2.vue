@@ -92,7 +92,7 @@ export default {
       return <>
         <div>{t('article.type')}</div>
         <g-select
-            disabled={!!(type && selectedProduct.value.id && selectedProduct.value.name && selectedProduct.value.price)}
+            disabled={!!(type.value && selectedProduct.value.id && selectedProduct.value.name && selectedProduct.value.price)}
             skip-search
             text-field-component="GTextFieldBs"
             v-model={type.value}
