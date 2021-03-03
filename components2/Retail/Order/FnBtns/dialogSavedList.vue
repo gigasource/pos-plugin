@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { execGenScopeId, genScopeId } from '../../../utils';
 dayjs.extend(relativeTime)
+import { savedOrders } from '../temp-logic';
 
 export default {
   name: 'dialogSavedList',
@@ -21,8 +22,6 @@ export default {
         emit('update:modelValue', value)
       }
     })
-
-    const savedOrders = ref()
 
     /*OrderStore*/
     function selectSavedOrder() {
