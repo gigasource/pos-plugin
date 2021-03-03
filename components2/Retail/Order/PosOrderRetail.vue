@@ -17,6 +17,7 @@ import {
   saveRetailLayoutSetting
 } from './retail-layout-setting-logic';
 import { savedOrders } from './temp-logic';
+import { username, formattedTime } from '../../AppSharedStates';
 
 export default {
   name: 'PosOrderRetail',
@@ -146,7 +147,8 @@ export default {
       return <div style="cursor: pointer" onClick={() => showCustomerDialog.value = true}>
         { !customer.value
             ? <div style="font-size: 12px">
-              Select customer
+              <p>Select customer</p>
+              <p>{username.value} - {formattedTime.value}</p>
               {/*TODO: Render customer dialog somehow*/}
               <g-dialog v-model={showCustomerDialog.value}></g-dialog>
             </div>

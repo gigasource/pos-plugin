@@ -188,6 +188,8 @@ export default {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 56px 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    max-height: 100%;
+    overflow: scroll;
 
     &__title {
       grid-area: 1 / 1 / 2 / 3;
