@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import { searchOrderByDateRange } from '../../../OrderView/pos-logic-be'
 import dayjs from 'dayjs'
 import { refundOrder } from '../../pos-retail-shared-logic'
+import { isMobile } from '../../../AppSharedStates';
 import {makeRefundOrder} from "../../../OrderView/pos-logic";
 
 export default {
@@ -76,8 +77,8 @@ export default {
       router.push({path: 'retail--order-refund'})
     }
     return genScopeId(() => <>
-      <g-dialog v-model={internalValue.value}>
-        <div style="background-color: #FFF; padding: 30px;" class="col-flex">
+      <g-dialog v-model={internalValue.value} fullscreen={isMobile.value}>
+        <div style="background-color: #FFF; padding: 15px 15px 30px 15px" class="col-flex">
           <div class="row-flex justify-between mb-3">
             <div>Search</div>
             <g-icon>close</g-icon>
