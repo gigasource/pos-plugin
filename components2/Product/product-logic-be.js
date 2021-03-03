@@ -26,6 +26,8 @@ export async function loadCategories() {
   categories.value = await Category.find({ appType: currentAppType.value })
 }
 
+const colors = ['#FFFFFF','#CE93D8','#B2EBF2','#C8E6C9','#DCE775','#FFF59D','#FFCC80','#FFAB91']
+
 export async function createProduct(product) {
   product.category = product.category.map(category => {
     if (category._id) return category._id
@@ -41,6 +43,8 @@ export async function createProduct(product) {
     }, 0)
     product.id = (maxId ? maxId + 1 : 0)
   }
+  // fixme: Add product layout color here if specified
+  // { layouts[0].color = Math.floor(Math.random() * colors.length) }
   products.value.push(product)
   await Product.create(product)
   return product
