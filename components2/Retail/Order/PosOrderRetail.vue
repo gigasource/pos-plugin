@@ -7,9 +7,10 @@ import PosRetailCategory from './PosRetailCategory';
 import { onBeforeMount, ref, onActivated } from 'vue'
 import { useRouter } from 'vue-router'
 import { loadCategories, loadProducts } from '../../Product/product-logic-be'
-import { genScopeId } from '../../utils';
+import { execGenScopeId, genScopeId } from '../../utils';
 import { refundOrder } from '../pos-retail-shared-logic'
 import { makeRefundOrder, prepareOrder } from '../../OrderView/pos-logic-be'
+import { loadRetailLayoutSetting } from './retail-layout-setting-logic';
 
 export default {
   name: 'PosOrderRetail',
@@ -40,9 +41,38 @@ export default {
       return <div>Top Right Toolbar</div>
     }
 
+    function goBack() {
+      router.go(-1)
+    }
+
+    const showMoreSettingCtxMenu = ref(false)
     return genScopeId(() => (
         <div class="por">
-          <pos-retail-category class="por__category"/>
+          <div class="por__category col-flex" style="background-color: #E3F2FD">
+            <pos-retail-category class="flex-1"/>
+            <g-spacer style="min-height: 15px"/>
+            <div style="margin: 5px;" class="row-flex">
+              <g-btn-bs style="margin: 0; background-color: #FFF" icon="icon-back" onClick={goBack}>Back</g-btn-bs>
+              <g-menu v-model={showMoreSettingCtxMenu.value} close-on-content-click top nudge-top={5} v-slots={{
+                default: () => (
+                    <g-expand-x-transition>{execGenScopeId(() =>
+                        <div style="background-color: #FFF;" class="col-flex">
+                          <g-btn-bs icon="icon-blue-cog" onClick={() => {
+                            loadRetailLayoutSetting()
+                            inEditScreenMode.vale = true
+                          }}>Edit Screen</g-btn-bs>
+                        </div>
+                    )}</g-expand-x-transition>
+                ),
+                activator: ({ on }) => (
+                    <g-btn-bs onClick={on.click} style="text-align: center; margin-right: 0; background-color: #FFF">
+                      <g-icon>more_horiz</g-icon>
+                    </g-btn-bs>
+                )
+              }}/>
+            </div>
+          </div>
+
           <div class="por__main">
             <pos-order-screen-scroll-window is-refund-mode={isRefundMode.value} class="por__main__window"/>
             <pos-order-screen-number-keyboard class="por__main__keyboard"/>
