@@ -152,6 +152,7 @@ export default {
     padding-right: 20px;
     height: 100%;
     overflow: auto;
+    padding-bottom: 40px;
 
     &__label {
       color: #000;
