@@ -7,7 +7,8 @@ onlineOrderIo.listen('local')
 onlineOrderIo.masterIp = null
 const orm = require("schemahandler/orm")
 const { stringify } = require("schemahandler/utils");
-orm.name = 'orm'
+const ormC = new orm()
+ormC.name = 'C'
 const ormA = new orm() // online-order Orm
 ormA.name = 'A'
 const ormB = new orm()
@@ -21,7 +22,7 @@ const mockSocket = []
 for (let i = 0; i < 3; i++) {
 	mockSocket.push(new Socket())
 }
-const ObjectId = require('bson').ObjectId
+const ObjectID = require('bson').ObjectID
 const uuid = require('uuid')
 
 global.APP_CONFIG = {
@@ -40,6 +41,10 @@ function cmsFactory(orm) {
 	}
 	let countOf = 0
 	let cms = {
+		socket: {
+			on: function () {},
+			emit: function () {}
+		},
 		io: {
 			of: function () {
 				countOf++
@@ -60,6 +65,10 @@ function cmsFactory(orm) {
 						return posSetting
 					},
 					findOneAndUpdate: function (condition, value) {
+						if (value['isMaster']) {
+							posSetting.isMaster = value['isMaster']
+							return
+						}
 						posSetting.masterIp = value
 					}
 				}
@@ -70,7 +79,7 @@ function cmsFactory(orm) {
 	return cms
 }
 
-const cms = cmsFactory(orm)
+const cms = cmsFactory(ormC)
 const cms1 = cmsFactory(ormB)
 
 jest.mock('socket.io-client', () => {
@@ -86,10 +95,10 @@ jest.mock('socket.io-client', () => {
 
 describe('test-flow', function () {
 	beforeAll(async () => {
-		orm.connect({uri: "mongodb://localhost:27017"}, "myproject");
+		ormC.connect({uri: "mongodb://localhost:27017"}, "myproject");
 		ormA.connect({uri: "mongodb://localhost:27017"}, "myproject1");
 		ormB.connect({uri: "mongodb://localhost:27017"}, "myproject2");
-		const orms = [orm, ormA, ormB]
+		const orms = [ormC, ormA, ormB]
 		for (let orm of orms) {
 			orm.registerSchema("Order", {
 				inProgress: Boolean,
@@ -98,6 +107,7 @@ describe('test-flow', function () {
 			});
 			await orm('Order').deleteMany()
 			await orm('Commit').deleteMany()
+			await orm('Recovery').deleteMany()
 		}
 
 		for (let orm of [ormA]) {
@@ -129,7 +139,7 @@ describe('test-flow', function () {
 	it('flow', async (done) => {
 		let countInitSyncForClient = 0
 		let countInitSyncForClientB = 0
-		orm.onCount('initSyncForClient', function (_count) {
+		ormC.onCount('initSyncForClient', function (_count) {
 			countInitSyncForClient = _count
 		})
 		ormB.onCount('initSyncForClient', function (_count) {
@@ -137,7 +147,7 @@ describe('test-flow', function () {
 		})
 		await require('./index')(cms)
 		await delay(50)
-		expect(orm.getMaster()).toEqual(false)
+		expect(ormC.getMaster()).toEqual(false)
 		expect(countInitSyncForClient).toEqual(0)
 		/*
 		after connect to master for the first time, expect master is false
@@ -146,17 +156,17 @@ describe('test-flow', function () {
 		await cms.emit('onlineOrderSocket', clientToOnlineSocket)
 		await delay(50)
 		expect(countInitSyncForClient).toEqual(1)
-		expect(orm._events['transport:toMaster']).not.toBe(undefined)
+		expect(ormC._events['transport:toMaster']).not.toBe(undefined)
 
 		/*
 		Do a create query
 		 */
-		await orm('Order').create({
-			_id: new ObjectId(),
+		await ormC('Order').create({
+			_id: new ObjectID(),
 			table: 10
 		})
-		await delay(50)
-		let doc = await orm('Order').find({})
+		await delay(200)
+		let doc = await ormC('Order').find({})
 		let docA = await ormA('Order').find({})
 		expect(doc).toEqual(expect.anything())
 		expect(doc).toEqual(docA)
@@ -170,7 +180,7 @@ describe('test-flow', function () {
 		expect(countInitSyncForClientB).toBe(1)
 		expect(ormB._events['transport:toMaster']).not.toBe(undefined)
 		expect(ormB.getMaster()).toEqual(false)
-		let docB = await orm('Order').find({})
+		let docB = await ormC('Order').find({})
 		expect(docB).toEqual(doc)
 
 		/*
@@ -196,12 +206,12 @@ describe('test-flow', function () {
 				resolve()
 			})
 		})
-		await delay(50)
+		await delay(200)
 		const ip = await registerDevicePromise
-		expect(orm.getMaster()).toEqual(true)
+		expect(ormC.getMaster()).toEqual(true)
 		expect(ormB.getMaster()).toEqual(false)
 		expect(ormB._events['transport:toMaster']).not.toBe(undefined)
-		expect(orm._events['transport:toMaster']).toBe(undefined)
+		expect(ormC._events['transport:toMaster']).toBe(undefined)
 		expect(cms.getCountOf()).toBe(1)
 		expect(cms.getIo().sockets.size).toBe(1)
 
@@ -214,15 +224,15 @@ describe('test-flow', function () {
 		await toMasterLockB.acquireAsync()
 
 		await ormB('Order').create({
-			_id: new ObjectId(),
+			_id: new ObjectID(),
 			table: 9
 		})
 		docB = await ormB('Order').find({})
 		expect(stringify(docB)).toMatchSnapshot()
 		toMasterLockB.release()
-		await delay(50)
+		await delay(200)
 		docB = await ormB('Order').find({})
-		doc = await orm('Order').find({})
+		doc = await ormC('Order').find({})
 		docA = await ormA('Order').find({})
 		expect(stringify(docB)).toMatchSnapshot()
 		expect(docB).toEqual(doc)

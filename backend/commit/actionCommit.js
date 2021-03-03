@@ -38,7 +38,7 @@ module.exports = async function (orm, cms) {
 			try {
 				if (commit.data.printFromClient && onlineDevice && commit.from === onlineDevice.id) {
 					await cms.emit('run:print', action)
-				} else if (commit.data.printFromMaster) {
+				} else if (commit.data.printFromMaster && orm.getMaster()) {
 					await cms.emit('run:print', action)
 				}
 			} catch (e) {
