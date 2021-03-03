@@ -146,10 +146,6 @@ export default {
     }
 
     .btn-back {
-      width: 37px;
-      height: 37px;
-      border-radius: 50%;
-
       & > .g-icon {
         min-width: 24px;
       }
