@@ -116,7 +116,7 @@ export default {
                   items={placesSearchResult.value}
                   onInputClick={() => showKeyboard.value = true}
                   onUpdate:searchText={debouncedSearch}/>
-      <pos-textfield-new class="tf-phone" label="Phone number"
+      <g-text-field-bs class="tf-phone" label="Phone number"
                          onClick={() => showKeyboard.value = true}
                          v-model={phone.value}/>
       {renderErrorMessage()}
