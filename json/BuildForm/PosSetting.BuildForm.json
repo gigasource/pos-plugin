@@ -18,19 +18,13 @@
         },
         {
           "schemaType": "string",
-          "key": "buttonFunction",
+          "key": "fn",
           "type": "input@select",
           "chips": true,
           "optionsType": null,
           "options": null,
           "flex": null,
           "notOnlyValueInOptions": true
-        },
-        {
-          "schemaType": "string",
-          "key": "buttonFunctionValue",
-          "type": "input",
-          "flex": "md4"
         },
         {
           "schemaType": "string",
@@ -43,17 +37,6 @@
           "key": "textColor",
           "type": "input",
           "flex": "md4"
-        },
-        {
-          "schemaType": "array",
-          "key": "containedButtons",
-          "type": "array",
-          "fields": [
-            {
-              "schemaType": "string",
-              "type": "input"
-            }
-          ]
         },
         {
           "schemaType": "array",
@@ -78,59 +61,6 @@
           ],
           "type": "input@multiSelect",
           "chips": true
-        },
-        {
-          "schemaType": "array",
-          "key": "originalRows",
-          "type": "input@multiSelect",
-          "fields": [
-            {
-              "schemaType": "number",
-              "type": "input@number"
-            }
-          ],
-          "chips": true
-        },
-        {
-          "schemaType": "array",
-          "key": "originalCols",
-          "type": "input@multiSelect",
-          "fields": [
-            {
-              "schemaType": "number",
-              "type": "input@number"
-            }
-          ],
-          "chips": true
-        },
-        {
-          "schemaType": "object",
-          "key": "buyback",
-          "type": "object",
-          "fields": [
-            {
-              "schemaType": "objectId",
-              "key": "product",
-              "ref": "Product",
-              "autopopulate": true,
-              "type": "ref-select",
-              "flex": null,
-              "labelProp": "name"
-            },
-            {
-              "schemaType": "number",
-              "key": "price",
-              "type": "input@number",
-              "addable": false,
-              "clipboardType": "cut"
-            },
-            {
-              "schemaType": "string",
-              "key": "unit",
-              "type": "input"
-            }
-          ],
-          "flex": null
         }
       ],
       "expansion": [

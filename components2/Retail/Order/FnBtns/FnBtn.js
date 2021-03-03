@@ -1,11 +1,14 @@
 import { computed, ref } from 'vue'
-import { posSettings } from '../../../AppSharedStates';
+import {appHooks, posSettings} from '../../../AppSharedStates';
 import DialogProductLookup from './dialogProductLookup'
 import DialogSavedList from './dialogSavedList'
+import {genScopeId} from "../../../utils";
+
 
 export const FnBtns = {
   'Refund': {
     name: 'FnBtn_Refund',
+    text: 'Refund order',
     props: {
       btnInput: Object
     },
@@ -20,6 +23,7 @@ export const FnBtns = {
   },
   'ProductLookup': {
     name: 'FnBtn_ProductLookup',
+    text: 'Product look up',
     props: {
       btnInput: Object
     },
@@ -34,6 +38,7 @@ export const FnBtns = {
   },
   'Discount': {
     name: 'FnBtn_Discount',
+    text: 'Discount',
     setup() {
       const showDiscountDialog = ref(false)
       return () => <div>
@@ -44,6 +49,7 @@ export const FnBtns = {
   },
   'ChangePrice': {
     name: 'FnBtn_ChangePrice',
+    text: 'Change price',
     setup() {
       const showChangePriceDialog = ref(false)
       return () => <div>
@@ -54,6 +60,7 @@ export const FnBtns = {
   },
   'SavedList': {
     name: 'FnBtn_SavedList',
+    text: 'Save list',
     components: { DialogSavedList },
     setup() {
       const showSavedListDialog = ref(false)
@@ -66,6 +73,7 @@ export const FnBtns = {
   },
   'Default': {
     name: 'Default_button',
+    text: 'Default',
     props: {
       btnInput: Object
     },
@@ -78,28 +86,88 @@ export const FnBtns = {
   }
 }
 export const FnBtnNames = computed(() => Object.keys(FnBtns))
-export const fnBtnSetting = computed({
-  get: () => {
+export const fnBtnSetting = computed(() => {
     return (posSettings.value && posSettings.value.rightFunctionButtons) || []
-  },
-  set: async (val) => {
-    // TODO: ensure it works
-    fnBtnSetting.value = val
-    await cms.getModel('PosSetting').updateOne({ rightFunctionButtons: val })
-  }
 })
+
+async function updatePosSetting(val) {
+  await cms.getModel('PosSetting').updateOne({}, { rightFunctionButtons: val })
+  appHooks.emit('settingChange')
+}
+
+//<editor-fold desc="dialog logic">
+const limitValue = {
+  MIN_ROW: 1,
+  MAX_ROW: 12,
+  MIN_COL: 1,
+  MAX_COL: 2
+}
 export function removeBtnFn(name) {
   const fnBtnIndex = fnBtnSetting.value.findIndex(fnBtn => fnBtn.fn === name)
   if (fnBtnIndex > -1) {
     fnBtnSetting.value.splice(fnBtnIndex, 1)
   }
 }
-export function addBtnFn(btnFn) {
-  fnBtnSetting.value.push(btnFn)
+export async function addBtnFn() {
+  //todo: add rules to g-select to prevent select duplicate item
+  await updatePosSetting([...fnBtnSetting.value, {
+    rows: [selectedBtn.value.row, selectedBtn.value.row + selectedBtn.value.height],
+    cols: [selectedBtn.value.col, selectedBtn.value.col + selectedBtn.value.width],
+    "backgroundColor": "#FFFFFF", //todo: add bg color
+    text: FnBtns[selectedBtn.value.fn].text,
+    fn: selectedBtn.value.fn
+  }])
+  showDialogBtnFn.value = false
 }
-export function showSetBtnFnDialog(row, column) {
 
+const showDialogBtnFn = ref(false)
+export const selectedBtn = ref({
+  row: 1,
+  col: 1,
+  height: 1,
+  width: 1,
+  fn: ''
+})
+export function showSetBtnFnDialog(row, col) {
+  selectedBtn.value = {
+    row,
+    col,
+    height: 1,
+    width: 1,
+    fn: ''
+  }
+  showDialogBtnFn.value = true
 }
+
+export function renderDialogSetBtn() {
+  return (
+    <g-dialog v-model={showDialogBtnFn.value}>
+      {
+        genScopeId(() => (
+          <div>
+            <pos-textfield-new disabled={true} v-model={selectedBtn.value.row}/>
+            <pos-textfield-new disabled={true} v-model={selectedBtn.value.col}/>
+            <div class="row-flex">
+              <g-icon onClick={() => selectedBtn.value.height -= (selectedBtn.value.height - 1 >= 1 ? limitValue.MIN_ROW : 0)}>remove_circle</g-icon>
+              <span>{selectedBtn.value.height}</span>
+              <g-icon onClick={() => selectedBtn.value.height += (selectedBtn.value.height + selectedBtn.value.row < limitValue.MAX_ROW ? 1 : 0)}>add_circle</g-icon>
+            </div>
+            <div className="row-flex">
+              <g-icon onClick={() => selectedBtn.value.width -= (selectedBtn.value.width - 1 >= limitValue.MIN_COL ? 1 : 0)}>remove_circle</g-icon>
+              <span>{selectedBtn.value.width}</span>
+              <g-icon onClick={() => selectedBtn.value.width += (selectedBtn.value.col + selectedBtn.value.width < limitValue.MAX_COL ? 1 : 0)}>add_circle</g-icon>
+            </div>
+            <g-select text-field-component="GTextFieldBs" items={FnBtnNames.value}
+                      v-model={selectedBtn.value.fn} placeholder="Reason (Optional)">
+            </g-select>
+            <g-btn onClick={addBtnFn}>Add button</g-btn>
+          </div>
+        ))()
+      }
+    </g-dialog>
+  )
+}
+//</editor-fold>
 
 const mock = [
   { 'rows': [5, 7], 'cols': [1, 1], 'backgroundColor': '#7BB872', 'textColor': '#FFFFFF', 'fn': 'Refund' },

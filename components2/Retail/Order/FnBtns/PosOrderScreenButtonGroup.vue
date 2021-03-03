@@ -2,7 +2,7 @@
 import { onActivated } from 'vue'
 import { genScopeId } from '../../../utils';
 import { appHooks } from '../../../AppSharedStates';
-import { FnBtns, fnBtnSetting, removeBtnFn, showSetBtnFnDialog } from './FnBtn'
+import { FnBtns, fnBtnSetting, removeBtnFn, showSetBtnFnDialog, renderDialogSetBtn } from './FnBtn'
 
 export default {
   name: 'PosOrderScreenButtonGroup',
@@ -53,8 +53,8 @@ export default {
 
     function isBtnOverlapAnArea(btn, row, column) {
       return (
-             btn.rows[0] <= row && row <= btn.rows[1]
-          && btn.cols[0] <= column && column <= btn.cols[1]
+             btn.rows[0] <= row && row < btn.rows[1]
+          && btn.cols[0] <= column && column < btn.cols[1]
       )
     }
 
@@ -114,6 +114,7 @@ export default {
     return genScopeId(() => (
         <div class="buttons" style={gridStyle}>
           {props.inEditMode ? renderFnBtnInEditMode() : renderBtnInUsageMode()}
+          {renderDialogSetBtn()}
         </div>
     ))
   }
