@@ -1,17 +1,11 @@
 <script>
-import { computed, ref } from 'vue'
+import { computed, ref, withModifiers } from 'vue'
 import { avatar, storeLocale, username } from '../../AppSharedStates';
 import { useRouter } from 'vue-router'
 import { execGenScopeId, genScopeId } from '../../utils'
 import { useI18n } from 'vue-i18n'
 import { getCurrentOrder } from '../../OrderView/pos-logic-be'
-import { changeItemQuantity, removeItem } from '../../OrderView/pos-logic';
-import {
-  changeValue,
-  loadRetailLayoutSetting,
-  retailLayoutSetting,
-  saveRetailLayoutSetting
-} from './retail-layout-setting-logic';
+import { changeItemQuantity } from '../../OrderView/pos-logic';
 
 export default {
   name: 'PosRetailCart',
@@ -30,7 +24,9 @@ export default {
       }, 0)
     })
     const footerHeight = '36px'
-    const cartHeightStyle = `max-height: calc(100% - ${footerHeight}); height: calc(100% - ${footerHeight})`
+    const footerMargin = '5px'
+    const cartHeightStyle = `calc(100% - ${footerHeight} - ${footerMargin})`
+    const cartPositionStyle = `max-height: ${cartHeightStyle}; height: ${cartHeightStyle}; margin-bottom: ${footerMargin}`
 
     function decreaseQty(item) {
       changeItemQuantity(order, item, -1)
@@ -45,7 +41,7 @@ export default {
     }
     function renderCartItems() {
       return (
-          <div class="detail-table" style={cartHeightStyle}>
+          <div class="detail-table" style={cartPositionStyle}>
             {order.items.map((item, i) =>
                 <div key={i} class="detail-table__row">
                   <div class="detail-table__row-main">
@@ -73,34 +69,24 @@ export default {
     const payable = computed(() => {
       return order.items && order.items.length && _.some(order.items, i => i.quantity > 0)
     })
-    const showFooterCtxMenu = ref(false)
     function toPayment() {
       router.push({ path: '/pos-payment' })
     }
+    function quickCash() {
+      // TODO: @Huy impl
+    }
     function renderFooter() {
       return (
-          <div class="row-flex mt-1" style={`cursor: pointer; height: ${footerHeight}; max-height: ${footerHeight}`}>
-            <g-menu v-model={showFooterCtxMenu.value} close-on-content-click top v-slots={{
-              default: () => (
-                  <g-expand-x-transition>{execGenScopeId(() =>
-                      <div style="background-color: #FFF;" class="col-flex">
-                        <g-btn-bs icon="icon-blue-cog" onClick={() => {}}> Item A</g-btn-bs>
-                        <g-btn-bs icon="icon-blue-cog" onClick={() => {}}> Item B</g-btn-bs>
-                        <g-btn-bs icon="icon-blue-cog" onClick={() => {}}> Item C</g-btn-bs>
-                        <g-btn-bs icon="icon-blue-cog" onClick={() => {}}> Item D</g-btn-bs>
-                      </div>
-                  )}</g-expand-x-transition>
-              ),
-              activator: ({ on }) => (
-                  <div style="width: 40px; border: 2px solid #1271FF; border-radius: 4px;" class="row-flex justify-center align-items-center" onClick={on.click}>
-                    <g-icon>icon-functions</g-icon>
-                  </div>
-              )
-            }}/>
+          <div style="display: grid; grid-template-columns: 1fr 2fr" style={`height: ${footerHeight}; max-height: ${footerHeight}`}>
             <g-btn-bs
-                style="flex: 1; margin-left: 5px; margin-right: 0" icon="icon-wallet" background-color="#1271FF"
+                style="flex: 1; margin-left: 0px; margin-right: 0" background-color="#1271FF"
                 disabled={!payable.value}
                 onClick={toPayment}>
+              <g-icon>icon-to-payment</g-icon>
+            </g-btn-bs>
+            <g-btn-bs
+                style="flex: 1; margin-left: 5px; margin-right: 0" icon="icon-wallet" background-color="#66BB6A"
+                onClick={quickCash}>
               {t('common.currency', storeLocale.value)}{total.value}
             </g-btn-bs>
           </div>
