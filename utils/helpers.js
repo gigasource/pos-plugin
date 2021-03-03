@@ -12,5 +12,7 @@ export const getScopeAttrs = () => {
 }
 
 export const onCLick_Stop = (listener) => withModifiers(listener, ['stop'])
-export const onCLick__Prevent_Stop = (listener) => withModifiers(listener, ['prevent', 'stop'])
 
+export function isInside(x, y, rec) {
+  return (x >= rec.left && x < rec.left + rec.width) && ( y >= rec.top && y < rec.top + rec.height)
+}
