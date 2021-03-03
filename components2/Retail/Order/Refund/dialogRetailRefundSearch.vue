@@ -80,8 +80,8 @@ export default {
       <g-dialog v-model={internalValue.value} fullscreen={isMobile.value}>
         <div style="background-color: #FFF; padding: 15px 15px 30px 15px" class="col-flex">
           <div class="row-flex justify-between mb-3">
-            <div>Search</div>
-            <g-icon>close</g-icon>
+            <b>Refund order lookup</b>
+            <g-icon onClick={() => internalValue.value = false}>close</g-icon>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 2fr 1fr" class="mb-3">
