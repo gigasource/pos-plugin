@@ -29,7 +29,7 @@ export default {
       !isRefundMode.value ? prepareOrder(0) : prepareOrder(makeRefundOrder(refundOrder.value))
     })
 
-    const inEditScreenMode = ref(true)
+    const inEditScreenMode = ref(false)
 
     onBeforeMount(async () => {
       await loadCategories()
