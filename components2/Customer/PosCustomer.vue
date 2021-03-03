@@ -158,8 +158,10 @@ export default {
                       <div class="row-flex">
                         <g-combobox label={`Address ${i + 1}`}
                                     key={`address_${i}`}
+                                    // text-field-component="GTextFieldBs"
                                     v-model={autocompleteAddresses.value[i].model}
                                     clearable
+                                    skip-search
                                     keep-menu-on-blur
                                     class="col-8" menu-class="menu-autocomplete-address"
                                     items={autocompleteAddresses.value[i].places}
