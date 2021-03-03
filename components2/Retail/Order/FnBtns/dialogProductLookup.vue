@@ -62,17 +62,17 @@ export default {
       const listener = e => {
         e.stopPropagation()
         const elements = [
-          dialogContent.value.querySelector('.g-tf-wrapper'),
-          dialogContent.value.querySelector('.keyboard-wrapper')
+          dialogContentRef.value.querySelector('.g-tf-wrapper'),
+          dialogContentRef.value.querySelector('.keyboard-wrapper')
         ]
         showKeyboard.value = elements.some(el => el.contains(e.target));
       }
 
       if (newVal) {
         showKeyboard.value = true
-        dialogContent.value.addEventListener('click', listener)
+        dialogContentRef.value.addEventListener('click', listener)
       } else {
-        dialogContent.value.removeEventListener('click', listener)
+        dialogContentRef.value.removeEventListener('click', listener)
       }
     })
 

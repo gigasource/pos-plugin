@@ -15,6 +15,7 @@ export default {
       return await cms.getModel('PosSetting').findOne({})
     }
 
+    const isConnectToMaster = ref(false)
     const generalSettings = ref(null)
     fetchGeneralSettings().then(posSettings => {
       const _generalSettings = posSettings.generalSetting || {};
@@ -39,7 +40,8 @@ export default {
     const deliveryOrderMode = attrComputed(generalSettings, 'deliveryOrderMode', 'tablet')
     const googleMapApiKey = attrComputed(generalSettings, 'googleMapApiKey')
     const showTutorial = attrComputed(generalSettings, 'showTutorial', false)
-
+    const isMaster = attrComputed(generalSettings, 'isMaster', false)
+    const masterIp = attrComputed(generalSettings, 'masterIp', '')
     //todo: should not watch like this, should add handler for update:modelValue
     watch(() => generalSettings.value,(val, oldV) => {
       if (val) {
@@ -47,8 +49,28 @@ export default {
       }
     }, {
       deep: true
-    }, { onTrigger: () => console.log('trigger')})
+    })
 
+    cms.socket.on('isMaster', (_isMaster, _masterIp) => {
+      generalSettings.value.isMaster = _isMaster
+      console.log('Is master is', isMaster.value)
+      if (_masterIp)
+        masterIp.value = _masterIp
+    })
+    cms.socket.emit('isConnectedToMaster', (isConnected) => {
+      isConnectToMaster.value = isConnected
+    })
+    cms.socket.on('connectedToMaster', (val) => { // val is true or false which is status of client socket
+      isConnectToMaster.value = val
+    })
+    function updateIsMaster(val) {
+      isMaster.value = val
+      cms.socket.emit('setMasterFe', val)
+    }
+    function updateMasterIp(val) {
+      masterIp.value = val
+      cms.socket.emit('setMasterFe', false, masterIp.value)
+    }
 
     const leftSideRender = genScopeId(() => <div class="col-5 px-3">
       <div class="row-flex align-items-center justify-between">
@@ -83,6 +105,10 @@ export default {
         <span> Show tutorial button </span>
         <g-switch v-model={showTutorial.value}></g-switch>
       </div>
+      <div className="row-flex align-items-center justify-between">
+        <span> Is master </span>
+        <g-switch modelValue={isMaster.value} onUpdate:modelValue={updateIsMaster}></g-switch>
+      </div>
     </div>)
 
     const rightSideRender = genScopeId(() => <div class="flex-grow-1 offset-1">
@@ -102,6 +128,19 @@ export default {
       }}>
       </g-text-field-bs>
       <dialog-text-filter v-model={dialog.value.googleMapApiKey} label="Google Map API Key" defaultValue={googleMapApiKey.value} onSubmit={(value) => googleMapApiKey.value = value}/>
+      <div className="row-flex align-items-center justify-between">
+        Master IP
+      </div>
+      <g-text-field-bs disable={isMaster.value} className="google-map-api-input bs-tf__pos" v-model={masterIp.value} v-slots={{
+        'append-inner': () =>
+            <g-icon onClick={() => dialog.value.masterIp = isMaster.value ? false : true}> icon-keyboard </g-icon>
+      }}>
+      </g-text-field-bs>
+      <dialog-text-filter v-model={dialog.value.masterIp} label="Master IP"
+                          defaultValue={masterIp.value} onSubmit={(value) => updateMasterIp(value)}/>
+      <div className="row-flex align-items-center justify-between" style="color:red">
+        {isConnectToMaster.value ? 'Connected' : 'No connection'}
+      </div>
       <div class="row-flex align-items-center justify-between">
         Quick pay button's action
       </div>

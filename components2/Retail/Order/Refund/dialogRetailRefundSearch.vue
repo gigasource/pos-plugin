@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import { searchOrderByDateRange } from '../../../OrderView/pos-logic-be'
 import dayjs from 'dayjs'
 import { refundOrder } from '../../pos-retail-shared-logic'
+import { isMobile } from '../../../AppSharedStates';
 import {makeRefundOrder} from "../../../OrderView/pos-logic";
 
 export default {
@@ -76,14 +77,14 @@ export default {
       router.push({path: 'retail--order-refund'})
     }
     return genScopeId(() => <>
-      <g-dialog v-model={internalValue.value}>
-        <div style="background-color: #FFF; padding: 30px;" class="col-flex">
+      <g-dialog v-model={internalValue.value} fullscreen={isMobile.value}>
+        <div style="background-color: #FFF; padding: 15px 15px 30px 15px" class="col-flex">
           <div class="row-flex justify-between mb-3">
-            <div>Search</div>
-            <g-icon>close</g-icon>
+            <b>Refund order lookup</b>
+            <g-icon onClick={() => internalValue.value = false}>close</g-icon>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 2fr 1fr" class="mb-3">
+          <div style="display: grid; grid-template-columns: 1fr 2fr 1fr" class="mb-2">
             <g-select text-field-component="g-text-field-bs" class="refund-g-select" items={searchTerms} v-model={searchTerm.value}></g-select>
             <g-text-field-bs v-model={searchValue.value}></g-text-field-bs>
             <g-select text-field-component="g-text-field-bs" items={searchTimes} v-model={searchTime.value}></g-select>
@@ -92,7 +93,7 @@ export default {
           {/*TODO: fix title scroll bug */}
           <g-table striped fixed-header dense class="mb-3" style="overflow: hidden">
             <thead>
-            <tr>
+            <tr style="height: 30px !important; font-size: 12px; font-weight: bold">
               <th class="ta-left" style="width: 15%; border-bottom: 1px solid #979797">Order No.</th>
               <th class="ta-left" style="width: 15%; border-bottom: 1px solid #979797">Date & Time</th>
               <th class="ta-left" style="width: 15%; border-bottom: 1px solid #979797">Cashier</th>
@@ -104,7 +105,7 @@ export default {
             <tbody style="overflow: scroll">
             {
               searchResult.value.map((order, index) =>
-                  <tr key={index}>
+                  <tr key={index} style="font-size: 12px">
                     <td>{order.id}</td>
                     <td>{dayjs(order.date).format('YYYY-MM-DD HH:MM')}</td>
                     <td>{order.user.map(user => <span>{user.name}</span>)}</td>

@@ -57,6 +57,7 @@ module.exports = {
     {loader: {type: 'route'}, filePath: 'components2/ReportViews/StaffReportView.vue', name: 'StaffReport', path: '/pos-staff-report'},
     {loader: {type: 'init '}, path: 'composition/plugin-init.js'},
     {loader: {type: 'vue-singleton'}, path: 'components/Store/Snackbar.vue',},
+    {loader: {type: 'vue-singleton'}, path: 'components2/EmptyStore.vue',},
     {loader: {type: 'backend-api'}, path: 'backend/dayjs-utils.js', type: 'backend'},
     {loader: {type: 'backend-api'}, path: 'backend/modifier/index.js', type: 'backend'},
     // {loader: {type: 'backend-api'}, path: 'backend/customer/customerSchemaRegister.js', type: 'backend'},

@@ -10,6 +10,8 @@ module.exports = async function (cms) {
 	let cloudSocket
 
 	const { orm } = cms
+	let feSocket
+	let isConnectedToMaster = false // variable to check client is connected to master
 	// todo check this later
 	orm.plugin(syncPlugin)
 	orm.plugin(syncFlow)
@@ -30,17 +32,36 @@ module.exports = async function (cms) {
 		'EndOfDay'
 	)
 
+	cms.socket.on('connect', socket => {
+		feSocket = socket
+		socket.on('setMasterFe', async (isMaster, masterIp) => {
+			await cms.getModel('PosSetting').findOneAndUpdate({}, { isMaster })
+			setMaster(isMaster)
+			if (!isMaster && !masterIp)
+				return
+			await cms.emit('connectToMaster', isMaster ? localIp() : masterIp)
+		})
+		socket.on('isConnectedToMaster', (cb) => {
+			const isConnected = orm.getMaster() ? true : isConnectedToMaster
+			cb(isConnected)
+		})
+		const isMaster = orm.getMaster()
+		socket.emit('isMaster', isMaster, localIp())
+	})
+
 	const setMaster = function (_isMaster) {
+		console.log('Master status is:', _isMaster)
 		orm.emit('commit:flow:setMaster', _isMaster)
+		feSocket && feSocket.emit('isMaster', _isMaster, _isMaster ? localIp() : null)
 	}
 	cms.setMaster = setMaster
 	const localIp = function () {
-		return global.APP_CONFIG.deviceIp ? global.APP_CONFIG.deviceIp : internalIp.v4.sync()
+		return global.APP_CONFIG.deviceIp ? global.APP_CONFIG.deviceIp : `${internalIp.v4.sync()}:${global.APP_CONFIG.port}`
 	}
 
 	cms.on('connectToMaster', async function (_masterIp, _masterClientId, cloudSocket) {
 		const posSettings = await cms.getModel('PosSetting').findOne({})
-		let { masterIp } = posSettings
+		let { masterIp, isMaster } = posSettings
 		if (posSettings.onlineDevice)
 			orm.emit('getOnlineDevice', posSettings.onlineDevice)
 		if (_masterIp && masterIp !== _masterIp) {
@@ -54,8 +75,12 @@ module.exports = async function (cms) {
 			}
 			await orm.emit('setUpCloudSocket', _masterIp, _masterClientId, cloudSocket)
 		}
-		if (masterIp && masterIp === localIp()) {
+		if (isMaster) {
 			setMaster(true)
+			orm.emit('offClient')
+			if (cloudSocket && _masterClientId) {
+				await orm.emit('setUpCloudSocket', _masterIp, _masterClientId, cloudSocket)
+			}
 		}
 		if (!masterIp) return // cloud is master
 		if (orm.getMaster()) {
@@ -67,6 +92,14 @@ module.exports = async function (cms) {
 			})
 		} else {
 			const clientSocket = socketClient.connect(`http://${masterIp}/masterNode`)
+			clientSocket.on('connect', () => {
+				isConnectedToMaster = true
+				feSocket && feSocket.emit('connectedToMaster', true)
+			})
+			clientSocket.on('disconnect', () => {
+				isConnectedToMaster = false
+				feSocket && feSocket.emit('connectedToMaster', false)
+			})
 			orm.emit('initSyncForClient', clientSocket)
 			const {value: highestId} = await orm.emit('getHighestCommitId')
 			orm.emit('transport:require-sync', highestId)
@@ -137,6 +170,7 @@ module.exports = async function (cms) {
 		socket.on('setDeviceAsMaster', async function (ack) {
 			ack()
 			masterIp = localIp()
+			await cms.getModel('PosSetting').findOneAndUpdate({}, { isMaster: true })
 			await cms.emit('connectToMaster', localIp(), onlineDevice.id, socket)
 		})
 

@@ -25,7 +25,8 @@ module.exports = (cms) => {
 		switch (data.type) {
 			case 'ipAddress':
 				console.log('Update ipAddress', data.value);
-				await cms.emit('load:masterIp',data.value);
+				global.APP_CONFIG.deviceIp = data.value
+				await cms.emit('load:masterIp', data.value);
 				break;
 			case 'onResume':
 				await cms.emit('run:requireSync');
