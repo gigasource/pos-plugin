@@ -1,34 +1,45 @@
 <script>
-import { withModifiers, ref, computed, watch, reactive } from 'vue'
-import { genScopeId } from '../utils';
-import _ from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
+import { ref, withModifiers } from 'vue'
+import { execGenScopeId, genScopeId } from '../utils';
 import { useRouter } from 'vue-router'
-import { online, posSettings } from '../AppSharedStates';
-import { isIOS, isMobile } from '../AppSharedStates';
-import { execGenScopeId } from '../utils';
 import {
+  demoMode,
+  dialog,
+  getServerUrl,
   items,
+  onKeyEnterPressed,
+  openDialogDemo,
+  pairingTabRef,
+  secretClick,
+  selectDemoData,
+  sendRequestTabRef,
+  showCustomUrlDialog,
+  showKeyboard,
+  showLoadingOverlay,
   tab,
-  secretClick, RequestFactory, showKeyboard, PairingFactory, showCustomUrlDialog, updateServerUrl, getServerUrl,
-  showLoadingOverlay
-} from './FirstTimeSetupFactory'
+  updateServerUrl
+} from './first-time-setup-shared';
+import SendRequestTab from './SendRequestTab';
+import PairingTab from './PairingTab';
 
 export default {
   name: 'FirstTimeSetup2',
+  components: { PairingTab, SendRequestTab },
   props: {},
   setup() {
 
-    function enterPress() {
+    const router = useRouter()
 
+    function start() {
+      router.push('/pos-login')
     }
 
-    const { renderRequestTab, place, placeId, phone } = RequestFactory()
-    const { renderPairingTab, openDialogDemo, selectDemoData, demoMode, dialog } = PairingFactory()
     const renderKeyboard = () => (showKeyboard.value) &&
         <div class="keyboard-wrapper">
-          <pos-keyboard-full type="alpha-number" onEnterPressed={enterPress}/>
+          <pos-keyboard-full type="alpha-number" onEnterPressed={onKeyEnterPressed}/>
         </div>
+    const place = ref('')
+    const phone = ref('')
     return genScopeId(() => (
         <div class="background row-flex align-items-center justify-center">
           <div class={showKeyboard.value ? 'left' : 'center'}>
@@ -36,21 +47,25 @@ export default {
               Welcome to Restaurant+ POS
             </div>
             <g-tabs v-model={tab.value} items={items.value}>
-              {execGenScopeId(() => <>
-                {renderRequestTab()}
-                {renderPairingTab()}
-              </>)
-              }
+              {execGenScopeId(() =>
+                  <>
+                    <g-tab-item item={items.value[0]} style="height: 230px; padding-top: 4px">
+                      {execGenScopeId(() =>
+                          <SendRequestTab v-models={[[place.value, 'place'], [phone.value, 'phone']]} ref={sendRequestTabRef} onStart={start}/>)}
+                    </g-tab-item>
+                    <g-tab-item item={items.value[1]} style="height: 200px; padding-top: 4px">
+                      {execGenScopeId(() => <PairingTab ref={pairingTabRef} onStart={start}/>)}
+                    </g-tab-item>
+                  </>
+              )}
             </g-tabs>
           </div>
-
           <dialog-custom-url v-model={showCustomUrlDialog.value} onConfirm={updateServerUrl} onGetServerUrl={async cb => await getServerUrl(cb)}/>
           <g-btn style="position: absolute; top: 10px; right: 10px" onClick={openDialogDemo}>
             Skip to Demo
           </g-btn>
           {renderKeyboard()}
-          <dialog-demo v-model={dialog.demo} mode={demoMode.value} address={place.value} phone={phone.value} onComplete={selectDemoData}/>
-
+          <dialog-demo v-model={dialog.demo} mode={demoMode.value} address={place.value} phone={phone.value} onComplete={(store) => { selectDemoData(store, start)}}/>
           <g-dialog v-model={showLoadingOverlay.value} content-class="loading-overlay">
             <g-progress-circular color="#fff" indeterminate size="100" width="10"/>
           </g-dialog>

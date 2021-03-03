@@ -1,6 +1,6 @@
 import { makeWrapper, wrapper } from "../test-utils";
-import FirstTimeSetup2 from "./FirstTimeSetup2";
-import { RequestFactory } from './FirstTimeSetupFactory';
+import FirstTimeSetup2 from "./FirstTimeSetup";
+import { RequestFactory } from './first-time-setup-shared';
 import delay from 'delay';
 
 describe("test first time setup ui", () => {
