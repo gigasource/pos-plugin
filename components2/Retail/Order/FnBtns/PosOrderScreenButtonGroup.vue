@@ -68,23 +68,27 @@ export default {
             componentKey = fnBtn.fn
             const compNotAddedYet = !_.has(uniqueBtns, componentKey)
             if (compNotAddedYet) {
-              uniqueBtns[componentKey] = <div
+              uniqueBtns[componentKey] = <div class="row-flex align-items-center"
                   key={fnBtn.fn} onClick={() => removeBtnFn(fnBtn.fn)}
                   style={{
+                    fontSize: '10px',
+                    border: '1px solid #979797',
                     gridRow: fnBtn.rows[0] + '/' + fnBtn.rows[1],
                     gridColumn: fnBtn.cols[0] + '/' + fnBtn.cols[1],
-                  }}>{componentKey} x
+                  }}> <g-icon small>delete</g-icon> {componentKey}
               </div>
             }
           } else {
             componentKey = `${row}_${column}`
-            uniqueBtns[componentKey] = <div
+            uniqueBtns[componentKey] = <div class="row-flex justify-center align-items-center"
                 key={componentKey}
                 onClick={() => showSetBtnFnDialog(row, column)}
                 style={{
+                  border: '1px solid #979797',
                   gridRow: row + '/' + row,
                   gridColumn: column + '/' + column,
-                }}> + </div>
+                }}><g-icon>add</g-icon>
+            </div>
           }
         }
       }
@@ -112,8 +116,10 @@ export default {
     }
 
     return genScopeId(() => (
-        <div class="buttons" style={gridStyle}>
-          {props.inEditMode ? renderFnBtnInEditMode() : renderBtnInUsageMode()}
+        <div>
+          <div class="buttons" style={gridStyle}>
+            {props.inEditMode ? renderFnBtnInEditMode() : renderBtnInUsageMode()}
+          </div>
           {renderDialogSetBtn()}
         </div>
     ))

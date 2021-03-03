@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue'
-import {appHooks, posSettings} from '../../../AppSharedStates';
+import { appHooks, isMobile, posSettings } from '../../../AppSharedStates';
 import DialogProductLookup from './dialogProductLookup'
 import DialogSavedList from './dialogSavedList'
 import {genScopeId} from "../../../utils";
@@ -140,27 +140,49 @@ export function showSetBtnFnDialog(row, col) {
 }
 
 export function renderDialogSetBtn() {
+  const dialogStyle = {
+    backgroundColor: '#FFF',
+    paddingTop: '30px',
+    padding: '10px',
+    margin: '0 auto',
+    minWidth: '40%',
+  }
+
   return (
-    <g-dialog v-model={showDialogBtnFn.value}>
+    <g-dialog v-model={showDialogBtnFn.value} persistent>
       {
         genScopeId(() => (
-          <div>
-            <pos-textfield-new disabled={true} v-model={selectedBtn.value.row}/>
-            <pos-textfield-new disabled={true} v-model={selectedBtn.value.col}/>
-            <div class="row-flex">
-              <g-icon onClick={() => selectedBtn.value.height -= (selectedBtn.value.height - 1 >= 1 ? limitValue.MIN_ROW : 0)}>remove_circle</g-icon>
-              <span>{selectedBtn.value.height}</span>
-              <g-icon onClick={() => selectedBtn.value.height += (selectedBtn.value.height + selectedBtn.value.row < limitValue.MAX_ROW ? 1 : 0)}>add_circle</g-icon>
+          <div style={dialogStyle}>
+            <div class="row-flex justify-end" onClick={() => showDialogBtnFn.value = false}>
+              <g-icon>close</g-icon>
             </div>
-            <div className="row-flex">
-              <g-icon onClick={() => selectedBtn.value.width -= (selectedBtn.value.width - 1 >= limitValue.MIN_COL ? 1 : 0)}>remove_circle</g-icon>
-              <span>{selectedBtn.value.width}</span>
-              <g-icon onClick={() => selectedBtn.value.width += (selectedBtn.value.col + selectedBtn.value.width < limitValue.MAX_COL ? 1 : 0)}>add_circle</g-icon>
+
+            <g-select label="Function" text-field-component="GTextFieldBs" items={FnBtnNames.value}
+                      v-model={selectedBtn.value.fn}/>
+
+            <div style="margin: 5px">
+              <div>Position: Row = {selectedBtn.value.row}, Column = {selectedBtn.value.col}</div>
+              <div class="row-flex">
+                <span style="width: 60px">Height:</span>
+                <span class="row-flex">
+                  <g-icon onClick={() => selectedBtn.value.height -= (selectedBtn.value.height - 1 >= 1 ? limitValue.MIN_ROW : 0)}>remove_circle</g-icon>
+                  <span style="width: 25px">{selectedBtn.value.height}</span>
+                  <g-icon onClick={() => selectedBtn.value.height += (selectedBtn.value.height + selectedBtn.value.row < limitValue.MAX_ROW ? 1 : 0)}>add_circle</g-icon>
+                </span>
+              </div>
+              <div class="row-flex">
+                <div style="width: 60px">Width:</div>
+                <span class="row-flex">
+                  <g-icon onClick={() => selectedBtn.value.width -= (selectedBtn.value.width - 1 >= limitValue.MIN_COL ? 1 : 0)}>remove_circle</g-icon>
+                  <span style="width: 25px">{selectedBtn.value.width}</span>
+                  <g-icon onClick={() => selectedBtn.value.width += (selectedBtn.value.col + selectedBtn.value.width < limitValue.MAX_COL ? 1 : 0)}>add_circle</g-icon>
+                </span>
+              </div>
             </div>
-            <g-select text-field-component="GTextFieldBs" items={FnBtnNames.value}
-                      v-model={selectedBtn.value.fn} placeholder="Reason (Optional)">
-            </g-select>
-            <g-btn onClick={addBtnFn}>Add button</g-btn>
+
+            <div class="row-flex justify-end mt-5">
+              <g-btn-bs background-color="#4caf50" onClick={addBtnFn}>Add button</g-btn-bs>
+            </div>
           </div>
         ))()
       }
