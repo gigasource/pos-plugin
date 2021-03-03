@@ -17,6 +17,9 @@ export const dateFormat = ref('DD-MM-YYYY') // TODO: i18n dates.dateFormat
 export const formattedDateTime = computed(() => {
   return dayjs(dateTime.value).format(`${timeFormat.value} ‧ ${dateFormat.value}`)
 })
+export const formattedTime = computed(() => {
+  return dayjs(dateTime.value).format(`${timeFormat.value}`)
+})
 
 export const user = ref(null)
 export const avatar = computed(() => user.value ? user.value.avatar : '');
