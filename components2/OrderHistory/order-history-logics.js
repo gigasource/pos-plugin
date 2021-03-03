@@ -140,7 +140,7 @@ export function getOrderPayment({ payment }) {
   if (payments.length > 1) {
     return { icon: 'icon-multi_payment', multi: true }
   }
-
+  //fixme: maybe there is some bug here
   const { value, type } = payment[0];
   let paymentMethod = listPayments.value.find(i => i.name === type)
   return Object.assign(paymentMethod || {}, { value, type })
