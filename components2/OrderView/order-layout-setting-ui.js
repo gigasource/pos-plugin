@@ -20,9 +20,9 @@ import {
 import { ref } from 'vue';
 import { isMobile } from '../AppSharedStates';
 
-const showCategory = ref(false)
-const showProduct = ref(false)
-const showSidebar = ref(false)
+const showCategory = ref(true)
+const showProduct = ref(true)
+const showSidebar = ref(true)
 
 export function renderOLSetting() {
   if (!editModeOL.value)
