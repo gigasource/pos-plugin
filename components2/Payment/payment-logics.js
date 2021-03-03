@@ -110,7 +110,6 @@ const PaymentLogicsFactory = () => {
     }
     if (currentOrderPaymentList.value && currentOrderPaymentList.value.length > 0) {
       const mainPayment = currentOrderPaymentList.value[0]
-      console.log(mainPayment)
       if (mainPayment.value > item.value) {
         updateSinglePayment(currentOrder, {
           type: mainPayment.type,
