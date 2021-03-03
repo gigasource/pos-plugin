@@ -28,7 +28,7 @@ export function renderOLSetting() {
   if (!editModeOL.value)
     return;
   return (
-      <div style="max-height: 90%;">
+      <div style="max-height: 80%;">
         <div style="max-height: 80%; overflow: scroll">
           <div class="mt-3">
             <div class="ta-left row-flex justify-between" style="background: #e2e2e2; padding: 5px" onClick={() => showCategory.value = !showCategory.value}>
