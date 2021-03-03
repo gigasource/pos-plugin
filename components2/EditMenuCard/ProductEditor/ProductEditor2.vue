@@ -37,7 +37,7 @@ import {appHooks} from "../../AppSharedStates";
 import {modifierGroups} from "../../Modifiers/dialogEditPopupModifier/modifier-ui-logics";
 
 
-const colors = '#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91'.split(',')
+const colors = ['#FFFFFF','#CE93D8','#B2EBF2','#C8E6C9','#DCE775','#FFF59D','#FFCC80','#FFAB91']
 
 export default {
   name: 'ProductEditor2.vue',
