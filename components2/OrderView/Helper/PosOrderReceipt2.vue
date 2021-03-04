@@ -174,18 +174,18 @@ export default {
     }
 
     function saveTip() {
-      const tip = split.value ? (+tipEditValue.value) - tempSplit.value.vSum : (+tipEditValue.value) - order.vSum
+      const tip = props.split ? (+tipEditValue.value) - tempSplit.value.vSum : (+tipEditValue.value) - order.vSum
 
       if (tip <= 0) {
         return
       }
 
-      if (split.value) {
+      if (props.split) {
         tipEditValue.value = ''
-        emit('updatePayment', tempSplit.value._id, [{type: 'card', value: tempSplit.value.vSum}], tip.value)
+        emit('updatePayment', tempSplit.value._id, [{type: 'card', value: tempSplit.value.vSum}], tip)
         tempSplit.value = {}
       } else {
-        emit('updateCurrentOrder', 'tip', tip.value)
+        emit('updateCurrentOrder', 'tip', tip)
         emit('updateCurrentOrder', 'payment', [{name: 'card', value: +tipEditValue.value}])
       }
 
