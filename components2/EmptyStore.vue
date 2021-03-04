@@ -1,8 +1,10 @@
 <script>
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { user } from './AppSharedStates';
+// import { user } from './AppSharedStates';
 import cms from 'cms'
+import { appHooks } from './AppSharedStates'
+import { useDeviceManagementSystem } from './online-order-pairing'
 
 // This file is for emitting screen-loaded
 export default {
@@ -12,7 +14,7 @@ export default {
   setup() {
     // TODO: navigate to login page if the user is not logged-in
     // Issue: not work as the Store loaded same time with component, only work in next route navigation.
-    // const router = useRouter()
+    const router = useRouter()
     // router.beforeEach((to, from, next) => {
     //   console.log('beforeEach', to, from, next, user.value)
     //   if (to.path === '/admin' || to.path === '/plugins' || to.path === '/pos-login' || to.path === '/pos-setup') {
@@ -24,7 +26,20 @@ export default {
     //   }
     // })
 
+    const {
+      setupPairDevice,
+      getPairStatus,
+      getWebshopName
+    } = useDeviceManagementSystem(router)
+
+    appHooks.emit('settingChange')
+
     onMounted(() => {
+      setTimeout(async () => {
+        await setupPairDevice()
+        await getPairStatus()
+        await getWebshopName()
+      }, 500)
       cms.socket.emit('screen-loaded')
     })
   }

@@ -88,10 +88,10 @@ export default {
         this.step = this.mode === 'demo' ? 1 : 2
         cms.socket.emit('get-demo-stores', this.mode === 'paired', (stores, error) => {
           if (error) {
-            console.log(error)
+            console.log('get-demo-stores', error)
             return
           }
-          this.listDemo = stores
+          this.listDemo = stores || []
           this.selectedDemo = this.listDemo.find(s => s.existingData)
         })
       }
