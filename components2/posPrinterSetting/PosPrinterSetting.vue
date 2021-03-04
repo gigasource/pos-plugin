@@ -1,16 +1,16 @@
 <script>
 import {
   onSelectPrinter,
-  PrinterSettingFactory,
   printerTypes,
   selectingPrinter,
   selectingPrinterGroup,
   selectingPrinterGroupType
-} from './pos-print-logics';
+} from './pos-print-shared';
 import { dineInTaxCategories, takeAwayTaxCategories } from '../Settings/TaxSetting/view-tax-logics';
 import { useI18n } from 'vue-i18n';
 import { computed, ref, watch } from 'vue'
 import { genScopeId } from '../utils';
+import { PrinterSettingFactory } from './printer-setting-factory'
 
 export default {
   setup() {
@@ -67,6 +67,7 @@ export default {
         <g-btn-bs background-color="blue accent 3" {...attrs} onClick={() => testPrinter(selectingPrinter.value)}>
           {t('settings.testPrinter')}
         </g-btn-bs>)
+
     const renderFn = genScopeId(() =>
         (selectingPrinterGroup.value) &&
         <div class="configuration">
@@ -78,8 +79,7 @@ export default {
                     <g-icon style="cursor: pointer" onClick={() => openDialog(nameInputRef)}>
                       icon-keyboard
                     </g-icon>
-              }}>
-              </g-text-field-bs>
+              }}/>
             </div>
           }
           <div class="config">
@@ -109,8 +109,7 @@ export default {
                             <g-icon style="cursor: pointer" onClick={() => openDialog(ipInputRef)}>
                               icon-keyboard
                             </g-icon>
-                      }}>
-                      </g-text-field-bs>
+                      }}/>
                       {testPrinterButtonRender({ style: 'padding: 6px; flex: 1; transition: none' })}
                     </div>
                     :

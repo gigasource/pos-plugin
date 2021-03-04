@@ -16,7 +16,7 @@ import {
   SidebarFactory,
   selectingPrinter,
   onSelectPrinter
-} from "../pos-print-logics";
+} from "../pos-print-shared";
 import { nextTick } from "vue";
 
 const kitchen_printer1 = {

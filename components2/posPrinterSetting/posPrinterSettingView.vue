@@ -3,45 +3,36 @@
 import PosPrinterSettingSidebar from './PosPrinterSettingSidebar';
 import {
   currentViewTarget,
-  onSelectPrinterGroup,
-  printerGroupsList,
-  printerHooks,
-  selectingPrinterGroup
-} from './pos-print-logics';
+  loadPrinterGroups,
+  printerHooks
+} from './pos-print-shared';
+import {
+  loadPrinterGeneralSetting
+} from './printer-general-setting-shared';
 import PosPrinterSetting from './PosPrinterSetting';
-import { h, KeepAlive, watch } from 'vue';
+import { h, KeepAlive } from 'vue';
 import { genScopeId } from '../utils';
 import { taxCategoryHooks } from '../Settings/TaxSetting/view-tax-logics';
 import PosPrinterSettingForMultiple from './PosPrinterSettingForMultiple';
-import { appHooks } from '../AppSharedStates';
 import { login } from '../Login/LoginLogic';
 import PosPrinterSettingGeneral from './PosPrinterSettingGeneral';
+import { printerGeneralSetting, printerGroupsList} from './pos-printer-be';
 
 export default {
   components: { PosPrinterSetting, PosPrinterSettingSidebar, PosPrinterSettingGeneral },
   setup() {
-    //todo: remove auto login
     login('0000')
-    appHooks.emit('settingChange')
-    printerHooks.emit('printerGroupsListChange')
-    const PrinterSettingView =
-        <PosPrinterSettingForMultiple class="pos-printer-setting-view__content"></PosPrinterSettingForMultiple>
-    const PrinterGeneralSettingView =
-        <PosPrinterSettingGeneral class="pos-printer-setting-view__content"></PosPrinterSettingGeneral>
+    const PrinterSettingView = <PosPrinterSettingForMultiple class="pos-printer-setting-view__content"/>
+    const PrinterGeneralSettingView = <PosPrinterSettingGeneral class="pos-printer-setting-view__content"/>
+    loadPrinterGroups()
+    loadPrinterGeneralSetting()
 
     const views = {
       PrinterSettingView,
       PrinterGeneralSettingView
     }
-
+    //todo:
     taxCategoryHooks.emit('updateListTaxCategories')
-
-    // watch(() => printerGroupsList.value, () => {
-    //   if (printerGroupsList.value && !selectingPrinterGroup.value) {
-    //     onSelectPrinterGroup(printerGroupsList.value[0])
-    //   }
-    // }, { deep: true })
-
     return genScopeId(() => <div className="pos-printer-setting-view">
       <PosPrinterSettingSidebar class="pos-printer-setting-view__sidebar"/>
       {

@@ -5,15 +5,15 @@ import {
   onCreateNewPrinter,
   onRemoveSelectingPrinter,
   onSelectPrinter,
-  PrinterSettingFactory,
   selectingPrinter,
-  selectingPrinterGroup
-} from './pos-print-logics';
-import { genScopeId, isSameId } from '../utils';
+  selectingPrinterGroup,
+    onCreateNewPrinterForSelectingPrinterGroup
+} from './pos-print-shared';
+import { execGenScopeId, genScopeId, isSameId } from '../utils';
 import { computed, watch } from 'vue'
-import { getScopeAttrs } from '../../utils/helpers';
 import PosPrinterSetting from './PosPrinterSetting';
 import _ from 'lodash'
+import { PrinterSettingFactory } from './printer-setting-factory';
 
 export default {
   components: { PosPrinterSetting },
@@ -42,36 +42,38 @@ export default {
     return genScopeId(() =>
         <div class="setting">
           {isMultiple.value ? <>
-                <g-tabs items={tabs.value} v-model={tab.value} addable onAdd={onCreateNewPrinter} deletable onDelete={() => showDeleteDialog.value = true}>
-                  {tabs.value.map(tabItem =>
+                <g-tabs items={tabs.value} v-model={tab.value} addable onAdd={onCreateNewPrinterForSelectingPrinterGroup} deletable onDelete={() => showDeleteDialog.value = true}>
+                  {tabs.value.map(genScopeId(tabItem =>
                       <g-tab-item key={tabItem._id} item={tabItem}>
-                        <div style="margin-top: 12px; margin-left: 12px; font-weight: 700">
-                          {t('settings.useFor')} </div>
-                        <g-grid-select multiple items={hardwares.value} v-model={hardwaresComputed.value} item-cols="auto" v-slots={{
-                          'default': genScopeId(({ toggleSelect, item }) =>
-                              <div class="hardware" onClick={e => {
-                                toggleSelect(item);
-                              }}>
-                                {item}
-                              </div>)
-                          ,
-                          'selected': genScopeId(({ toggleSelect, item }) =>
-                              <div class="hardware hardware--selected" onClick={e => {
-                                toggleSelect(item);
-                              }}>
-                                {item}
-                              </div>)
-                        }}>
-                        </g-grid-select>
-                        <PosPrinterSetting {...getScopeAttrs()}></PosPrinterSetting>
+                        {execGenScopeId(() => <>
+                              <div style="margin-top: 12px; margin-left: 12px; font-weight: 700">
+                                {t('settings.useFor')}
+                              </div>
+                              <g-grid-select multiple items={hardwares.value} v-model={hardwaresComputed.value} item-cols="auto" v-slots={{
+                                'default': genScopeId(({ toggleSelect, item }) =>
+                                    <div class="hardware" onClick={e => {
+                                      toggleSelect(item);
+                                    }}>
+                                      {item}
+                                    </div>)
+                                ,
+                                'selected': genScopeId(({ toggleSelect, item }) =>
+                                    <div class="hardware hardware--selected" onClick={e => {
+                                      toggleSelect(item);
+                                    }}>
+                                      {item}
+                                    </div>)
+                              }}/>
+                              <PosPrinterSetting/>
+                            </>
+                        )}
                       </g-tab-item>
-                  )}
+                  ))}
                 </g-tabs>
-                <dialog-confirm-delete v-model={showDeleteDialog.value} type=" printer setting " onSubmit={onRemoveSelectingPrinter}></dialog-confirm-delete>
+                <dialog-confirm-delete v-model={showDeleteDialog.value} type=" printer setting " onSubmit={onRemoveSelectingPrinter}/>
               </>
               :
-              <PosPrinterSetting> </PosPrinterSetting>
-          }
+              <PosPrinterSetting/>}
         </div>)
   }
 }
