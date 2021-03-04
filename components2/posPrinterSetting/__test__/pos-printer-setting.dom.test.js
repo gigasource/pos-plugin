@@ -8,9 +8,9 @@ import {
   onCreateNewPrinterGroup,
   onSelectPrinterGroup,
   PrinterSettingFactory
-} from "../pos-print-logics";
+} from "../pos-print-shared";
 
-import * as Logics from "../pos-print-logics";
+import * as Logics from "../pos-print-shared";
 
 const kitchen_printer1 = {
   name: "k_p1"

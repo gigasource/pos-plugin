@@ -1,23 +1,20 @@
 <script>
-import { attrComputed, genScopeId } from '../utils';
-import { printerGeneralSetting } from './pos-print-logics';
+import { genScopeId } from '../utils';
+import {
+  _updateNoEntireReceipt,
+  entireReceipt,
+  listNoEntireReceipt,
+  mergeAfterPrint,
+  showDineInTax,
+  useMultiPrinterForEntirePrinter,
+  useMultiPrinterForInvoicePrinter,
+  useMultiPrinterForKitchenPrinter
+} from './printer-general-setting-shared';
 import { useI18n } from 'vue-i18n';
 
 export default {
   setup() {
     const { t } = useI18n()
-    const listNoEntireReceipt = [0, 1, 2, 3, 4]
-    const useMultiPrinterForKitchenPrinter = attrComputed(printerGeneralSetting, 'useMultiPrinterForKitchenPrinter', false)
-    const useMultiPrinterForInvoicePrinter = attrComputed(printerGeneralSetting, 'useMultiPrinterForInvoicePrinter', false)
-    const useMultiPrinterForEntirePrinter = attrComputed(printerGeneralSetting, 'useMultiPrinterForEntirePrinter', false)
-    const mergeAfterPrint = attrComputed(printerGeneralSetting, 'mergeAfterPrint', false)
-    const showDineInTax = attrComputed(printerGeneralSetting, 'showDineInTax', false)
-    const entireReceipt = attrComputed(printerGeneralSetting, 'entireReceipt', 0)
-
-    function _updateNoEntireReceipt(number) {
-      entireReceipt.value = number
-    }
-
     return genScopeId(() =>
         <div class="setting">
           <div class="checkbox-group">

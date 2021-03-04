@@ -1,11 +1,11 @@
 <script>
-import { onCreateNewPrinterGroup, SidebarFactory } from './pos-print-logics';
+import { onCreateNewPrinterGroup } from './pos-print-shared';
 import { avatar, user, username } from '../AppSharedStates';
 import { onBeforeMount, onBeforeUnmount, ref, withModifiers } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { genScopeId } from '../utils'
 import { useRouter } from 'vue-router'
-import { login } from '../Login/LoginLogic';
+import { SidebarFactory } from './sidebar-factory'
 import dayjs from 'dayjs';
 
 export default {
@@ -18,19 +18,13 @@ export default {
     onBeforeMount(async function () {
       timerInterval = setInterval(() => now.value = dayjs().format('HH:mm'), 1000)
     })
-
     onBeforeUnmount(() => {
       if (timerInterval) clearInterval(timerInterval)
     })
-
-    // todo: sidebar header: duplicate code
-
     function back() {
       router.go(-1)
     }
-
     const showDeleteDialog = ref(false)
-
     return genScopeId(() =>
         <g-sidebar v-slots={{
           'default': genScopeId(() =>
