@@ -14,8 +14,6 @@ const dialog = reactive({
 export async function loadKeyboardConfig() {
   const setting = await cms.getModel('PosSetting').findOne()
   const _keyboardConfig = setting.keyboardConfig;
-  // work-around: Fixing error keyboardConfig is null
-  // TODO: Find what is the purpose of keyboardConfig layout
   if (_keyboardConfig && !_keyboardConfig.layout)
     _keyboardConfig.layout = []
   keyboardConfig.value = _keyboardConfig || {layout: []};
