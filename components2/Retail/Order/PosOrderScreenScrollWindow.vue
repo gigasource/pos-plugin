@@ -17,10 +17,11 @@ export default {
       type: Number,
       default: 0
     },
-    isRefundMode: Boolean
+    isRefundMode: Boolean,
+    isEditMode: Boolean
   },
   setup(props) {
-    const { isRefundMode } = props
+    const { isRefundMode, isEditMode } = props
     /**
      * Object key is category._id
      */
@@ -63,7 +64,7 @@ export default {
     })
 
     function addProduct(item) {
-      if (isRefundMode) return
+      if (isRefundMode || isEditMode.value) return
       const order = getCurrentOrder()
       addItem(order, item, 1)
     }

@@ -18,6 +18,13 @@ import {
 } from './retail-layout-setting-logic';
 import { savedOrders } from './temp-logic';
 import { username, formattedTime } from '../../AppSharedStates';
+import {
+  getCurrentOrder
+} from "../../OrderView/pos-logic-be";
+import {
+  addCustomer
+} from "../../OrderView/pos-logic";
+import { customerNames } from "../../Customer/customer-logic";
 
 export default {
   name: 'PosOrderRetail',
@@ -131,7 +138,7 @@ export default {
     function render2ndColumn() {
       return (
           <div class="por__main">
-            <pos-order-screen-scroll-window is-refund-mode={isRefundMode.value} class="por__main__window"/>
+            <pos-order-screen-scroll-window is-edit-mode={inEditScreenMode} is-refund-mode={isRefundMode.value} class="por__main__window"/>
             <pos-order-screen-number-keyboard class="por__main__keyboard"/>
             <pos-order-screen-button-group
                 class="por__main__buttons"
@@ -144,13 +151,26 @@ export default {
     const customer = ref(null)
     const showCustomerDialog = ref(false)
     function renderCustomer() {
+      const order = getCurrentOrder()
       return <div style="cursor: pointer" onClick={() => showCustomerDialog.value = true}>
         { !customer.value
             ? <div style="font-size: 12px">
               <p>Select customer</p>
               <p>{username.value} - {formattedTime.value}</p>
               {/*TODO: Render customer dialog somehow*/}
-              <g-dialog v-model={showCustomerDialog.value}></g-dialog>
+              <g-dialog v-model={showCustomerDialog.value} persistent>
+                {
+                  genScopeId(() => (
+                    <div class="por__detail__dialog">
+                      <div className="row-flex justify-end" onClick={() => showCustomerDialog.value = false}>
+                        <g-icon>close</g-icon>
+                      </div>
+                      <g-autocomplete text-field-component="GTextFieldBs"
+                                      modelValue={order.customer} items={customerNames.value} onUpdate:modelValue={(customer) => addCustomer(order, customer)}/>
+                    </div>
+                  ))()
+                }
+              </g-dialog>
             </div>
             : <div>
               <p style="color: #2979FF">{customer.value.name}</p>
@@ -241,6 +261,14 @@ export default {
   &__detail {
     grid-area: 1/3/2/4;
     padding: 4px 4px 4px 0;
+
+    &__dialog {
+      backgroundColor: '#FFF';
+      paddingTop: 30px;
+      padding: 10px;
+      margin: 0 auto;
+      minWidth: '40%';
+    }
   }
 }
 </style>
