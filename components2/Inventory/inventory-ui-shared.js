@@ -1,7 +1,13 @@
 import { ref, watch, computed } from 'vue'
 import {detailInventories, filter, inventories} from './inventory-logic-ui'
 import { categories, categoriesWithParentName } from '../Product/product-logic'
-import { createInventory, deleteInventory, loadInventoryActions, updateInventory } from './inventory-logic-be';
+import {
+  createInventory,
+  deleteInventory,
+  loadInventories,
+  loadInventoryActions,
+  updateInventory
+} from './inventory-logic-be';
 import dayjs from 'dayjs'
 import { genScopeId } from '../utils';
 import _ from 'lodash'
@@ -13,6 +19,13 @@ import {
   getCurrentOrder,
   genMaxId
 } from "../OrderView/pos-logic-be";
+import {loadCategories, loadProducts} from "../Product/product-logic-be";
+
+watch(() => currentAppType.value, async () => {
+  await loadCategories()
+  await loadProducts()
+  await loadInventories()
+})
 
 export const reason = {
   PURCHASE_NEW_STOCK: 'Purchase new stock',
