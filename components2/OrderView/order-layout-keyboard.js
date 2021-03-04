@@ -54,16 +54,18 @@ function openDialogEdit(position) {
 }
 
 export function orderLayoutKeyboardFactory(editable) {
-  const renderKeyboard = () => (
-    <>
-      {showCalculator.value && <pos-order-keyboard2 keyboard-config={keyboardConfig.value}
-                           mode={editable ? 'edit' : 'active'}
-                           onEdit:keyboard={e => openDialogEdit(e)}
-                           onOpenDialogSearch={() => dialog.search = true}/>}
-      <dialog-text-filter v-model={dialog.value} onSubmit={e => changeKeyboardExtension(e)}/>
-      <dialog-product-search-result v-model={dialog.search}/>
-    </>
-  )
+  const renderKeyboard = () => {
+    return (
+      <>
+        {showCalculator.value && <pos-order-keyboard2 keyboard-config={keyboardConfig}
+                             mode={editable ? 'edit' : 'active'}
+                             onEdit:keyboard={e => openDialogEdit(e)}
+                             onOpenDialogSearch={() => dialog.search = true}/>}
+        <dialog-text-filter v-model={dialog.value} onSubmit={e => changeKeyboardExtension(e)}/>
+        <dialog-product-search-result v-model={dialog.search}/>
+      </>
+    )
+  }
 
   return {
     renderKeyboard

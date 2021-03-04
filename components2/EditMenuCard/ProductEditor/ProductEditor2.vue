@@ -1,6 +1,6 @@
 <script>
 import { withModifier } from 'vue'
-import {selectedProduct, selectedProductLayout,} from '../../OrderView/pos-ui-shared';
+import {selectedProduct, selectedProductLayout, selectedProductLayoutPosition} from '../../OrderView/pos-ui-shared';
 
 import {
   addPopupModifierGroup,
@@ -28,7 +28,7 @@ import {
 } from './ProductEditorLogic'
 import {useI18n} from 'vue-i18n'
 import {useRouter} from 'vue-router'
-import {computed, onActivated, reactive, watch} from 'vue';
+import {computed, onActivated, reactive, watch, onDeactivated} from 'vue';
 import {genScopeId} from '../../utils';
 import dialogEditPopupModifiers2 from "../../Modifiers/dialogEditPopupModifier/dialogEditPopupModifiers2";
 import dialogProductInfo from "../dialog/dialogProductInfo";
@@ -89,6 +89,8 @@ export default {
     }
 
     function renderLayoutType() {
+      if (!selectedProduct.value)
+        return
       return <>
         <div>{t('article.type')}</div>
         <g-select
@@ -118,6 +120,8 @@ export default {
     }
 
     function renderProductLayout() {
+      if (!selectedProduct.value)
+        return
       return <>
         <div>{t('article.id')} </div>
         <g-text-field-bs
@@ -174,6 +178,8 @@ export default {
     }
 
     function renderTax() {
+      if (!selectedProduct.value)
+        return
       const dineInTaxSlots = {
         default: ({toggleSelect, item, index}) => {
           return genScopeId(() =>
@@ -245,7 +251,9 @@ export default {
       )
     }
 
-    const renderColor = () => (
+    const renderColor = () => {
+      if (!selectedProductLayout.value) return
+      return (
         <div class="mt-2">
           <div class="product-editor__label">{t('ui.color')}</div>
           <color-selector
@@ -254,7 +262,8 @@ export default {
               item-size="25"
               onUpdate:modelValue={e => updateProductLayout({color: e})}/>
         </div>
-    )
+      )
+    }
 
     const renderPopupModifier = () => isProductLayout.value && (
         <div class="mt-2">
@@ -309,6 +318,9 @@ export default {
 
     setLayoutTypeByRouteQuery()
     onActivated(() => setLayoutTypeByRouteQuery())
+    onDeactivated(() => {
+      selectedProductLayoutPosition.value = { top: 0, left: 0 }
+    })
 
     async function _created() {
       await loadPrinters()

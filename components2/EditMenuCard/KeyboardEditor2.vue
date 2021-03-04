@@ -99,7 +99,7 @@ export default {
           l.rows.shift()
         }
       }
-      await updateKeyboardConfig(config)
+      await _updateKeyboardConfig(config)
     }
     async function resetKeyboard() {
       const config = Object.assign({}, keyboardConfig.value)

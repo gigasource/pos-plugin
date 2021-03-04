@@ -15,7 +15,7 @@ export default {
     const productIdQueryResults = ref(null)
     const mainKeyboard = computed(() => {
       const keyboard = _.cloneDeep(defaultKeyboard)
-      if (!keyboardConfig.x) {
+      if (!keyboardConfig.value.x) {
         const index = keyboard.items.findIndex(k => k.type === 'x')
         if (index > 0) {
           keyboard.items.splice(index, 1)
@@ -28,8 +28,8 @@ export default {
     const leftsideItems = computed(() => {
       let keys = [], maxColumns = 0
 
-      for (let i = 0; i < keyboardConfig.layout.length; i++) {
-        const rows = keyboardConfig.layout[i].rows
+      for (let i = 0; i < keyboardConfig.value.layout.length; i++) {
+        const rows = keyboardConfig.value.layout[i].rows
         if (maxColumns < rows.length) maxColumns = rows.length
         for (let j = 0; j < rows.length; j++) {
           if (rows[j].trim() === '') {
@@ -53,8 +53,8 @@ export default {
           }
           k = i + 1
           //check duplicate in vertical
-          while (k < keyboardConfig.layout.length) {
-            const nextRows = keyboardConfig.layout[k].rows
+          while (k < keyboardConfig.value.layout.length) {
+            const nextRows = keyboardConfig.value.layout[k].rows
             if (nextRows[j] === rows[j]) {
               let flag = false
               if (key.right > key.left + 1) {
@@ -81,11 +81,11 @@ export default {
           keys.push(key)
         }
       }
-      return {items: keys, rows: keyboardConfig.layout.length, columns: maxColumns}
+      return {items: keys, rows: keyboardConfig.value.layout.length, columns: maxColumns}
     })
     const keyboardStyles = computed(() => {
       let styles = {}
-      styles['grid-area'] = `${keyboardConfig.top}/${keyboardConfig.left}/${keyboardConfig.top + keyboardConfig.height}/${keyboardConfig.left + keyboardConfig.width}`
+      styles['grid-area'] = `${keyboardConfig.value.top}/${keyboardConfig.value.left}/${keyboardConfig.value.top + keyboardConfig.value.height}/${keyboardConfig.value.left + keyboardConfig.value.width}`
       styles['grid-template-rows'] = `repeat(${Math.max(mainKeyboard.value.rows, leftsideItems.value.rows) + 1}, 1fr)`
       styles['grid-template-columns'] = `repeat(${mainKeyboard.value.columns + leftsideItems.value.columns}, 1fr)`
       styles['grid-gap'] = `5px`
