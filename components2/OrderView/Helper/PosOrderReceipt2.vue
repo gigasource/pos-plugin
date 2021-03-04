@@ -82,12 +82,6 @@ export default {
       return 'icon-multi_payment'
     }
 
-    function getOrderPaymentIcon() {
-      if (!order.payment) return getIcon('cash')
-      if (order.payment.length > 1) return getIcon()
-      return getIcon(order.payment[0].type)
-    }
-
     function getPaymentColor(payment, type) {
       if (payment.length > 1 && type === 'multi') return '#1271ff'
       if (payment.length === 1 && type === payment[0].type) return '#1271ff'
@@ -174,8 +168,9 @@ export default {
     }
 
     function showTipDialog(split) {
-      if (split) tempSplit.value = split
-      dialog.tip = true
+      if (split)
+        tempSplit.value = split
+      dialog.value.tip = true
     }
 
     function saveTip() {
@@ -194,7 +189,7 @@ export default {
         emit('updateCurrentOrder', 'payment', [{name: 'card', value: +tipEditValue.value}])
       }
 
-      this.dialog.tip = false
+      dialog.value.tip = false
     }
 
     const contentRender = genScopeId(() => (<>
@@ -373,34 +368,43 @@ export default {
       <div class="blur-overlay" v-show={blurReceipt.value}/>
     </>))
 
+    function renderMultiPaymentDialog() {
+      return (
+          <dialog-multi-payment
+              rotate
+              v-model={dialog.value.multi}
+              total={props.split ? tempSplit.vSum : order.vSum}
+              onSubmit={saveMultiPayment}/>
+      )
+    }
+
+    function renderTipDialog() {
+      return (
+          <dialog-form-input
+              width="40%"
+              v-model={dialog.value.tip}
+              keyboard-type="numeric"
+              onSubmit={saveTip}
+              keyboard-width="100%"
+              rotate v-slots={{
+            input: () => (
+                <pos-textfield-new
+                    ref={tipTextFieldRef}
+                    label="Card Payment"
+                    v-model={tipEditValue.value}
+                    clearable/>
+            )
+          }}>
+          </dialog-form-input>
+      )
+    }
+
     return genScopeId(() => <>
       <g-dialog fullscreen v-model={internalValue.value}>
         {contentRender()}
       </g-dialog>
-
-      <dialog-multi-payment
-          rotate
-          v-model={dialog.value.multi}
-          total={props.split ? tempSplit.vSum : order.vSum}
-          onSubmit={saveMultiPayment}/>
-
-      <dialog-form-input
-          width="40%"
-          v-model={dialog.tip}
-          keyboard-type="numeric"
-          onSubmit={saveTip}
-          keyboard-width="100%"
-          rotate>
-        {{
-          input: () => (
-              <pos-textfield-new
-                  ref={tipTextFieldRef}
-                  label="Card Payment"
-                  v-model={tipEditValue}
-                  clearable/>
-          )
-        }}
-      </dialog-form-input>
+      { renderMultiPaymentDialog() }
+      { renderTipDialog() }
     </>)
   }
 }
