@@ -29,7 +29,7 @@ export default {
     const cartPositionStyle = `max-height: ${cartHeightStyle}; height: ${cartHeightStyle}; margin-bottom: ${footerMargin}`
 
     function decreaseQty(item) {
-      changeItemQuantity(order, item, -1)
+      changeItemQuantity(order, item, -1, true)
     }
     function increaseQty(item) {
       if (isRefundMode && item.quantity === item.maxQuantity)

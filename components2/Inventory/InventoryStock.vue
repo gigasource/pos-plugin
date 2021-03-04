@@ -6,12 +6,13 @@ import DialogChangeStock from './helpers/dialogChangeStock';
 import cms from 'cms'
 import _ from 'lodash';
 import { useI18n } from 'vue-i18n'
-import { updateInventoryAction } from './inventory-logic-be';
+import { updateInventory } from './inventory-logic-be';
 import {
   detailInventories
 } from './inventory-logic-ui'
 import { genScopeId } from '../utils';
 import { $filters } from '../AppSharedStates';
+import {reason} from "./inventory-ui-shared";
 
 export default {
   name: "InventoryStock",
@@ -35,8 +36,7 @@ export default {
     const showKeyboard = ref(false)
 
     onActivated(async () => {
-      const _inventories = await cms.getModel('Inventory').find()
-      inventories.value = _inventories.map(item => ({
+      inventories.value = detailInventories.value.map(item => ({
         ...item,
         text: item.product.name,
         category: item.product.category
@@ -73,8 +73,8 @@ export default {
     const openDialogAdd = function (item) {
       if (item) {
         itemId.value = _.cloneDeep(item._id)
-        name.value = _.cloneDeep(item.name)
-        category.value = _.cloneDeep(item.category.name)
+        name.value = _.cloneDeep(item.product.name)
+        category.value = _.cloneDeep(getCategoryText(item.product.category))
         unit.value = _.cloneDeep(item.unit)
         stock.value = _.cloneDeep(+item.stock)
         added.value = _.cloneDeep(+item.added)
@@ -115,21 +115,13 @@ export default {
       dialog.value.low = false
     }
     const complete = async function () {
-      const updateItems = items.value.filter(item => item.added).map(item => ({
-        ...item,
-        stock: item.stock + item.added
-      }))
+      const updateItems = items.value.filter(item => item.added).map(item => {
+        const foundedItem = _.clone(detailInventories.value.find(inventory => inventory._id.toString() === item._id.toString()))
+        foundedItem.stock += item.added
+        return foundedItem
+      })
       for (const item of updateItems) {
-        await updateInventory(item)
-        const history = {
-          inventory: item._id,
-          category: item.category._id,
-          type: 'add',
-          amount: item.added,
-          date: new Date(),
-          reason: 'Import stock'
-        }
-        await updateInventoryHistory(history)
+        await updateInventory(item, reason.UPDATE_BY_USER)
       }
       back()
     }

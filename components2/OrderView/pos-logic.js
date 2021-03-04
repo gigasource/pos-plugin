@@ -601,6 +601,10 @@ export function mergeSameItems(order, mutate = true) {
   return items;
 }
 
+export function addCustomer(order, customer) {
+  order.customer = customer
+}
+
 //todo: recent items
 
 //</editor-fold>
