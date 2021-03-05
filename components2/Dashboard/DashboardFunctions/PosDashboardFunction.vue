@@ -6,11 +6,13 @@ import {
   demoLicense,
   dayLeft,
   iframeHeight,
-  iframeWidth, iframeSrc, iframeDragging, showIframe, viewLicense
+  iframeWidth, iframeSrc, iframeDragging, showIframe, showExportDataDialog, viewLicense
 } from './pos-dashboard-function-logics';
 import { appHooks } from '../../AppSharedStates';
 import { genScopeId } from '../../utils';
 import { computed } from 'vue'
+import dialogExportData from '../../Report/dialogExportData';
+
 
 export default {
   setup() {
@@ -84,6 +86,9 @@ export default {
           </g-dnd-dialog>
       )
     }
+    function renderExportDataDialog() {
+      return <dialogExportData v-model={showExportDataDialog.value}/>
+    }
 
     return genScopeId(() =>
         <div class="function">
@@ -92,6 +97,7 @@ export default {
           { renderBottomButtons() }
           { renderDemoLicenseWarning() }
           { renderOnlineOrderingSettingDialog() }
+          { renderExportDataDialog() }
         </div>
     )
   }
