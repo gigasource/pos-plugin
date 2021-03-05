@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { formatDatetime } from '../utils';
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n';
+import { currentAppType } from '../AppType';
 
 export const selectingOrder = ref({})
 
@@ -149,7 +150,7 @@ export function getOrderPayment({ payment }) {
 export async function getOrderHistory() {
   const Order = cms.getModel('Order');
   const condition = filters.value.reduce((acc, filter) => ({ ...acc, ...filter['condition'] }),
-    { $or: [{ status: 'paid' }, { status: 'completed' }, { status: 'cancelled' }] });
+    { $or: [{ status: 'paid' }, { status: 'completed' }, { status: 'cancelled' }], appType: currentAppType.value });
   const { limit, currentPage } = pagination
   const _orders = await Order.find(condition).sort({ date: -1 }).skip(limit * (currentPage - 1)).limit(limit);
   orders.value = _orders.map(order => ({
