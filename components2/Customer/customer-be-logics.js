@@ -16,6 +16,8 @@ watch(() => currentAppType.value, async () => {
 })
 
 export async function createCustomer(customer) {
+  delete customer.spending
+  delete customer.orders
   customer.appType = currentAppType.value
   const { create } = CRUdDbFactory(customers.value, '', CUSTOMER_COLLECTION_NAME)
   return create(customer)
@@ -27,12 +29,16 @@ export async function removeCustomer(customer) {
 }
 
 export async function updateCustomer(oldCustomer, newCustomer) {
+  delete newCustomer.spending
+  delete newCustomer.orders
   newCustomer.appType = currentAppType.value
   const { update } = CRUdDbFactory(customers.value, '', CUSTOMER_COLLECTION_NAME)
   return update(oldCustomer, newCustomer)
 }
 
 export async function advanceUpdateCustomer(customer) {
+  delete customer.spending
+  delete customer.orders
   customer.appType = currentAppType.value
   if (!customer._id) {
     return createCustomer(customer)

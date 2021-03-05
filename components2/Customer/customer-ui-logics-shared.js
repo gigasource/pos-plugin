@@ -1,6 +1,4 @@
-import { CRUdDbFactory } from '../../utils/CRUD/crud-db';
-import { CUSTOMER_COLLECTION_NAME } from './customer-be-logics';
-import { ref, computed, reactive, toRaw } from 'vue'
+import { ref, watch, reactive, toRaw } from 'vue'
 import { CRUdFactory } from '../../utils/CRUD/crud';
 import { ObjectID } from 'bson';
 import { loadCustomers, createCustomer, removeCustomer, updateCustomer} from './customer-be-logics';
@@ -8,14 +6,49 @@ import { loadCustomers, createCustomer, removeCustomer, updateCustomer} from './
 export const selectingCustomer = ref(null)
 import Hooks from 'schemahandler/hooks/hooks'
 import { isSameId } from '../utils';
+import {getCustomerOrder, getCurrentOrder} from "../OrderView/pos-logic-be";
+import {customers} from "./customer-logic";
+import { hooks as orderHook } from "../OrderView/pos-logic";
+import _ from 'lodash'
+import {isIOS} from "../AppSharedStates";
 
 export const customerHooks = new Hooks()
 
+//<editor-fold desc="Handle customer payment logic">
 export const customerDialogData = reactive({
   name: '',
   phone: '',
   addresses: []
 })
+
+export async function calculateCustomerSpending(customer, order) {
+  if (!customer) return
+  if (!customer._id)
+    customer = customers.value.find(_customer => _customer._id.toString() === customer.toString())
+  if (!order) {
+    customer.orders = await getCustomerOrder(customer._id)
+    customer.spending = customer.orders.reduce((total, currentOrder) => {
+      total += currentOrder.vSum
+      return total
+    }, 0)
+  } else {
+    customer.orders.push(order)
+    customer.spending += order.vSum
+  }
+}
+
+watch(() => customers.value, async () => {
+  for (let customer of customers.value) {
+    await calculateCustomerSpending(customer)
+  }
+})
+
+// this must be received before pay is triggered so the layer is -1
+orderHook.on('pay', -1, async () => {
+  const currentOrder = _.clone(getCurrentOrder())
+  await calculateCustomerSpending(currentOrder.customer, currentOrder)
+})
+//</editor-fold>
 
 export const autocompleteAddresses = ref([])
 
@@ -105,8 +138,60 @@ export function onAddAddress(_address) {
 }
 
 export function onRemoveAddress(address) {
-  const idx = _.findIndex(customerDialogData.addresses, isSameId(i, address))
+  const idx = _.findIndex(customerDialogData.addresses, (_address) => isSameId(_address, address))
   const { remove: removeAddress } = CRUdFactory(customerDialogData, 'addresses')
   removeAddress(address)
   if (idx !== -1) autocompleteAddresses.value.splice(idx, 1)
+}
+
+export function clearCustomerDialogData() {
+  customerDialogData.name = ''
+  customerDialogData.phone = ''
+  customerDialogData.addresses = []
+}
+
+export function renderCustomerInfo() {
+  return <div className="dialog-left">
+    <div className="row-flex">
+      <g-text-field virtualEvent={isIOS.value} outlined style="flex: 1" label="Name" v-model={customerDialogData.name}/>
+      <g-text-field virtualEvent={isIOS.value} outlined style="flex: 1" label="Phone"
+                    v-model={customerDialogData.phone}/>
+    </div>
+
+    {
+      customerDialogData.addresses.map((address, i) =>
+        <div class="row-flex flex-wrap justify-around mt-4 r">
+          <div class="btn-delete" onClick={() => onRemoveAddress(address)}>
+            <g-icon>
+              icon-cancel3
+            </g-icon>
+          </div>
+          <div class="row-flex">
+            <g-combobox label={`Address ${i + 1}`}
+                        key={`address_${i}`}
+              // text-field-component="GTextFieldBs"
+                        v-model={autocompleteAddresses.value[i].model}
+                        clearable
+                        skip-search
+                        keep-menu-on-blur
+                        class="col-8" menu-class="menu-autocomplete-address"
+                        items={autocompleteAddresses.value[i].places}
+                        onUpdate:searchText={text => debounceSearchAddress(text, i)}
+                        onUpdate:modelValue={val => selectAutocompleteAddress(val, i)}
+                        virtualEvent={isIOS.value} outlined
+            />
+            <g-text-field label={`House ${i + 1}`} key={`house_${i}`} v-model={address.house} virtualEvent={isIOS.value} outlined/>
+          </div>
+          <div class="row-flex">
+            <g-text-field label={`Street ${i + 1}`} key={`street_${i}`} v-model={address.street} virtualEvent={isIOS.value} outlined/>
+            <g-text-field label={`Zipcode ${i + 1}`} key={`zipcode_${i}`} v-model={address.zipcode} virtualEvent={isIOS.value} outlined/>
+            <g-text-field label={`City ${i + 1}`} key={`city_${i}`} v-model={address.city} virtualEvent={isIOS.value} outlined/>
+          </div>
+        </div>
+      )
+    }
+    <g-icon color="#1271FF" size="40" style="margin: 8px calc(50% - 20px)" onClick={onAddAddress}>
+      add_circle
+    </g-icon>
+  </div>
 }

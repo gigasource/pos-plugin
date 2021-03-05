@@ -1,3 +1,5 @@
+const { ObjectID } = require('bson')
+
 module.exports = {
   "user": [
     {
@@ -74,5 +76,8 @@ module.exports = {
   },
   "vDate": {
     "type": Date
+  },
+  "customer": {
+    "type": ObjectID
   }
 }

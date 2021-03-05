@@ -11,7 +11,7 @@ export const appHooks = new Hooks()
 export const dateTime = ref(new Date())
 setInterval(() => {
   dateTime.value = new Date()
-}, 1000)
+}, 60000)
 export const timeFormat = ref('HH:mm') // TODO: i18n dates.timeFormat
 export const dateFormat = ref('DD-MM-YYYY') // TODO: i18n dates.dateFormat
 export const formattedDateTime = computed(() => {
