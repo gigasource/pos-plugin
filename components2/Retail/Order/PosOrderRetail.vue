@@ -4,10 +4,10 @@ import PosOrderScreenButtonGroup from './FnBtns/PosOrderScreenButtonGroup';
 import PosOrderScreenScrollWindow from './PosOrderScreenScrollWindow';
 import PosRetailCart from './PosRetailCart';
 import PosRetailCategory from './PosRetailCategory';
-import { onBeforeMount, ref, onActivated } from 'vue'
+import { onBeforeMount, ref, onActivated, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { loadCategories, loadProducts } from '../../Product/product-logic-be'
-import { execGenScopeId, genScopeId } from '../../utils';
+import {execGenScopeId, genScopeId} from '../../utils';
 import { refundOrder } from '../pos-retail-shared-logic'
 import { makeRefundOrder, prepareOrder } from '../../OrderView/pos-logic-be'
 import {
@@ -24,12 +24,16 @@ import {
 import {
   addCustomer
 } from "../../OrderView/pos-logic";
-import { customerNames } from "../../Customer/customer-logic";
+import {customerNames, customers} from "../../Customer/customer-logic";
+import {loadCustomers} from "../../Customer/customer-be-logics";
+import {renderCustomerInfo} from "../../Customer/customer-ui-logics-shared";
+import PosKeyboardFull from "../../pos-shared-components/PosKeyboardFull";
 
 export default {
   name: 'PosOrderRetail',
   props: {},
   components: {
+    PosKeyboardFull,
     PosRetailCategory,
     PosOrderScreenScrollWindow,
     PosOrderScreenNumberKeyboard,
@@ -42,10 +46,12 @@ export default {
     const inEditScreenMode = ref(false)
     isRefundMode.value = router.currentRoute.value.path.includes('refund')
     onBeforeMount(async () => {
+      await loadCustomers()
       await loadCategories()
       await loadProducts()
     })
     onActivated(() => {
+      // todo: Don't reset order when activated (.i.e when back from payment)
       !isRefundMode.value ? prepareOrder(0) : prepareOrder(makeRefundOrder(refundOrder.value))
     })
 
@@ -148,35 +154,83 @@ export default {
       )
     }
 
-    const customer = ref(null)
+    const customer = ref('')
     const showCustomerDialog = ref(false)
-    function renderCustomer() {
+    const autoCompleteRef = ref(null)
+    const tabsTitle = [{
+      title: 'Find',
+    }, {
+      title: 'Add new'
+    }]
+    const selectedTab = ref(tabsTitle[0])
+    watch(() => showCustomerDialog.value, (val) => {
+      if (val) {
+        setTimeout(() => {
+          nextTick(() => autoCompleteRef._rawValue.$refs.textfield.onFocus())
+        }, 200)
+      }
+    })
+
+    function onDialogSubmitCustomerForOrder() {
+      showCustomerDialog.value = false
+      if (!customer.value) return
+      // customer.value form is "name - phone"
+      const phone = customer.value.split('-')[1].trim()
+      const foundCustomer = customers.value.find(customer => {
+        return customer.phone === phone
+      })
       const order = getCurrentOrder()
+      addCustomer(order, foundCustomer._id)
+    }
+
+    function renderCustomer() {
+      selectedTab.value = tabsTitle[0]
+      if (!showCustomerDialog.value) { // prevent change of customer.value while dialog is opening
+        const order = getCurrentOrder()
+        if (order.customer) {
+          const foundCustomer = customers.value.find(_customer => order.customer.toString() === _customer._id.toString())
+          customer.value = `${foundCustomer.name} - ${foundCustomer.phone}`
+        } else {
+          customer.value = null
+        }
+      }
       return <div style="cursor: pointer" onClick={() => showCustomerDialog.value = true}>
         { !customer.value
             ? <div style="font-size: 12px">
               <p>Select customer</p>
               <p>{username.value} - {formattedTime.value}</p>
-              {/*TODO: Render customer dialog somehow*/}
-              <g-dialog v-model={showCustomerDialog.value} persistent>
-                {
-                  genScopeId(() => (
-                    <div class="por__detail__dialog">
-                      <div className="row-flex justify-end" onClick={() => showCustomerDialog.value = false}>
-                        <g-icon>close</g-icon>
-                      </div>
-                      <g-autocomplete text-field-component="GTextFieldBs"
-                                      modelValue={order.customer} items={customerNames.value} onUpdate:modelValue={(customer) => addCustomer(order, customer)}/>
-                    </div>
-                  ))()
-                }
-              </g-dialog>
             </div>
-            : <div>
-              <p style="color: #2979FF">{customer.value.name}</p>
-              <p style="color: #757575">{customer.value.phone}</p>
+            : <div onClick={() => showCustomerDialog.value = true}>
+              <p style="color: #2979FF">{customer.value.split('-')[0].trim()}</p>
+              <p style="color: #757575">{customer.value.split('-')[1].trim()}</p>
             </div>
         }
+        <g-dialog fullscreen v-model={showCustomerDialog.value} persistent>
+          {
+            genScopeId(() => (
+                <div class="dialog">
+                  <g-tabs class="dialog-left" items={tabsTitle} v-model={selectedTab.value}>
+                    <g-tab-item item={tabsTitle[0]}>
+                      <g-autocomplete text-field-component="GTextFieldBs"
+                                      v-model={customer.value} items={customerNames.value}
+                                      style="margin-bottom: 100px; width: 50%"
+                                      ref={autoCompleteRef}/>
+                    </g-tab-item>
+                    <g-tab-item item={tabsTitle[1]}>
+                      {renderCustomerInfo()}
+                    </g-tab-item>
+                  </g-tabs>
+                  <div class="dialog-keyboard">
+                    <div style="flex: 1" onClick={() => showCustomerDialog.value = false}/>
+                    <div class="keyboard-wrapper">
+                      <pos-keyboard-full class="dialog-keyboard" type="alpha-number"
+                                         onEnterPressed={onDialogSubmitCustomerForOrder}/>
+                    </div>
+                  </div>
+                </div>
+            ))()
+          }
+        </g-dialog>
       </div>
     }
     const showSavedListDialog = ref(false)
@@ -257,17 +311,56 @@ export default {
       grid-area: 2/2/3/3;
     }
   }
+}
 
-  &__detail {
-    grid-area: 1/3/2/4;
-    padding: 4px 4px 4px 0;
+.dialog {
+  width: 100%;
+  background: rgba(21, 21, 21, 0.42);
+  display: flex;
 
-    &__dialog {
-      backgroundColor: '#FFF';
-      paddingTop: 30px;
-      padding: 10px;
-      margin: 0 auto;
-      minWidth: '40%';
+  &-left {
+    flex: 0 0 45%;
+    background-color: white;
+    padding: 4px;
+    overflow: auto;
+
+    ::v-deep .g-tf-wrapper {
+      margin: 4px 2px 4px;
+      width: auto;
+
+      fieldset {
+        border-width: 1px !important;
+        border-color: #9e9e9e;
+      }
+
+      &.g-tf__focused fieldset {
+        border-color: #1271FF;
+      }
+
+      .g-tf-input {
+        font-size: 14px;
+        padding: 4px;
+      }
+
+      .g-tf-label {
+        font-size: 14px;
+        top: 4px;
+
+        &__active {
+          transform: translateY(-13px) translateX(7px) scale(0.75) !important;
+        }
+      }
+    }
+  }
+
+  &-keyboard {
+    flex: 0 0 55%;
+    display: flex;
+    flex-direction: column;
+
+    .keyboard-wrapper {
+      padding: 4px;
+      background-color: #f0f0f0;
     }
   }
 }

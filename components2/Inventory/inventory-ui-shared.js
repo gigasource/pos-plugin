@@ -41,14 +41,20 @@ posLogicHook.on('pay', -1, async () => {
   const order = _.cloneDeep(getCurrentOrder())
   await genMaxId(order)
   for (let item of order.items) {
-    if (!item.ingredients) continue
-    for (let ingredient of item.ingredients) {
-      const consumedIngredient = ingredient.amount * item.quantity
-      const foundInventory = _.cloneDeep(inventories.value.find(inventory => inventory._id.toString() === ingredient.inventory.toString()))
-      if (foundInventory) {
-        foundInventory.stock = foundInventory.stock - consumedIngredient
-        await updateInventory(foundInventory, reason.SALES(order.id))
+    if (currentAppType.value === appType.POS_RESTAURANT) {
+      if (!item.ingredients) continue
+      for (let ingredient of item.ingredients) {
+        const consumedIngredient = ingredient.amount * item.quantity
+        const foundInventory = _.cloneDeep(inventories.value.find(inventory => inventory._id.toString() === ingredient.inventory.toString()))
+        if (foundInventory) {
+          foundInventory.stock = foundInventory.stock - consumedIngredient
+          await updateInventory(foundInventory, reason.SALES(order.id))
+        }
       }
+    } else {
+      const foundInventory = _.cloneDeep(inventories.value.find(inventory => inventory.productId.toString() === item._id.toString()))
+      foundInventory.stock = foundInventory.stock - item.quantity
+      await updateInventory(foundInventory, reason.SALES(order.id))
     }
   }
 })
