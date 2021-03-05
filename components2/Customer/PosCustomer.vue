@@ -17,7 +17,7 @@ import {
   onDialogSubmit, customerHooks,
   onSelectCustomer,
   autocompleteAddresses
-} from './customer-ui-logics';
+} from './customer-ui-logics-shared';
 import { customers } from './customer-be-logics';
 import { v4 as uuidv4 } from 'uuid';
 import { useI18n } from 'vue-i18n';

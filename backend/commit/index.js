@@ -16,7 +16,7 @@ module.exports = async function (cms) {
 	orm.plugin(syncPlugin)
 	orm.plugin(syncFlow)
 	orm.plugin(syncTransporter)
-	orm.registerCommitBaseCollection(
+	const listCollection = [
 		'Order',
 		'Category',
 		'Customer',
@@ -30,7 +30,17 @@ module.exports = async function (cms) {
 		'InventoryCategory',
 		'InventoryHistory',
 		'EndOfDay'
-	)
+	]
+	orm.registerCommitBaseCollection(...listCollection)
+	const debounceFn = _.debounce((collection) => {
+		feSocket && feSocket.emit(`commit:handler:finish:${collection}`) // for reloading purpose
+	}, 100)
+	listCollection.forEach(collection => {
+		orm.on(`commit:handler:finish:${collection}`, () => {
+			console.debug('Finish commit of collection', collection) // need
+			debounceFn(collection)
+		})
+	})
 
 	cms.socket.on('connect', socket => {
 		feSocket = socket

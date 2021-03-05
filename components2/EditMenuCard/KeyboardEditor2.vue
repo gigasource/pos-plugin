@@ -13,8 +13,6 @@ export default {
   components: {InputNumber},
   props: {},
   setup() {
-    window.dbg = window.dbg || {}
-    window.dbg.keyboardConfig = keyboardConfig
     const { t } = useI18n()
     const state = reactive({
       dialog: false,
@@ -101,7 +99,7 @@ export default {
           l.rows.shift()
         }
       }
-      await updateKeyboardConfig(config)
+      await _updateKeyboardConfig(config)
     }
     async function resetKeyboard() {
       const config = Object.assign({}, keyboardConfig.value)

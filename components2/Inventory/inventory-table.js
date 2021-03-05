@@ -41,7 +41,7 @@ export function renderMainInventoryTable(props, { emit }) {
 	const getCategoryText = function (categoryList) {
 		return categoryList.reduce((result, category) => {
 			if (result.length) result += ', '
-			result += category.name
+			result += category ? category.name : ''
 			return result
 		}, '')
 	}

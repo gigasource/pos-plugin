@@ -2,9 +2,8 @@ import { ref, watch } from 'vue';
 export const CUSTOMER_COLLECTION_NAME = 'Customer'
 import { CRUdDbFactory } from '../../utils/CRUD/crud-db';
 import { currentAppType } from '../AppType';
-import cms from 'cms';
-
-export const customers = ref([])
+import { customers } from './customer-logic'
+import cms from 'cms'
 
 const Customer = cms.getModel(CUSTOMER_COLLECTION_NAME)
 

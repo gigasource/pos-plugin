@@ -3,7 +3,7 @@ import { CUSTOMER_COLLECTION_NAME } from './customer-be-logics';
 import { ref, computed, reactive, toRaw } from 'vue'
 import { CRUdFactory } from '../../utils/CRUD/crud';
 import { ObjectID } from 'bson';
-import { customers, loadCustomers, createCustomer, removeCustomer, updateCustomer} from './customer-be-logics';
+import { loadCustomers, createCustomer, removeCustomer, updateCustomer} from './customer-be-logics';
 
 export const selectingCustomer = ref(null)
 import Hooks from 'schemahandler/hooks/hooks'
