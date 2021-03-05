@@ -2,11 +2,14 @@ Chung:
  - pos-payment: Lỗi khi click vào item (xem itemsRenderFactory)
    (Retail -> chọn item(s) -> bấm toPayment button -> bấm item trong màn pos-payment)
  - Pairing device trong firstTimeSetup không work trên code mới của online-order.
+ - Order History đang hiện cả payment của PosRetail và PosRestant 
+ - Bấm nút Send trong màn support tại màn pos-login ko thấy hiện tượng gì xảy ra.
 
 POS Restaurant:
  - hardwares
  - tách setting chung trong PosSettings sang SystemSetting để share cho mọi máy trong hệ thống.
  - [Bug] inventory history không hiện ngay khi vào history, phải chuyển qua lại date-time-picker thì mới hiện.
+ - Di chuyển mục Edit Screen trong màn hình Pos Order sang Edit Menu Card. 
  - ...
 
 POS Retail:
@@ -16,6 +19,7 @@ POS Retail:
  - Mua hàng: 
     - inventory chưa trừ
     - inventory history chưa log.
+ - Bấm vào nút support trên dashboard ko có hiện tượng gì xảy ra.
     
 QA Bugs:
 https://gigasource.sharepoint.com/sites/dev/_layouts/OneNote.aspx?id=%2Fsites%2Fdev%2FShared%20Documents%2FCss%20Vue%20Component%20Materialize%2FMaterialize%20vue&wd=target%28Task.one%7CFCA2D0D2-D007-4B60-AA2A-163AAB3998DA%2FQA%20cho%20Huy%20%2825%5C%2F2%5C%29%7C1E8F0DC7-6BB1-4737-B893-F1DC383CE531%2F%29
