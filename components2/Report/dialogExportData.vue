@@ -39,7 +39,7 @@ export default {
                          onClick={() => type.value = 'GoDB'}>GoDB</div>
                     <div class={['dialog-content__type', type.value === 'DSFINV' && 'dialog-content__type--selected']}
                          onClick={() => type.value = 'DSFINV'}>DSFINV</div>
-                    <div class="dialog-content__title">{}</div>
+                    <div class="dialog-content__title">Von</div>
                     <div class="dialog-content__title">Bis</div>
                     <g-date-picker-input max={toDate.value} class="dialog-content__date" no-title icon="" v-model={fromDate.value}/>
                     <g-date-picker-input min={fromDate.value} max={now.value} class="dialog-content__date" no-title icon="" v-model={toDate.value}/>
