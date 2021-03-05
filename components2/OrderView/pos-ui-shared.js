@@ -251,7 +251,7 @@ export function itemsRenderFactory() {
   const {t, locale} = useI18n();
   const itemsRender = (items, onClick) => items.map(item => (
     <div class="item" key={item._id.toString()}>
-      <div class="item-detail" onClick={() => onClick(item)}>
+      <div class="item-detail" onClick={() => onClick && onClick(item)}>
         <div>
           <p class="item-detail__name" style={[item.sent && {opacity: 0.55}]}>
             {item.id && `${item.id}. `}{item.name}</p>
