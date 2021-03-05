@@ -27,10 +27,6 @@ export const PrinterSettingFactory = () => {
     selectingPrinter.value.printerType = ''
   }
 
-  function testPrinter() {
-
-  }
-
   const usbPrinters = ref([])
 
   async function loadUsbPrinters() {
@@ -83,7 +79,6 @@ export const PrinterSettingFactory = () => {
     showDeleteDialog,
     onSelectPrinterType,
     onResetPrinterType,
-    testPrinter,
     loadUsbPrinters,
     usbPrinterSelectModel,
     usbPrinters,

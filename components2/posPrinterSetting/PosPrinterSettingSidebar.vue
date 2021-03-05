@@ -7,16 +7,17 @@ import { genScopeId } from '../utils'
 import { useRouter } from 'vue-router'
 import { SidebarFactory } from './sidebar-factory'
 import dayjs from 'dayjs';
+import { items } from '../FirstTimeSetup/first-time-setup-shared';
 
 export default {
   setup() {
     const { t } = useI18n()
     const router = useRouter()
     const { sidebarData, onSelect, isSelecting, selectingItem, onDeleteMenu } = SidebarFactory()
-    const now = ref('')
+    const now = ref(dayjs().format('HH:mm'))
     let timerInterval
     onBeforeMount(async function () {
-      timerInterval = setInterval(() => now.value = dayjs().format('HH:mm'), 1000)
+      timerInterval = setInterval(() => now.value = dayjs().format('HH:mm'), 30000)
     })
     onBeforeUnmount(() => {
       if (timerInterval) clearInterval(timerInterval)

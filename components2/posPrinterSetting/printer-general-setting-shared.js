@@ -4,6 +4,7 @@ import { watch } from 'vue';
 import { attrComputed } from '../utils';
 import _ from 'lodash';
 import { updateSetting } from '../Settings/settings-shared-logics';
+import { MAX_NO_ENTIRE_RECEIPT } from './pos-print-shared';
 
 export async function loadPrinterGeneralSetting() {
   printerGeneralSetting.value = await fetchPrinterGeneralSetting() || {}
@@ -17,7 +18,7 @@ watch(() => printerGeneralSetting.value, () => {
   })
 }, { deep: true })
 
-export const listNoEntireReceipt = [0, 1, 2, 3, 4]
+export const listNoEntireReceipt = _.range(MAX_NO_ENTIRE_RECEIPT + 1)
 export const useMultiPrinterForKitchenPrinter = attrComputed(printerGeneralSetting, 'useMultiPrinterForKitchenPrinter', false)
 export const useMultiPrinterForInvoicePrinter = attrComputed(printerGeneralSetting, 'useMultiPrinterForInvoicePrinter', false)
 export const useMultiPrinterForEntirePrinter = attrComputed(printerGeneralSetting, 'useMultiPrinterForEntirePrinter', false)

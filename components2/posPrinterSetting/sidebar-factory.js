@@ -1,6 +1,7 @@
 import { useI18n } from 'vue-i18n';
 import { computed, ref } from 'vue';
 import { onRemoveSelectingPrinterGroup, onSelectPrinterGroup, printerGroups, printerHooks } from './pos-print-shared';
+import { entireReceipt } from './printer-general-setting-shared';
 
 export const SidebarFactory = () => {
   const { messages, locale, fallbackLocale } = useI18n()
@@ -8,43 +9,53 @@ export const SidebarFactory = () => {
     return (messages.value[locale.value] && messages.value[locale.value].sidebar) || messages.value[fallbackLocale.value].sidebar
   })
   const selectingItem = ref(null)
-
   const sidebarData = computed(() => {
-    return [
-      ref({
-        title: sidebar.value.receiptCategory,
-        icon: 'icon-restaurant',
-        key: 'receiptCategory',
-        displayChild: true,
-        items: [...(printerGroups.value.kitchen || []).map(i => ({
-          title: i.name,
-          icon: 'radio_button_unchecked',
-          target: 'PrinterSettingView',
-          data: i,
-          groupKey: 'kitchen'
-        })), {
-          type: 'edit',
-          groupKey: 'kitchen'
-        }]
-      }),
-      ref({
-        title: sidebar.value.invoiceReport,
-        icon: 'icon-invoice_report',
+    const kitchenGroup = ref({
+      title: sidebar.value.receiptCategory,
+      icon: 'icon-restaurant',
+      key: 'receiptCategory',
+      displayChild: true,
+      items: [...(printerGroups.value.kitchen || []).map(i => ({
+        title: i.name,
+        icon: 'radio_button_unchecked',
         target: 'PrinterSettingView',
-        data: (printerGroups.value.invoice || [null])[0]
-      }),
-      // ref({
-      //   title: sidebar.entireReceipt,
-      //   icon: 'icon-receipt',
-      //   displayChild: false,
-      //   type: 'entire',
-      //   key: 'entireReceipt'
-      // }),
-      ref({
-        title: sidebar.value.generalSettings,
-        icon: 'icon-general_setting',
-        target: 'PrinterGeneralSettingView'
-      })
+        data: i,
+        groupKey: 'kitchen'
+      })), {
+        type: 'edit',
+        groupKey: 'kitchen'
+      }]
+    })
+    const invoiceGroup = ref({
+      title: sidebar.value.invoiceReport,
+      icon: 'icon-invoice_report',
+      target: 'PrinterSettingView',
+      data: (printerGroups.value.invoice || [null])[0]
+    })
+    const entireGroup = ref({
+      title: sidebar.value.entireReceipt,
+      icon: 'icon-receipt',
+      displayChild: true,
+      type: 'entire',
+      key: 'entireReceipt',
+      items: (printerGroups.value.entire || []).slice(0, entireReceipt.value).map(i => ({
+        title: i.name,
+        icon: 'radio_button_unchecked',
+        target: 'PrinterSettingView',
+        data: i,
+        groupKey: 'entire'
+      }))
+    })
+    const printerGeneralSettingGroup = ref({
+      title: sidebar.value.generalSettings,
+      icon: 'icon-general_setting',
+      target: 'PrinterGeneralSettingView'
+    })
+    return [
+      kitchenGroup,
+      invoiceGroup,
+      entireGroup,
+      printerGeneralSettingGroup
     ]
   })
 

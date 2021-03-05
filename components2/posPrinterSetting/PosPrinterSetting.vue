@@ -4,7 +4,9 @@ import {
   printerTypes,
   selectingPrinter,
   selectingPrinterGroup,
-  selectingPrinterGroupType
+  selectingPrinterGroupType,
+  kitchenPrinterGroups,
+  testPrinter
 } from './pos-print-shared';
 import { dineInTaxCategories, takeAwayTaxCategories } from '../Settings/TaxSetting/view-tax-logics';
 import { useI18n } from 'vue-i18n';
@@ -24,9 +26,7 @@ export default {
       openDialog,
       onSelectPrinterType,
       onResetPrinterType,
-      testPrinter,
       showDialog,
-      listReceipt,
     } = PrinterSettingFactory()
 
     const printerGroupNameTf = ref('')
@@ -63,109 +63,112 @@ export default {
       }
     }, { deep: true })
 
-    const testPrinterButtonRender = genScopeId((attrs) =>
+    const renderTestPrinterButton = genScopeId((attrs) =>
         <g-btn-bs background-color="blue accent 3" {...attrs} onClick={() => testPrinter(selectingPrinter.value)}>
           {t('settings.testPrinter')}
         </g-btn-bs>)
 
+    const renderPrinterGroupNameInput = () => (selectingPrinterGroupType.value === 'kitchen') &&
+        <div class="config">
+          <g-text-field-bs label={t('settings.name')} v-model={selectingPrinterGroup.value.name} v-slots={{
+            'append-inner': () =>
+                <g-icon style="cursor: pointer" onClick={() => openDialog(nameInputRef)}>
+                  icon-keyboard
+                </g-icon>
+          }}/>
+        </div>
+
+    const renderPrinterTypeSelect = () =>
+        <div class="config">
+          <p class="title">
+            {t('settings.thermalPrinter')} </p>
+          <div class="row-flex flex-wrap">
+            {printerTypes.map((type, i) =>
+                <div key={i}
+                     class={['printer', selectingPrinter.value.printerType === type.value && 'printer__active']}
+                     onClick={() => onSelectPrinterType(type.value)}>
+                  {t(`settings.${type.name}`, type.name)}
+                </div>
+            )}
+            <div class="printer" onClick={onResetPrinterType}>
+              {t('settings.reset')}
+            </div>
+          </div>
+        </div>
+    const renderConnectionInputs = () => (selectingPrinter.value) && selectingPrinter.value.printerType &&
+        (
+            (selectingPrinter.value.printerType === 'ip') ?
+                <div class="config row-flex align-items-end">
+                  <g-text-field-bs label={t('settings.ipAddress')} v-model={selectingPrinter.value.ip} v-slots={{
+                    'append-inner': () =>
+                        <g-icon style="cursor: pointer" onClick={() => openDialog(ipInputRef)}>
+                          icon-keyboard
+                        </g-icon>
+                  }}/>
+                  {renderTestPrinterButton({ style: 'padding: 6px; flex: 1; transition: none' })}
+                </div>
+                :
+                (
+                    (selectingPrinter.value.printerType === 'usb') ?
+                        <div class="config row-flex align-items-end">
+                          <g-select class="config__usb-printer-paths"
+                                    style={{ flex: 1 }}
+                                    items={usbPrinterSelectModel.value}
+                                    v-model={selectingPrinter.value.usb}
+                                    textFieldComponent="GTextFieldBs"
+                          />
+                          {renderTestPrinterButton({ style: 'padding: 6px; transition: none' })}
+                        </div>
+                        :
+                        <div class="config">
+                          {renderTestPrinterButton({ style: 'padding: 6px; transition: none' })}
+                        </div>
+                )
+        )
+
+    const renderReceiptConfig = () => (selectingPrinterGroup.value.type === 'entire') &&
+        <div class="receipt-config">
+          <g-switch label={t('settings.onlyTakeAway')} v-model={selectingPrinter.value.onlyTakeAway}/>
+          <div class="title">
+            Include:
+          </div>
+          <g-grid-select multiple item-cols="auto" returnObject v-model={selectingPrinter.value.includes} items={kitchenPrinterGroups.value} v-slots={{
+            'default': genScopeId(({ toggleSelect, item }) =>
+                <div class="option" onClick={() => toggleSelect(item)}>
+                  {item.name}
+                </div>)
+            ,
+            'selected': genScopeId(({ toggleSelect, item }) =>
+                <div class="option option--selected" onClick={() => toggleSelect(item)}>
+                  {item.name}
+                </div>)
+          }}/>
+        </div>
+
+    const renderPrinterSettings = () =>
+        <div class="switch-group">
+          {
+            (selectingPrinterGroup.value.type === 'kitchen') && <>
+              <g-switch label={t('settings.splitArticles')} v-model={selectingPrinter.value.oneReceiptForOneArticle}/>
+              <g-switch label={t('settings.groupArticles')} v-model={selectingPrinter.value.groupArticles}/>
+            </>
+          }
+          <g-switch label={t('settings.sound')} v-model={selectingPrinter.value.sound}/>
+          <g-switch label={t('settings.escPos')} v-model={selectingPrinter.value.escPOS}/>
+          <g-switch label="TSC POS" v-model={selectingPrinter.value.tscPOS}/>
+        </div>
     const renderFn = genScopeId(() =>
         (selectingPrinterGroup.value) &&
         <div class="configuration">
           {
-            (selectingPrinterGroupType.value === 'kitchen') &&
-            <div class="config">
-              <g-text-field-bs label={t('settings.name')} v-model={selectingPrinterGroup.value.name} v-slots={{
-                'append-inner': () =>
-                    <g-icon style="cursor: pointer" onClick={() => openDialog(nameInputRef)}>
-                      icon-keyboard
-                    </g-icon>
-              }}/>
-            </div>
+            renderPrinterGroupNameInput()
           }
-          <div class="config">
-            <p class="title">
-              {t('settings.thermalPrinter')} </p>
-            <div class="row-flex flex-wrap">
-              {printerTypes.map((type, i) =>
-                  <div key={i}
-                       class={['printer', selectingPrinter.value.printerType === type.value && 'printer__active']}
-                       onClick={() => onSelectPrinterType(type.value)}>
-                    {t(`settings.${type.name}`, type.name)}
-                  </div>
-              )}
-              <div class="printer" onClick={onResetPrinterType}>
-                {t('settings.reset')}
-              </div>
-            </div>
-          </div>
+          {renderPrinterTypeSelect()}
           <g-divider inset/>
-          {
-            (selectingPrinter.value) && selectingPrinter.value.printerType &&
-            (
-                (selectingPrinter.value.printerType === 'ip') ?
-                    <div class="config row-flex align-items-end">
-                      <g-text-field-bs label={t('settings.ipAddress')} v-model={selectingPrinter.value.ip} v-slots={{
-                        'append-inner': () =>
-                            <g-icon style="cursor: pointer" onClick={() => openDialog(ipInputRef)}>
-                              icon-keyboard
-                            </g-icon>
-                      }}/>
-                      {testPrinterButtonRender({ style: 'padding: 6px; flex: 1; transition: none' })}
-                    </div>
-                    :
-                    (
-                        (selectingPrinter.value.printerType === 'usb') ?
-                            <div class="config row-flex align-items-end">
-                              <g-select class="config__usb-printer-paths"
-                                        style={{ flex: 1 }}
-                                        items={usbPrinterSelectModel.value}
-                                        v-model={selectingPrinter.value.usb}
-                                        textFieldComponent="GTextFieldBs"
-                              />
-                              {testPrinterButtonRender({ style: 'padding: 6px; transition: none' })}
-                            </div>
-                            :
-                            <div class="config">
-                              {testPrinterButtonRender({ style: 'padding: 6px; transition: none' })}
-                            </div>
-                    )
-            )
-          }
-          {
-            (selectingPrinterGroup.value.type === 'entire') &&
-            <div class="receipt-config">
-              <g-switch label={t('settings.onlyTakeAway')} v-model={selectingPrinter.value.onlyTakeAway}/>
-              <div class="title">
-                Include:
-              </div>
-              <g-grid-select multiple item-cols="auto" items={listReceipt} v-model={includes} v-slots={{
-                'default': ({ toggleSelect, item }) =>
-                    <div class="option" onClick={e => {toggleSelect(item)}}>
-                      {item}
-                    </div>
-                ,
-                'selected': ({ toggleSelect, item }) => <>
-                  <div class="option option--selected" onClick={e => {toggleSelect(item);}}>
-                    {item}
-                  </div>
-                </>
-                ,
-              }}>
-              </g-grid-select>
-            </div>
-          }
-          <g-divider class="mt-2" inset></g-divider>
-          <div class="switch-group">
-            {
-              (selectingPrinterGroup.value.type === 'kitchen') && <>
-                <g-switch label={t('settings.splitArticles')} v-model={selectingPrinter.value.oneReceiptForOneArticle}/>
-                <g-switch label={t('settings.groupArticles')} v-model={selectingPrinter.value.groupArticles}/>
-              </>
-            }
-            <g-switch label={t('settings.sound')} v-model={selectingPrinter.value.sound}/>
-            <g-switch label={t('settings.escPos')} v-model={selectingPrinter.value.escPOS}/>
-            <g-switch label="TSC POS" v-model={selectingPrinter.value.tscPOS}/>
-          </div>
+          {renderConnectionInputs()}
+          {renderReceiptConfig()}
+          <g-divider class="mt-2" inset/>
+          {renderPrinterSettings()}
           <div class="title" style="margin-left: 12px">
             {t('settings.receiptFontSize')}
           </div>
@@ -179,8 +182,7 @@ export default {
                 <g-btn-bs class="option option--selected">
                   {item}
                 </g-btn-bs>)
-          }}>
-          </g-grid-select>
+          }}/>
           <div class="title" style="margin-left: 12px">
             {t('settings.receiptTopMargin')}
           </div>
@@ -194,12 +196,11 @@ export default {
                 <g-btn-bs class="option option--selected">
                   + {item} Cm
                 </g-btn-bs>)
-          }}>
-          </g-grid-select>
+          }}/>
           {
             (selectingPrinterGroup.value.type === 'kitchen') &&
             <>
-              <g-divider inset class="mt-2 mb-2"></g-divider>
+              <g-divider inset class="mt-2 mb-2"/>
               <div class="title" style="margin-left: 12px">
                 Default tax
               </div>
@@ -217,8 +218,7 @@ export default {
                       <div class="option option--selected">
                         {item.name} ({item.value}%)
                       </div>)
-                }}>
-                </g-grid-select>
+                }}/>
               </div>
               <div class="row-flex" style="margin-left: 12px; margin-top: 8px;">
                 <div class="col-3">
@@ -240,22 +240,21 @@ export default {
                                      <div class="option option--selected">
                                        {item.name} ({item.value}%)
                                      </div>)
-                               }}>
-                </g-grid-select>
+                               }}
+                />
               </div>
             </>
           }
           <dialog-form-input v-model={showDialog.value} onSubmit={updateSettings} v-slots={{
             'input': () =>
                 <div>
-                  <g-text-field-bs label="Name" v-model={printerGroupNameTfComputed.value} ref={nameInputRef}></g-text-field-bs>
+                  <g-text-field-bs label="Name" v-model={printerGroupNameTfComputed.value} ref={nameInputRef}/>
                   {
                     (selectingPrinter.value.printerType === 'ip') &&
-                    <g-text-field-bs label="IP Address" v-model={ipTfComputed.value} ref={ipInputRef}></g-text-field-bs>
+                    <g-text-field-bs label="IP Address" v-model={ipTfComputed.value} ref={ipInputRef}/>
                   }
                 </div>
-          }}>
-          </dialog-form-input>
+          }}/>
         </div>)
     return {
       renderFn,
