@@ -1,59 +1,65 @@
-<template>
-  <g-dialog v-model="internalValue" width="90%" eager :fullscreen="isMobile">
-    <div class="wrapper">
-      <g-icon @click="internalValue = false" svg size="20" class="icon">icon-close</g-icon>
-      <div class="screen">
-        <g-combobox :multiple="multiple" :items="items" v-model="screenValue" :label="label"
-                    text-field-component="GTextFieldBs" class="bs-tf__pos" large  ref="combobox"/>
-        <div v-if="!isMobile" class="buttons">
-          <g-btn :uppercase="false" text @click="internalValue = false" outlined width="120" class="mr-2">
-            {{$t('ui.cancel')}}
-          </g-btn>
-          <g-btn :uppercase="false" text @click="submit" backgroundColor="#2979FF" text-color="#FFFFFF" width="120">
-            {{$t('ui.ok')}}
-          </g-btn>
-        </div>
-      </div>
-      <div class="keyboard">
-        <pos-keyboard-full v-model="screenValue" @enter-pressed="submit"/>
-      </div>
-    </div>
-  </g-dialog>
-</template>
-
 <script>
-  export default {
-    name: "dialogSelectionFilter",
-    emits: ['update:modelValue', 'submit'],
-    props: {
-      modelValue: Boolean,
-      multiple: Boolean,
-      items: Array,
-      label: String,
-    },
-    injectService: ['PosStore:isMobile'],
-    data() {
-      return {
-        screenValue: null
-      }
-    },
-    computed: {
-      internalValue: {
-        get() {
-          return this.modelValue || false
-        },
-        set(value) {
-          this.$emit('update:modelValue', value)
-        }
-      },
-    },
-    methods: {
-      async submit() {
-        this.$emit('submit', this.screenValue);
-        this.internalValue = false;
-      },
-    },
+import { genScopeId, internalValueFactory } from '../../utils';
+import { isMobile } from '../../AppSharedStates';
+import { useI18n } from 'vue-i18n';
+import { ref } from 'vue'
+export default {
+  name: 'dialogSelectionFilter',
+  emits: ['update:modelValue', 'submit'],
+  props: {
+    modelValue: Boolean,
+    multiple: Boolean,
+    items: Array,
+    label: String,
+  },
+  setup(props, { emit }) {
+    const { t } = useI18n()
+    const internalValue = internalValueFactory(props, { emit })
+    const screenValue = ref(null)
+    const combobox = ref(null)
+    function submit() {
+      emit('submit', screenValue.value);
+      internalValue.value = false;
+    }
+    const renderFn = genScopeId(() =>
+          <g-dialog v-model={internalValue.value} width="90%" eager fullscreen={ isMobile.value } >
+            <div class="wrapper" >
+              <g-icon onClick={() => internalValue.value = false} svg size="20" class="icon" >
+                icon-close </g-icon>
+              <div class="screen" >
+                <g-combobox multiple={ props.multiple }
+                            items={ props.items }
+                            v-model={screenValue.value}
+                            label={ props.label }
+                            text-field-component="GTextFieldBs"
+                            class="bs-tf__pos"
+                            large ref={combobox}/>
+                {
+                  (!isMobile.value) &&
+                  <div class="buttons" >
+                    <g-btn uppercase={ false } text onClick={() => internalValue.value = false} outlined width="120" class="mr-2" >
+                      {t('ui.cancel')}
+                    </g-btn>
+                    <g-btn uppercase={ false } text onClick={submit} backgroundcolor="#2979FF" text-color="#FFFFFF" width="120" >
+                      {t('ui.ok')}
+                    </g-btn>
+                  </div>
+                }
+              </div>
+              <div class="keyboard" >
+                <pos-keyboard-full v-model={screenValue.value} onEnterPressed={submit}/>
+              </div>
+            </div>
+          </g-dialog>
+    )
+    return {
+      renderFn,
+      combobox
+    }
+  }, render() {
+    return this.renderFn()
   }
+}
 </script>
 
 <style scoped lang="scss">

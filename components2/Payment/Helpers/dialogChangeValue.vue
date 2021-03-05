@@ -1,25 +1,24 @@
 <script>
 
 import { isMobile } from '../../AppSharedStates';
-import { genScopeId, internalValueFactory, intervalLog } from '../../utils';
+import { execGenScopeId, genScopeId, internalValueFactory } from '../../utils';
 import { getCurrentOrder } from '../../OrderView/pos-logic-be';
 import { ref } from 'vue'
-import { getScopeAttrs } from '../../../utils/helpers';
-import DiscountInput2 from './DiscountInput2';
+import DiscountInput from './DiscountInput';
+
 export default {
   name: 'dialogChangeValue2',
   props: {
     modelValue: Boolean,
     newValueEditable: false
   },
-  components: {DiscountInput2},
+  components: { DiscountInput },
   emits: ['update:modelValue', 'submit'],
   setup(props, { emit }) {
     const order = getCurrentOrder()
-    const changeType = ref(null)
-    const change = ref(0)
     const showSnackBar = ref(false)
     const dialog = internalValueFactory(props, { emit })
+
     function submit(update) {
       console.log(update)
       if (order.vSum) {
@@ -33,19 +32,20 @@ export default {
       }
       dialog.value = false;
     }
+
     function removeDiscount() {
-      //todo: just close dialog or remove current discount ???
       dialog.value = false
     }
+
     return genScopeId(() =>
         <g-dialog v-model={dialog.value} overlay-color="#6b6f82" fullscreen={isMobile.value} overlay-opacity="0.95">
-          <div class="dialog-change w-100" style={[{ background: 'white' }]} {...getScopeAttrs()}>
-            <g-icon class="dialog-change--close" onClick={() => dialog.value = false} {...getScopeAttrs()}>close</g-icon>
-            <discount-input-2 type={changeType} value={change.value} onSubmit={submit} onRemoveDiscount={removeDiscount} {...getScopeAttrs()}/>
+          {execGenScopeId(() => <div class="dialog-change w-100" style={[{ background: 'white' }]}>
+            <g-icon class="dialog-change--close" onClick={() => dialog.value = false}>close</g-icon>
+            <discount-input onSubmit={submit} onRemoveDiscount={removeDiscount}/>
             <g-snackbar v-model={showSnackBar.value} timeout="2000" color="#FF4552">
               <div>Discount exceeds order value!</div>
             </g-snackbar>
-          </div>
+          </div>)}
         </g-dialog>)
   }
 }

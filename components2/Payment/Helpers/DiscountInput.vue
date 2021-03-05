@@ -9,7 +9,6 @@ export default {
   name: 'DiscountInput2',
   components: { ScrollSelect },
   props: {
-    type: String,
     modelValue: null,
     percent: Number,
     hooks: Function
@@ -17,7 +16,6 @@ export default {
   emits: ['update:modelValue', 'remove-discount', 'submit'],
   setup(props, { emit }) {
     const { t, locale } = useI18n();
-
     const percent = ref(0)
     const amount = ref(0)
     const custom = ref(0)
@@ -101,7 +99,7 @@ export default {
       }
     })
 
-    const _render = genScopeId(() =>
+    const render = genScopeId(() =>
         <div class="discount h-100">
           <div class="discount-content">
             <div class="w-10 mx-2">
@@ -157,14 +155,14 @@ export default {
           </div>
         </div>)
     return {
-      _render,
+      render,
       percent,
       custom,
       amount
     }
   },
   render() {
-    return this._render();
+    return this.render();
   }
 }
 </script>

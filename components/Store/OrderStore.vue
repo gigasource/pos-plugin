@@ -60,7 +60,6 @@
 <script>
   import orderUtil from '../logic/orderUtil';
   import dialogCommon from './OrderStoreDialogs/dialogCommon';
-  import dialogChangeValue from '../../components2/pos-shared-components/dialogChangeValue';
   import dialogOrderTransactionRefundConfirm from './OrderStoreDialogs/dialogOrderTransactionRefundConfirm';
   import dialogOrderTransactionRefundFailed from './OrderStoreDialogs/dialogOrderTransactionRefundFailed';
   import { getBookingNumber, getProductGridOrder, getVDate } from '../logic/productUtils';
@@ -72,7 +71,7 @@
   export default {
     name: 'OrderStore',
     domain: 'OrderStore',
-    components: { dialogCommon, dialogOrderTransactionRefundConfirm, dialogOrderTransactionRefundFailed, dialogChangeValue},
+    components: { dialogCommon, dialogOrderTransactionRefundConfirm, dialogOrderTransactionRefundFailed},
     injectService: ['PosStore:(user, timeFormat, dateFormat, device, storeLocale)'],
     data() {
       return {
