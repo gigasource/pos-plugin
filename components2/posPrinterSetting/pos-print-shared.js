@@ -3,7 +3,6 @@ import { ObjectID } from 'bson';
 import { computed, ref, watch } from 'vue'
 import { isSameId } from '../utils';
 import _ from 'lodash'
-import { updateSetting } from '../Settings/settings-shared-logics';
 import {
   createPrinter,
   createPrinterGroup,
@@ -12,9 +11,11 @@ import {
   printerGroupsList,
   removePrinter,
   removePrinterGroup,
-  updatePrinter, updatePrinterGroup
+  updatePrinter,
+  updatePrinterGroup
 } from './pos-printer-be';
 
+export const MAX_NO_ENTIRE_RECEIPT = 4
 export const printerGroups = computed(() => {
   const res = {}
   printerGroupsList.value.forEach(printerGroup => {
@@ -23,6 +24,10 @@ export const printerGroups = computed(() => {
     res[type].push(printerGroup)
   })
   return res
+})
+
+export const kitchenPrinterGroups = computed(() => {
+  return (printerGroups.value && printerGroups.value.kitchen) || []
 })
 
 export const printerList = computed(() => {
@@ -51,14 +56,23 @@ export const selectingPrinterGroupType = computed(() => {
 
 export async function loadPrinterGroups() {
   printerGroupsList.value = await fetchPrinterGroups()
+  const kitchenPrinterGroups = _.filter(printerGroupsList.value, i => i.type === 'kitchen')
   const invoicePrinterGroup = _.find(printerGroupsList.value, i => i.type === 'invoice')
   if (!invoicePrinterGroup) {
     await onCreateNewPrinterGroup('invoice')
   }
+  const entireReceiptPrinterGroups = _.filter(printerGroupsList.value, i => i.type === 'entire')
+  let cnt = MAX_NO_ENTIRE_RECEIPT - entireReceiptPrinterGroups.length
+  //auto fill entire receipt
+  while (cnt > 0) {
+    //todo: can change printer name here
+    onCreateNewPrinterGroup('entire')
+    cnt--
+  }
 }
 
 
-const newPrinterGroupName = computed(() => {
+const newKitchenPrinterGroupName = computed(() => {
   if (!printerGroupsList.value) return ''
   if (!_.some(printerGroupsList.value, i => i.name === `New Printer`)) return `New Printer`
   let res = 1
@@ -66,15 +80,24 @@ const newPrinterGroupName = computed(() => {
   return `New Printer (${res})`
 })
 
+const newEntirePrinterGroupName = computed(() => {
+  if (!printerGroupsList.value) return ''
+  if (!_.some(printerGroupsList.value, i => i.name === `Entire Receipt`)) return `Entire Receipt`
+  let res = 1
+  while (_.some(printerGroupsList.value, i => i.name === `Entire Receipt (${res})`)) res++
+  return `Entire Receipt (${res})`
+})
+
 export async function onCreateNewPrinterGroup(type = 'kitchen', _newPrinterGroup = {}) {
   const newPrinterGroup = {
-    name: newPrinterGroupName.value
+    name: type === 'kitchen' ? newKitchenPrinterGroupName.value : (
+      type === 'invoice' ? 'Invoice' : newEntirePrinterGroupName.value
+    )
   }
   newPrinterGroup._id = new ObjectID()
   newPrinterGroup.type = type
   Object.assign(newPrinterGroup, _newPrinterGroup)
   const createdPrinterGroup = await createPrinterGroup(newPrinterGroup);
-  console.log(createdPrinterGroup)
   await onCreateNewPrinter({}, createdPrinterGroup._id)
 }
 
@@ -86,8 +109,11 @@ export async function onUpdatePrinterGroup(oldPrinterGroupInfo, newPrinterGroupI
   await updatePrinterGroup(oldPrinterGroupInfo, newPrinterGroupInfo)
 }
 
-export function onSelectPrinterGroup(printerGroup) {
+export async function onSelectPrinterGroup(printerGroup) {
   selectingPrinterGroup.value = printerGroup
+  if (!printerGroup.printers || !printerGroup.printers.length) {
+    await onCreateNewPrinter({}, printerGroup._id)
+  }
   onSelectPrinter(printerGroup.printers[0])
 }
 
@@ -123,9 +149,10 @@ export async function onCreateNewPrinter(_newPrinter, groupId = null) {
   return createPrinter(Object.assign({}, _newPrinter), groupId)
 }
 
-export async function onCreateNewPrinterForSelectingPrinterGroup(_newPrinter, groupId=null) {
+export async function onCreateNewPrinterForSelectingPrinterGroup(_newPrinter, groupId = null) {
   return onCreateNewPrinter(_newPrinter, selectingPrinterGroup.value._id)
 }
+
 export async function onRemovePrinter(printer, groupId) {
   return removePrinter(printer, groupId)
 }
@@ -149,3 +176,7 @@ export const isMultiple = computed(() => {
   if (selectingPrinterGroupType.value === 'entire') return printerGeneralSetting.value.useMultiPrinterForEntirePrinter
   return false
 })
+
+export async function testPrinter(printer) {
+  await cms.socket.emit('testPrinter', printer)
+}
