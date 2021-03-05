@@ -206,8 +206,8 @@ export default {
   }
 }
 
-/*Iphone 6/7/8 Plus*/
-@media screen and (max-width: 736px) {
+
+@media screen and (min-width: 668px) and (max-width: 860px) {
   .function {
     &--up,
     &--down {
