@@ -46,6 +46,7 @@ function printToCustomerdisplay({ line1, line2, sum, item, rabatt }) {
       if (!SerialPort) {
         SerialPort = require('serialport');
       }
+
       SerialPort.list().then(function (serials) {
         if (_.find(serials, { path: comName })) {
           spCustomerdisplay = new SerialPort(comName, {
@@ -53,12 +54,8 @@ function printToCustomerdisplay({ line1, line2, sum, item, rabatt }) {
           });
 
           spCustomerdisplay.on('open', function (err) {
-            console.log('on spCustomerdisplay open')
             spCustomerdisplay.write(`${pre1}${line1}${pre2}${line2}`, function (err, results) {
-              console.log('write result', results, err)
-              spCustomerdisplay.drain(function () {
-                console.log('drain')
-              });
+              spCustomerdisplay.drain(function () {});
             });
           });
 
