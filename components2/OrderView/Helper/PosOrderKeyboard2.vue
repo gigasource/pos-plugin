@@ -9,13 +9,12 @@ export default {
   props: ['keyboardConfig', 'mode'],
   emits: ['edit:keyboard'],
   setup(props, {emit}) {
-    const {keyboardConfig, mode} = props
     const order = getCurrentOrder();
     const productIdQuery = ref(null)
     const productIdQueryResults = ref(null)
     const mainKeyboard = computed(() => {
       const keyboard = _.cloneDeep(defaultKeyboard)
-      if (!keyboardConfig.value.x) {
+      if (!props.keyboardConfig.x) {
         const index = keyboard.items.findIndex(k => k.type === 'x')
         if (index > 0) {
           keyboard.items.splice(index, 1)
@@ -28,12 +27,12 @@ export default {
     const leftsideItems = computed(() => {
       let keys = [], maxColumns = 0
 
-      for (let i = 0; i < keyboardConfig.value.layout.length; i++) {
-        const rows = keyboardConfig.value.layout[i].rows
+      for (let i = 0; i < props.keyboardConfig.layout.length; i++) {
+        const rows = props.keyboardConfig.layout[i].rows
         if (maxColumns < rows.length) maxColumns = rows.length
         for (let j = 0; j < rows.length; j++) {
           if (rows[j].trim() === '') {
-            if (mode === 'edit') {
+            if (props.mode === 'edit') {
               keys.push({top: i + 1, left: j + 1, bottom: i + 2, right: j + 2, type: 'edit'})
             }
             continue
@@ -53,8 +52,8 @@ export default {
           }
           k = i + 1
           //check duplicate in vertical
-          while (k < keyboardConfig.value.layout.length) {
-            const nextRows = keyboardConfig.value.layout[k].rows
+          while (k < props.keyboardConfig.layout.length) {
+            const nextRows = props.keyboardConfig.layout[k].rows
             if (nextRows[j] === rows[j]) {
               let flag = false
               if (key.right > key.left + 1) {
@@ -75,17 +74,17 @@ export default {
               break
             }
           }
-          if (mode === 'edit') {
+          if (props.mode === 'edit') {
             key.type = 'edit'
           }
           keys.push(key)
         }
       }
-      return {items: keys, rows: keyboardConfig.value.layout.length, columns: maxColumns}
+      return {items: keys, rows: props.keyboardConfig.layout.length, columns: maxColumns}
     })
     const keyboardStyles = computed(() => {
       let styles = {}
-      styles['grid-area'] = `${keyboardConfig.value.top}/${keyboardConfig.value.left}/${keyboardConfig.value.top + keyboardConfig.value.height}/${keyboardConfig.value.left + keyboardConfig.value.width}`
+      styles['grid-area'] = `${props.keyboardConfig.top}/${props.keyboardConfig.left}/${props.keyboardConfig.top + props.keyboardConfig.height}/${props.keyboardConfig.left + props.keyboardConfig.width}`
       styles['grid-template-rows'] = `repeat(${Math.max(mainKeyboard.value.rows, leftsideItems.value.rows) + 1}, 1fr)`
       styles['grid-template-columns'] = `repeat(${mainKeyboard.value.columns + leftsideItems.value.columns}, 1fr)`
       styles['grid-gap'] = `5px`
@@ -156,7 +155,7 @@ export default {
     }
 
     const openDialogProductSearchResults = async function () {
-      if (mode !== 'active') {
+      if (props.mode !== 'active') {
         return
       }
       if (productIdQuery.value.trim()) {
