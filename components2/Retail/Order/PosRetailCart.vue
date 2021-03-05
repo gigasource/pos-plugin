@@ -73,7 +73,7 @@ export default {
       router.push({ path: '/pos-payment' })
     }
     function quickCash() {
-      // TODO: @Huy impl
+      console.error('PosRetailCart.vue::quickCash was not implemented yet')
     }
     function renderFooter() {
       return (
