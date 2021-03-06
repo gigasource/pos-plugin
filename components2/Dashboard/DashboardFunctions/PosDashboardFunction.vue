@@ -129,10 +129,7 @@ export default {
   }
 
   &--down {
-    grid-template-rows: repeat(2, 1fr);
     margin-top: 40px;
-    flex: 1;
-    /*flex: 0 0 calc(66.67% - 40px)*/
   }
 
   &-btn {
