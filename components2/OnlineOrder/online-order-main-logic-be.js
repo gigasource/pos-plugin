@@ -54,6 +54,7 @@ export async function declineOrder(order) {
 	const status = 'declined'
 	const orderStatus = {
 		orderId: order.id,
+		user,
 		status,
 		responseMessage: order.declineReason
 	}
@@ -62,6 +63,8 @@ export async function declineOrder(order) {
 		_id: order._id
 	}, order)
 	_.remove(pendingOrders.value, _order => _order._id.toString() === order._id.toString())
+
+	cms.socket.emit('updateOrderStatus', order)
 }
 
 export async function loadOrders() {
