@@ -5579,5 +5579,92 @@
       "lastUpdateTimestamp": "2021-03-05T08:59:59.287Z",
       "appType": "POS_RETAIL"
     }
+  ],
+  "Customer": [
+    {
+      "_id": "6042f3510a30c0b50bf90a12",
+      "name": "Eminem",
+      "phone": "123456",
+      "addresses": [
+        {
+          "_id": "6042f2de0a30c0b50bf90a11",
+          "address": "23 Phố Duy Tân",
+          "house": "1004",
+          "street": "Duy Tan",
+          "zipcode": "100000",
+          "city": "Ha Noi",
+          "isTrusted": true
+        }
+      ],
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6042f3700a30c0b50bf90a14",
+      "name": "Thomas Shelby",
+      "phone": "0912385",
+      "addresses": [
+        {
+          "_id": "6042f3580a30c0b50bf90a13",
+          "address": "18 Duy Tân",
+          "house": "Phu Nhuan",
+          "street": "Duy Tan",
+          "zipcode": "123123",
+          "city": "HCM",
+          "isTrusted": true
+        }
+      ],
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6042f38d0a30c0b50bf90a16",
+      "name": "John",
+      "phone": "49349234",
+      "addresses": [
+        {
+          "_id": "6042f37b0a30c0b50bf90a15",
+          "address": "Berlin",
+          "house": "Berlin",
+          "street": "",
+          "zipcode": "",
+          "city": "",
+          "isTrusted": true
+        }
+      ],
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6042f3eb0a30c0b50bf90a18",
+      "name": "Changpeng Zhao",
+      "phone": "09824123123",
+      "addresses": [
+        {
+          "_id": "6042f3da0a30c0b50bf90a17",
+          "address": "Huangzhou District",
+          "house": "",
+          "street": "",
+          "zipcode": "",
+          "city": "",
+          "isTrusted": true
+        }
+      ],
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6042f4d90a30c0b50bf90a1a",
+      "name": "Vitalik",
+      "phone": "123123834",
+      "addresses": [
+        {
+          "_id": "6042f4cb0a30c0b50bf90a19",
+          "address": "Tokyo",
+          "house": "",
+          "street": "",
+          "zipcode": "",
+          "city": "",
+          "isTrusted": true
+        }
+      ],
+      "appType": "POS_RETAIL"
+    }
   ]
 }

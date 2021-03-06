@@ -1,5 +1,4 @@
 <script>
-import { withModifier } from 'vue'
 import {selectedProduct, selectedProductLayout, selectedProductLayoutPosition} from '../../OrderView/pos-ui-shared';
 
 import {
@@ -33,7 +32,7 @@ import {genScopeId} from '../../utils';
 import dialogEditPopupModifiers2 from "../../Modifiers/dialogEditPopupModifier/dialogEditPopupModifiers2";
 import dialogProductInfo from "../dialog/dialogProductInfo";
 import dialogTextFilter from "../../pos-shared-components/dialogFilter/dialogTextFilter";
-import {appHooks} from "../../AppSharedStates";
+import { modifierHooks } from '../../Modifiers/dialogEditPopupModifier/modifier-ui-logics';
 import {modifierGroups} from "../../Modifiers/dialogEditPopupModifier/modifier-ui-logics";
 
 
@@ -62,11 +61,6 @@ export default {
     function openDialogTextFilter() {
       dialog.showTextKbd = true
     }
-
-    watch(() => dialog.popupModifiers, async (val) => {
-      appHooks.emit('updateModifiers');
-      //await loadPopupModifierGroups()
-    })
 
 
     // styles
@@ -326,8 +320,7 @@ export default {
       await loadPrinters()
       await loadCategories()
       await loadTaxes()
-      await appHooks.emit('updateModifiers');
-      //await loadPopupModifierGroups()
+      modifierHooks.emit('updateModifiers')
     }
 
     _created()

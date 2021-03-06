@@ -194,6 +194,12 @@ export function renderInventoryDialog(t) {
       selectedInventory.value.product.category.push(newAddedCategory.parentCategory)
   }
 
+  const genCategoryWithParentName = function (productCategories) {
+    return productCategories.map(category => {
+      return categoriesWithParentName.value.find(_category => _category._id.toString() === category._id.toString())
+    })
+  }
+
   const renderDialog = {
     [appType.POS_RESTAURANT]: () => (
         <div class="row-flex flex-wrap justify-around mt-3" key={dialog.value.inventory}>
@@ -246,7 +252,7 @@ export function renderInventoryDialog(t) {
                   text-field-component="g-text-field-bs"
                   menu-class="menu-select-inventory" outlined
                   items={categoriesWithParentName.value} item-text="name" return-object
-                  modelValue={selectedInventory.value.product.category}
+                  modelValue={genCategoryWithParentName(selectedInventory.value.product.category)}
                   onUpdate:modelValue={updateSelectedInventoryCategory}/>
 
               <div style={halfGrid}>
@@ -293,7 +299,7 @@ export function renderInventoryDialog(t) {
             {/* attribute */}
             <div class="column-flex">
               <div>{t('inventory.attribute')}</div>
-              {selectedInventory.value.product.attributes.map((attribute, i) => (
+              {selectedInventory.value.product.attributes && selectedInventory.value.product.attributes.map((attribute, i) => (
                   <div class="row-flex">
                     <g-select
                         menu-class="menu-select-inventory" outlined style="width: 10%" label={t('inventory.attributes')}

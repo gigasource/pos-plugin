@@ -1,12 +1,12 @@
 import { ObjectID } from 'bson';
 import cms from 'cms'
 import { computed, nextTick, ref, watch } from 'vue'
-// import { CRUdFactory } from './CRUD/crud';
 import { CRUdDbFactory as CRUdFactory } from '../../../utils/CRUD/crud-db';
 import _ from 'lodash'
 import { isSameId } from '../../utils';
-import { appHooks } from '../../AppSharedStates';
+import Hooks from 'schemahandler/hooks/hooks'
 
+export const modifierHooks = new Hooks()
 export const currentGroup = ref(null)
 export const activeItem = ref(null)
 export const modifierGroups = ref({})
@@ -25,7 +25,7 @@ export const currentGroupIdx = computed(() => {
   return _.findIndex(modifierGroups.value.groups, i => isSameId(i, currentGroup.value))
 })
 
-appHooks.on('updateModifiers', async () => {
+modifierHooks.on('updateModifiers', async () => {
   await fetchModifiers()
 })
 

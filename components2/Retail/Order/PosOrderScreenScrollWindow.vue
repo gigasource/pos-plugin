@@ -21,7 +21,7 @@ export default {
     isEditMode: Boolean
   },
   setup(props) {
-    const { isRefundMode, isEditMode } = props
+    const { isRefundMode } = props
     /**
      * Object key is category._id
      */
@@ -64,7 +64,7 @@ export default {
     })
 
     function addProduct(item) {
-      if (isRefundMode || isEditMode.value) return
+      if (isRefundMode || props.isEditMode) return
       const order = getCurrentOrder()
       addItem(order, item, 1)
     }

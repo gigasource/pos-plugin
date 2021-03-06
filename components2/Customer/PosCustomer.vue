@@ -6,22 +6,15 @@ import { useRouter } from 'vue-router';
 import { isIOS } from '../AppSharedStates';
 import {
   selectingCustomer,
-  onCreateCustomer,
-  onRemoveAddress,
-  onUpdateCustomer,
   onOpenDialog,
   onRemoveSelectingCustomer,
   showCustomerDialog,
-  customerDialogData,
-  onAddAddress,
-  onDialogSubmit, customerHooks,
+  onDialogSubmit,
   onSelectCustomer,
-  autocompleteAddresses,
-  renderCustomerInfo
+  renderCustomerInfo,
 } from './customer-ui-logics-shared';
 import { customers } from './customer-logic';
 import { loadCustomers } from "./customer-be-logics";
-import { v4 as uuidv4 } from 'uuid';
 import { useI18n } from 'vue-i18n';
 
 export default {
@@ -39,35 +32,6 @@ export default {
     const sortedCustomer = computed(() => {
       return _.sortBy(customers.value, sortField.value)
     })
-    const token = uuidv4()
-
-    async function selectAutocompleteAddress(place_id, index) {
-      if (autocompleteAddresses.value[index].places.find(item => item.value === place_id)) {
-        cms.socket.emit('getPlaceDetail', place_id, token, data => {
-          if (!_.isEmpty(data)) {
-            for (const component of data.address_components) {
-              customerDialogData.addresses[index].house = component.types.includes('street_number') ? component.long_name : ''
-              customerDialogData.addresses[index].street = component.types.includes('route') ? component.long_name : ''
-              customerDialogData.addresses[index].zipcode = component.types.includes('postal_code') ? component.long_name : ''
-              customerDialogData.addresses[index].city = component.types.includes('locality') ? component.long_name : ''
-            }
-            customerDialogData.addresses[index].address = data.name
-          }
-        })
-      }
-    }
-
-    async function searchAddress(text, index) {
-      if (!text || text.length < 4) return
-      cms.socket.emit('searchPlace', text, token, (places) => {
-        autocompleteAddresses.value[index].places = places.map(place => ({
-          text: place.description,
-          value: place.place_id,
-        }))
-      })
-    }
-
-    const debounceSearchAddress = _.debounce(searchAddress, 300)
 
     function changeSortField(field) {
       sortField.value = field
