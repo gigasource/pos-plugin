@@ -1,26 +1,23 @@
 <script>
-import { ref, onActivated, onDeactivated } from 'vue'
+import { onActivated, onDeactivated, ref, withModifiers } from 'vue'
 import { useRouter } from 'vue-router'
 import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
 import DialogChangeStock from './helpers/dialogChangeStock';
-import cms from 'cms'
 import _ from 'lodash';
 import { useI18n } from 'vue-i18n'
 import { updateInventory } from './inventory-logic-be';
-import {
-  detailInventories
-} from './inventory-logic-ui'
+import { detailInventories } from './inventory-logic-ui'
 import { genScopeId } from '../utils';
 import { $filters } from '../AppSharedStates';
-import {reason} from "./inventory-ui-shared";
+import { reason } from './inventory-ui-shared';
 
 export default {
-  name: "InventoryStock",
-  components: {PosKeyboardFull, DialogChangeStock},
+  name: 'InventoryStock',
+  components: { PosKeyboardFull, DialogChangeStock },
   setup() {
     const { t } = useI18n()
     const items = ref([])
-    const inventories = ref ([])
+    const inventories = ref([])
     const selectedItem = ref(null)
     const dialog = ref({
       inventory: false,
@@ -66,7 +63,7 @@ export default {
       if (isNaN(added.value))
         added.value = 0
       const item = inventories.value.find(item => item._id.toString() === itemId.value.toString())
-      Object.assign(item, { added: added.value})
+      Object.assign(item, { added: added.value })
       items.value.push(item)
       dialog.value.inventory = false
     }
@@ -82,7 +79,7 @@ export default {
       selectedItem.value = item
       dialog.value.add = true
     }
-    const updateStock = function ({change}) {
+    const updateStock = function ({ change }) {
       const item = items.value.find(item => item._id.toString() === itemId.value.toString())
       const index = items.value.findIndex(i => i._id === item._id)
       Object.assign(item, { added: +change })
@@ -125,16 +122,17 @@ export default {
       }
       back()
     }
+
     function keyboardHandle(event) {
       event.stopPropagation()
-      if(event.key === 'Tab' || event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+      if (event.key === 'Tab' || event.key === 'ArrowDown' || event.key === 'ArrowRight') {
         event.preventDefault()
-        if(items.value.length > 0) {
-          if(!selectedItem.value) {
+        if (items.value.length > 0) {
+          if (!selectedItem.value) {
             selectedItem.value = items[0]
           } else {
             const index = items.value.findIndex(i => i._id === selectedItem.value._id)
-            if(index === items.value.length - 1) {
+            if (index === items.value.length - 1) {
               selectedItem.value = items.value[0]
             } else {
               selectedItem.value = items.value[index + 1]
@@ -142,14 +140,14 @@ export default {
           }
         }
       }
-      if(event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+      if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
         event.preventDefault()
-        if(items.value.length > 0) {
-          if(!selectedItem.value) {
+        if (items.value.length > 0) {
+          if (!selectedItem.value) {
             selectedItem.value = _.last(items)
           } else {
             const index = items.findIndex(i => i._id === selectedItem.value._id)
-            if(index === 0) {
+            if (index === 0) {
               selectedItem.value = _.last(items.value)
             } else {
               selectedItem.value = items.value[index - 1]
@@ -157,8 +155,8 @@ export default {
           }
         }
       }
-      if(event.key === 'Enter') {
-        if(selectedItem.value) {
+      if (event.key === 'Enter') {
+        if (selectedItem.value) {
           openDialogAdd(selectedItem.value)
         }
       }
@@ -173,10 +171,11 @@ export default {
     }
 
     return genScopeId(() => <>
-      <div class="inventory-stock">
+      <div class="inventory-stock" onClick={() => {if (showKeyboard.value) showKeyboard.value = false}}>
         <div class="inventory-stock__header">
           <g-autocomplete text-field-component="GTextFieldBs" onUpdate:modelValue={selectItem} clearable keep-menu-on-blur items={inventories.value} return-object menu-class="menu-inventory-stock" v-slots={{
-            'append-inner': () => <g-icon onClick={() => showKeyboard.value = true}>icon-keyboard</g-icon>
+            'append-inner': () =>
+                <g-icon onClick={withModifiers(() => showKeyboard.value = true, ['stop'])}>icon-keyboard</g-icon>
           }}></g-autocomplete>
           <div class="inventory-stock__header-btn" onClick={() => openDialog()}>
             <g-icon color="white">add</g-icon>
@@ -188,16 +187,16 @@ export default {
         <g-simple-table striped fixed-header style="flex: 1">
           {genScopeId(() => <>
             <thead>
-          <tr>
-            <th>Product ID</th>
-            <th>Name</th>
-            <th> {t('article.category')} </th>
-            <th> {t('inventory.unit')} </th>
-            <th> {t('inventory.currentStock')} </th>
-            <th> {t('inventory.addedStock')} </th>
-            <th> </th>
-          </tr>
-          </thead>
+            <tr>
+              <th>Product ID</th>
+              <th>Name</th>
+              <th> {t('article.category')} </th>
+              <th> {t('inventory.unit')} </th>
+              <th> {t('inventory.currentStock')} </th>
+              <th> {t('inventory.addedStock')} </th>
+              <th></th>
+            </tr>
+            </thead>
             {items.value.map((inventory, i) =>
                 <tr key={i} class={selectedItem.value && selectedItem.value._id === inventory._id && 'row--selected'}>
                   <td onClick={() => openDialogAdd(inventory)}> {inventory.id} </td>
@@ -250,7 +249,7 @@ export default {
         <dialog-change-stock v-model={dialog.value.add} removable={false} name={name.value} stock={stock.value} onSubmit={updateStock}/>
         {
           (showKeyboard.value) &&
-          <div class="keyboard-wrapper">
+          <div class="keyboard-wrapper" onClick={withModifiers(() => {}, ['stop'])}>
             <pos-keyboard-full type="alpha-number"/>
           </div>
         }
