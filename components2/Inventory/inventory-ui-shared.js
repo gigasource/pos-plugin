@@ -20,6 +20,7 @@ import {
   genMaxId
 } from "../OrderView/pos-logic-be";
 import {loadCategories, loadProducts} from "../Product/product-logic-be";
+import { categoryColor, debouncedUpdateCategory } from '../EditMenuCard/CategoryEditor/category-editor-category';
 
 watch(() => currentAppType.value, async () => {
   await loadCategories()
@@ -73,6 +74,7 @@ export const dialog = ref({
   category: false
 })
 
+const colors = ['#FFFFFF', '#CE93D8', '#B2EBF2', '#C8E6C9', '#DCE775', '#FFF59D', '#FFCC80', '#FFAB91']
 /**
  * Reference of selected inventory
  * in inventory dialog and in stock
@@ -84,7 +86,10 @@ const createEmptyInventory = () => ({
   product: {
     option: {},
     attributes: [],
-    category: []
+    category: [],
+    layouts: [{
+      color: colors[0]
+    }]
   },
   unit: null,
   stock: null
@@ -284,6 +289,13 @@ export function renderInventoryDialog(t) {
                   rules={[val => !isNaN(val) || 'Must be a number!']}
                   v-model={selectedInventory.value.product.barcode}/>
             </div>
+
+            <div class="category-editor__label">{t('ui.color')}</div>
+            <color-selector
+                modelValue={selectedInventory.value.product.layouts[0].color}
+                colors={colors}
+                itemSize={25}
+                onUpdate:modelValue={color => selectedInventory.value.product.layouts[0].color = color}/>
 
             <div style={triGrid}>
               {/* switch */}
