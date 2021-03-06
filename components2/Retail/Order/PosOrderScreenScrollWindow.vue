@@ -73,7 +73,8 @@ export default {
 
     function getItemStyle(item) {
       const customizableStyle = {
-        fontSize: retailLayoutSetting.productFontSize + 'px'
+        fontSize: retailLayoutSetting.productFontSize + 'px',
+        fontWeight: 'bold'
       }
 
       if (retailLayoutSetting.showFullProductName) {

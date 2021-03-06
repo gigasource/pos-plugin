@@ -90,8 +90,7 @@ export default {
                                   onLogin={onLogin}
                                   onClear={resetIncorrectPasscodeFlag}
                                   onDelete={resetIncorrectPasscodeFlag}
-                                  onAppend={resetIncorrectPasscodeFlag}
-                />
+                                  onAppend={resetIncorrectPasscodeFlag}/>
               </div>
             </div>
             <div></div>
@@ -157,6 +156,7 @@ export default {
 
     &__textfield {
       margin: 0 30%;
+      margin-bottom: 12px;
     }
   }
 
