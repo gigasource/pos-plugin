@@ -217,7 +217,7 @@ export default {
     return genScopeId(renderInventoryStock)
   }
 }
-</script>
+</script>OnlineOrderList.vue
 
 <style scoped lang="scss">
 .inventory-report {
@@ -231,6 +231,15 @@ export default {
     flex-direction: column;
     padding: 6px;
     background-color: #E1E3EB;
+
+    &__category {
+      :deep .bs-tf-wrapper {
+        background-color: #FFF;
+        border-radius: 4px;
+        margin: 4px 0 0;
+        width: 100%;
+      }
+    }
 
     .category {
       flex: 1;
@@ -452,14 +461,5 @@ export default {
       background-color: #F8F8FB;
     }
   }
-}
-</style>
-
-<style lang="css">
-.inventory-report__left__category > .bs-tf-wrapper {
-  background-color: #FFF;
-  border-radius: 4px;
-  margin: 4px 0 0;
-  width: 100%;
 }
 </style>
