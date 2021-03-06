@@ -2,6 +2,9 @@ import { ref } from 'vue'
 import { storeLocale } from '../AppSharedStates';
 import { execGenScopeId } from '../utils';
 import Hooks from 'schemahandler/hooks/hooks'
+import {products} from "../Product/product-logic";
+import { getCurrentOrder } from "../OrderView/pos-logic-be";
+import { addItem } from "../OrderView/pos-logic";
 
 export const retailHook = new Hooks()
 export const refundOrder = ref(null)
@@ -66,18 +69,8 @@ export function renderDisplayOrderItemsTable(order, t) {
   )
 }
 
-// export function chooseFunction(functionName) {
-//   if (!functionName || !configFunctionList[functionName]) return
-//   return configFunctionList[functionName]
-// }
-//
-// //<editor-fold desc="List function to config with button">
-// export const configFunctionList = {
-//   payOrder(order) {
-//
-//   },
-//   openRefundSearch() {
-//     retailHook.emit('openRefundSearch')
-//   }
-// }
-// //</editor-fold>
+export function addProductByBarcode(barcode) {
+  const order = getCurrentOrder()
+  const item = products.value.find(product => product.barcode === barcode)
+  return addItem(order, item, 1)
+}

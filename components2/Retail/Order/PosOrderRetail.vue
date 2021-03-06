@@ -4,11 +4,11 @@ import PosOrderScreenButtonGroup from './FnBtns/PosOrderScreenButtonGroup';
 import PosOrderScreenScrollWindow from './PosOrderScreenScrollWindow';
 import PosRetailCart from './PosRetailCart';
 import PosRetailCategory from './PosRetailCategory';
-import { onBeforeMount, ref, onActivated, watch, nextTick } from 'vue'
+import { onBeforeMount, ref, onActivated, watch, nextTick, onDeactivated } from 'vue'
 import { useRouter } from 'vue-router'
 import { loadCategories, loadProducts } from '../../Product/product-logic-be'
 import {execGenScopeId, genScopeId} from '../../utils';
-import { refundOrder } from '../pos-retail-shared-logic'
+import {addProductByBarcode, refundOrder} from '../pos-retail-shared-logic'
 import { makeRefundOrder, prepareOrder } from '../../OrderView/pos-logic-be'
 import {
   changeValue,
@@ -26,8 +26,9 @@ import {
 } from "../../OrderView/pos-logic";
 import {customerNames, customers} from "../../Customer/customer-logic";
 import {loadCustomers} from "../../Customer/customer-be-logics";
-import {renderCustomerInfo} from "../../Customer/customer-ui-logics-shared";
+import {renderCustomerInfo, customerDialogData, clearCustomerDialogData, onCreateCustomer} from "../../Customer/customer-ui-logics-shared";
 import PosKeyboardFull from "../../pos-shared-components/PosKeyboardFull";
+import { barcodeHook, setHandleKeyupBarcode, removeHandleKeyupBarcode } from "../../Product/barcode-listener";
 
 export default {
   name: 'PosOrderRetail',
@@ -50,10 +51,26 @@ export default {
       await loadCategories()
       await loadProducts()
     })
+
+    //<editor-fold desc="activated and deactivated">
+    let off
     onActivated(() => {
       // todo: Don't reset order when activated (.i.e when back from payment)
       !isRefundMode.value ? prepareOrder(0) : prepareOrder(makeRefundOrder(refundOrder.value))
+      // clear data of customer in add new
+      clearCustomerDialogData()
+      // barcode hook
+      setHandleKeyupBarcode()
+      off = barcodeHook.on('newBarcode', barcode => {
+        addProductByBarcode(barcode)
+      }).off
     })
+
+    onDeactivated(() => {
+      removeHandleKeyupBarcode()
+      off()
+    })
+    //</editor-fold>
 
     const showScreenSettingPanel = ref(false)
     const showMoreSettingCtxMenu = ref(false)
@@ -144,7 +161,7 @@ export default {
     function render2ndColumn() {
       return (
           <div class="por__main">
-            <pos-order-screen-scroll-window is-edit-mode={inEditScreenMode} is-refund-mode={isRefundMode.value} class="por__main__window"/>
+            <pos-order-screen-scroll-window is-edit-mode={inEditScreenMode.value} is-refund-mode={isRefundMode.value} class="por__main__window"/>
             <pos-order-screen-number-keyboard class="por__main__keyboard"/>
             <pos-order-screen-button-group
                 class="por__main__buttons"
@@ -154,6 +171,7 @@ export default {
       )
     }
 
+    //<editor-fold desc="customer render logic">
     const customer = ref('')
     const showCustomerDialog = ref(false)
     const autoCompleteRef = ref(null)
@@ -171,8 +189,12 @@ export default {
       }
     })
 
-    function onDialogSubmitCustomerForOrder() {
+    async function onDialogSubmitCustomerForOrder() {
       showCustomerDialog.value = false
+      if (!customer.value && customerDialogData) {
+        await onCreateCustomer(customerDialogData)
+        customer.value = `${customerDialogData.name} - ${customerDialogData.phone}`
+      }
       if (!customer.value) return
       // customer.value form is "name - phone"
       const phone = customer.value.split('-')[1].trim()
@@ -181,6 +203,7 @@ export default {
       })
       const order = getCurrentOrder()
       addCustomer(order, foundCustomer._id)
+      clearCustomerDialogData()
     }
 
     function renderCustomer() {
@@ -233,6 +256,9 @@ export default {
         </g-dialog>
       </div>
     }
+    //</editor-fold>
+
+
     const showSavedListDialog = ref(false)
     function renderSavedList() {
       return savedOrders.value.length > 0 && <div>
