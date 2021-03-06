@@ -57,7 +57,7 @@ export function orderLayoutKeyboardFactory(editable) {
   const renderKeyboard = () => {
     return (
       <>
-        {showCalculator.value && <pos-order-keyboard2 keyboard-config={keyboardConfig}
+        {showCalculator.value && <pos-order-keyboard2 keyboard-config={keyboardConfig.value}
                              mode={editable ? 'edit' : 'active'}
                              onEdit:keyboard={e => openDialogEdit(e)}
                              onOpenDialogSearch={() => dialog.search = true}/>}

@@ -1,7 +1,7 @@
 <script>
 import { genScopeId } from '../utils';
 import _ from 'lodash';
-import { reactive, ref, computed } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router';
 import { isIOS } from '../AppSharedStates';
 import {
@@ -16,9 +16,11 @@ import {
   onAddAddress,
   onDialogSubmit, customerHooks,
   onSelectCustomer,
-  autocompleteAddresses
+  autocompleteAddresses,
+  renderCustomerInfo
 } from './customer-ui-logics-shared';
-import { customers } from './customer-be-logics';
+import { customers } from './customer-logic';
+import { loadCustomers } from "./customer-be-logics";
 import { v4 as uuidv4 } from 'uuid';
 import { useI18n } from 'vue-i18n';
 
@@ -27,7 +29,9 @@ export default {
 
     //fixme: current problem: address text field
     const { t } = useI18n()
-    customerHooks.emit('fetchCustomer')
+    onMounted(async () => {
+      await loadCustomers()
+    })
     const router = useRouter()
     const showSortMenu = ref(false)
     const showDeleteDialog = ref(false)
@@ -82,6 +86,7 @@ export default {
                     <th class="sticky"> {t('onlineOrder.refundDialog.name')} </th>
                     <th class="sticky"> {t('onlineOrder.refundDialog.phone')} </th>
                     <th class="sticky"> {t('onlineOrder.refundDialog.address')} </th>
+                    <th className="sticky"> {t('onlineOrder.refundDialog.spending')} </th>
                   </tr>
                   {sortedCustomer.value.map((customer, i) =>
                       <tr key={i} onClick={() => onSelectCustomer(customer)} class={[selectingCustomer.value && selectingCustomer.value._id === customer._id && 'bordered']}>
@@ -92,6 +97,7 @@ export default {
                               <p key={`address_${i}_${index}`}> {item.address} </p>
                           )}
                         </td>
+                        <td> {customer.spending} </td>
                       </tr>
                   )}
                 </>)()}
@@ -143,45 +149,7 @@ export default {
           <dialog-confirm-delete v-model={showDeleteDialog.value} type=" customer " label={selectingCustomer.value && selectingCustomer.value.name} onSubmit={onRemoveSelectingCustomer}/>
           <g-dialog fullscreen v-model={showCustomerDialog.value}>
             {genScopeId(() => <div class="dialog">
-              <div class="dialog-left">
-                <div class="row-flex">
-                  <g-text-field virtualEvent={isIOS.value} outlined style="flex: 1" label="Name" v-model={customerDialogData.name}/>
-                  <g-text-field virtualEvent={isIOS.value} outlined style="flex: 1" label="Phone" v-model={customerDialogData.phone}/>
-                </div>
-                {customerDialogData.addresses.map((address, i) =>
-                    <div class="row-flex flex-wrap justify-around mt-4 r">
-                      <div class="btn-delete" onClick={() => onRemoveAddress(address)}>
-                        <g-icon>
-                          icon-cancel3
-                        </g-icon>
-                      </div>
-                      <div class="row-flex">
-                        <g-combobox label={`Address ${i + 1}`}
-                                    key={`address_${i}`}
-                                    // text-field-component="GTextFieldBs"
-                                    v-model={autocompleteAddresses.value[i].model}
-                                    clearable
-                                    skip-search
-                                    keep-menu-on-blur
-                                    class="col-8" menu-class="menu-autocomplete-address"
-                                    items={autocompleteAddresses.value[i].places}
-                                    onUpdate:searchText={text => debounceSearchAddress(text, i)}
-                                    onUpdate:modelValue={val => selectAutocompleteAddress(val, i)}
-                                    virtualEvent={isIOS.value} outlined
-                        />
-                        <g-text-field label={`House ${i + 1}`} key={`house_${i}`} v-model={address.house} virtualEvent={isIOS.value} outlined/>
-                      </div>
-                      <div class="row-flex">
-                        <g-text-field label={`Street ${i + 1}`} key={`street_${i}`} v-model={address.street} virtualEvent={isIOS.value} outlined/>
-                        <g-text-field label={`Zipcode ${i + 1}`} key={`zipcode_${i}`} v-model={address.zipcode} virtualEvent={isIOS.value} outlined/>
-                        <g-text-field label={`City ${i + 1}`} key={`city_${i}`} v-model={address.city} virtualEvent={isIOS.value} outlined/>
-                      </div>
-                    </div>
-                )}
-                <g-icon color="#1271FF" size="40" style="margin: 8px calc(50% - 20px)" onClick={onAddAddress}>
-                  add_circle
-                </g-icon>
-              </div>
+              {renderCustomerInfo()}
               <div class="dialog-keyboard">
                 <div style="flex: 1" onClick={() => showCustomerDialog.value = false}/>
                 <div class="keyboard-wrapper">

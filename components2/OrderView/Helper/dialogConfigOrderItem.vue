@@ -3,7 +3,7 @@ import {useI18n} from 'vue-i18n';
 import {computed, ref, watch} from 'vue';
 import {getCurrentOrder} from "../pos-logic-be";
 import {addItemModifier, addModifier, makeDiscount, makeItemDiscount} from "../pos-logic";
-import DiscountInput2 from "../../Payment/Helpers/DiscountInput2";
+import DiscountInput2 from "../../Payment/Helpers/DiscountInput";
 import {getScopeAttrs} from "../../../utils/helpers";
 import {genScopeId} from "../../utils";
 import Hooks from "schemahandler/hooks/hooks";

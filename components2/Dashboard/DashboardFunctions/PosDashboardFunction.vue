@@ -73,10 +73,10 @@ export default {
                         showMinimize={false}
                         showMaximize={false}
                         onClose={() => showIframe.value = false}
-                        onDragstart={() => iframeDragging.value = true}
-                        onDragend={() => iframeDragging.value = false}
-                        onResizestart={() => iframeDragging.value = true}
-                        onResizeend={() => iframeDragging.value = false} v-slots={{
+                        onDragStart={() => iframeDragging.value = true}
+                        onDragEnd={() => iframeDragging.value = false}
+                        onResizeStart={() => iframeDragging.value = true}
+                        onResizeEnd={() => iframeDragging.value = false} v-slots={{
             default: () => <>
               { showIframe.value && iframeDragging.value && <div style="height: 100%; width: 100%; position: absolute; background: transparent"></div> }
               { showIframe.value && <iframe src={iframeSrc.value} width="100%" height="100%"></iframe> }

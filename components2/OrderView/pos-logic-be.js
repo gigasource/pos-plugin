@@ -540,6 +540,10 @@ export async function genMaxId(order) {
   order.id = order0 ? order0.id + 1 : 1;
 }
 
+export async function getCustomerOrder(customerId) {
+  return await Order.find({ customer: customerId })
+}
+
 async function genBookingNumber(order) {
   order.bookingNumber = dayjs(order.date).format('YYMMDDHHmmssSSS');
 }

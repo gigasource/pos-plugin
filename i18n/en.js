@@ -463,7 +463,8 @@ module.exports = {
         //
         items: 'Items',
         cancel: 'Cancel',
-        ok: 'OK'
+        ok: 'OK',
+        spending: 'Spending'
       },
       refundingDialog: {
         title: 'Refunding',

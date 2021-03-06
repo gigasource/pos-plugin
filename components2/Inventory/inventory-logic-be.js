@@ -42,9 +42,9 @@ export async function createInventory(inventory) {
 	 */
 	if (!inventory.id) {
 		const maxId = inventories.value.reduce((maxId, inventory) => {
-			return Math.max(maxId, parseInt(inventory.id))
+			return Math.max(maxId, inventory.id)
 		}, 0)
-		inventory.id = (maxId ? maxId + 1 : 0)
+		inventory.id = (maxId ? maxId + 1 : 1)
 	} else {
 		const foundId = inventories.value.find(_inventory => {
 			return inventory.id === _inventory.id
