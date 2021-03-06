@@ -20,7 +20,7 @@
       <div style="max-height: 50%">
         <slot name="keyboard">
           <div class="keyboard" v-if="showKeyboard">
-            <pos-keyboard-full @enter-pressed="submit" @change-type="changeKeyboardType" :type="keyboardType" :width="keyboardWidth"/>
+            <pos-keyboard-full @enter-pressed="submit" @change-type="changeKeyboardType" :type="internalKeyboardType" :width="keyboardWidth"/>
           </div>
         </slot>
       </div>
