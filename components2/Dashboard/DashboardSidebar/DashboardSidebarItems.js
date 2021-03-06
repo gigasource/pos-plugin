@@ -146,14 +146,14 @@ const DashboardSidebarFactory = () => {
         case 'Reservation':
           return {
             ...item,
-            ...{ badge: todayPendingReservation.value + '', badgeColor: '#FF5252' }
+            ...(todayPendingReservation.value ? { badge: todayPendingReservation.value + '', badgeColor: '#FF5252' } : {})
           }
         case 'Dashboard':
           const items = item.items.map(i => {
             if (i.key === 'Orders') {
               return {
                 ...i,
-                ...{ badge: pendingOrders.value.length + '', badgeColor: '#FF5252' }
+                ...(pendingOrders.value.length ? { badge: pendingOrders.value.length + '', badgeColor: '#FF5252' } : {})
               }
             }
             return i
