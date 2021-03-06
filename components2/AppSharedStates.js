@@ -141,11 +141,6 @@ export const generalSettings = computed(() => {
   return (posSettings.value && posSettings.value.generalSetting) || {}
 })
 
-export const groupPrinters = ref([])
-appHooks.on('updateGroupPrinters', async () => {
-  groupPrinters.value = await cms.getModel('GroupPrinter').find()
-})
-
 export const tseConfig = ref({})
 appHooks.on('updateTseConfig', async () => {
   tseConfig.value = await cms.getModel('tseConfig').findOne()
