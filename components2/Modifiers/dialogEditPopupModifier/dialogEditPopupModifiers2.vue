@@ -1,5 +1,5 @@
 <script>
-import { onBeforeMount, ref, watch, withModifiers } from 'vue';
+import { ref, watch, withModifiers } from 'vue';
 import { genScopeId, internalValueFactory, VModel_number } from '../../utils';
 
 import {
@@ -27,11 +27,7 @@ export default {
     //todo:
     const internalValue = internalValueFactory(props, { emit })
     // const internalValue = internalValueFactory(props, { emit })
-    onBeforeMount(async () => {
-      appHooks.emit('updateModifiers')
-      appHooks.emit('updateGroupPrinters')
 
-    })
     const showDialog = ref(false)
 
     watch(() => activeItem.value, () => {
@@ -39,8 +35,12 @@ export default {
     }, { deep: true })
 
     const close = () => internalValue.value = false;
-
-    // console.log(getScopeAttrs())
+    watch(() => internalValue.value, () => {
+      if (internalValue.value) {
+        appHooks.emit('updateModifiers')
+        appHooks.emit('updateGroupPrinters')
+      }
+    })
     return genScopeId(() => <div>
       <g-dialog fullscreen v-model={internalValue.value}>
         {genScopeId(() => <div class="col-flex flex-grow-1" style="background: #fff">
@@ -104,7 +104,7 @@ export default {
                      text-color="#fff" uppercase={false}
                      onClick={() => onCreateItem(`groups.${currentGroupIdx.value}.categories`, 'category')}
                      v-show={currentGroup.value}>
-                <g-icon color="#fff" size="18" class="mr-2"> add </g-icon>
+                <g-icon color="#fff" size="18" class="mr-2"> add</g-icon>
                 <span> Category </span>
               </g-btn>
             </div>
