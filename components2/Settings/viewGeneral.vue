@@ -4,7 +4,7 @@ import { appHooks, posSettings } from '../AppSharedStates';
 import { computed, ref, withModifiers, watch } from 'vue'
 import cms from 'cms'
 import { useI18n } from 'vue-i18n';
-import { updateSetting } from './settings-shared-logics';
+import { updateSetting } from './settings-be';
 
 export default {
   setup() {

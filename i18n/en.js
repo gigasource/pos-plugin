@@ -286,6 +286,7 @@ module.exports = {
       address2: 'Address 2',
       zipCode: 'Zip Code',
       city: 'City',
+      country: 'Country',
       tel: 'Telephone',
       taxNo: 'Tax Number',
       ustId: 'UST ID',

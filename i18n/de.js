@@ -282,6 +282,7 @@ module.exports = {
       //company
       companyName: 'Fimen Name',
       address: 'Adresse',
+      country: 'Land',
       tel: 'Telefon',
       taxNo: 'Steuer-Nr.',
       logo: 'Logo',

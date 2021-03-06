@@ -286,6 +286,7 @@ module.exports = {
       address2: 'Địa chỉ 2',
       zipCode: 'Zip Code',
       city: 'Thành phố',
+      country: 'Quốc gia',
       tel: 'Điện thoại',
       taxNo: 'Mã số thuế',
       ustId: 'UST ID',

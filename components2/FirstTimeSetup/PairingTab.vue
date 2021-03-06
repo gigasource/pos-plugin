@@ -1,6 +1,6 @@
 <script>
 import { reactive, ref } from 'vue';
-import { updateSetting } from '../Settings/settings-shared-logics';
+import { updateSetting } from '../Settings/settings-be';
 import { execGenScopeId, genScopeId } from '../utils';
 import { isIOS } from '../AppSharedStates';
 import { signedInFailed, connect, offline } from './first-time-setup-shared'
