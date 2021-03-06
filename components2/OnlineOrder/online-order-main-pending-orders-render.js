@@ -20,7 +20,7 @@ import {
 	getItemPrice
 } from './online-order-main-logic'
 
-import { acceptOrder } from './online-order-main-logic-be'
+import { acceptOrder, declineOrder } from './online-order-main-logic-be'
 //<editor-fold desc="delivery">
 import { selectedCustomer as deliverySelectedCustomer } from "../OrderView/delivery/delivery-shared";
 import { orderType } from "../OrderView/delivery/delivery-customer-ui";
@@ -264,6 +264,11 @@ export function renderPendingOrdersFactory () {
 	}
 
 	function renderPendingOrdersActions(order) {
+		function onBack() {
+			order.declineStep2 = false
+			order.confirmStep2 = false
+		}
+
 		return (
 			<>
 				{
@@ -274,7 +279,7 @@ export function renderPendingOrdersFactory () {
 								<g-icon style="cursor: pointer" onClick={() => openDialogReason(order)}>
 									icon-keyboard
 								</g-icon>
-						}}></g-text-field-bs>
+						}}/>
 					</g-card-actions>
 				}
 				{
@@ -297,7 +302,7 @@ export function renderPendingOrdersFactory () {
 				<g-card-actions>
 					{
 						(!order.confirmStep2 && !order.declineStep2) &&
-						<g-btn-bs height="54" width="60" border-color="#C4C4C4" text-color="black" onClick={withModifiers(() => onClickDecline(order), ['stop'])}>
+						<g-btn-bs height="54" width="60" border-color="#C4C4C4" text-color="black" onClick={withModifiers(() => declineOrder(order), ['stop'])}>
 							<g-icon size="14">
 								icon-cross-red
 							</g-icon>

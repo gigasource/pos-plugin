@@ -61,7 +61,7 @@ export async function declineOrder(order) {
 	await Order.findOneAndUpdate({
 		_id: order._id
 	}, order)
-	_.remove(kitchenOrders.value, _order => _order._id.toString() === order._id.toString())
+	_.remove(pendingOrders.value, _order => _order._id.toString() === order._id.toString())
 }
 
 export async function loadOrders() {
