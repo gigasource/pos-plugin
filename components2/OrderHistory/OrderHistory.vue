@@ -24,6 +24,8 @@ import OrderHistoryDetail from './OrderHistoryDetail';
 import DialogDateTimePicker from './dialogDateTimePicker';
 import { appHooks } from '../AppSharedStates';
 import { listPayments } from '../Settings/PaymentSetting/view-payment-logics';
+import { execGenScopeId } from '../utils';
+
 export default {
   components: { DialogDateTimePicker, OrderHistoryDetail, OrderHistoryTable },
   setup() {
@@ -119,16 +121,18 @@ export default {
 
     const renderToolbar = () =>
         <g-toolbar height={'50px'} color="#eeeeee" elevation="0">
-          <g-btn-bs elevation="2" icon="icon-back" onClick={back}>
-            {t('ui.back')}
-          </g-btn-bs>
-          <g-spacer/>
-          <g-btn-bs elevation="2" icon="icon-remove-square" onClick={() => openDialog('confirm')}>
-            {t('orderHistory.deleteOrder')}
-          </g-btn-bs>
-          <g-btn-bs elevation="2" background-color="blue-accent-3" icon="icon-print2" onClick={print}>
-            {t('ui.print')}
-          </g-btn-bs>
+          {execGenScopeId(() => <>
+            <g-btn-bs elevation="2" icon="icon-back" onClick={back}>
+              {t('ui.back')}
+            </g-btn-bs>
+            <g-spacer/>
+            <g-btn-bs elevation="2" icon="icon-remove-square" onClick={() => openDialog('confirm')}>
+              {t('orderHistory.deleteOrder')}
+            </g-btn-bs>
+            <g-btn-bs elevation="2" background-color="blue-accent-3" icon="icon-print2" onClick={print}>
+              {t('ui.print')}
+            </g-btn-bs>
+          </>)}
         </g-toolbar>
 
     const renderDialogs = () => <>

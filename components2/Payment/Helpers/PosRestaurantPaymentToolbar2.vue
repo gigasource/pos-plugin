@@ -1,20 +1,20 @@
 <script>
-import {ref, withModifiers, computed} from 'vue';
-import {useI18n} from 'vue-i18n';
-import {getCurrentOrder} from '../../OrderView/pos-logic-be';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { getCurrentOrder } from '../../OrderView/pos-logic-be';
 import PaymentLogicsFactory from '../payment-logics';
-import {useRoute, useRouter} from 'vue-router';
-import {posSettings} from '../../AppSharedStates';
-import {GBtnBs, GProgressCircular, GSpacer, GToolbar} from 'pos-vue-framework';
-import {genScopeId} from '../../utils';
-import {hooks} from "../../OrderView/pos-logic";
+import { useRouter } from 'vue-router';
+import { posSettings } from '../../AppSharedStates';
+import { GBtnBs, GProgressCircular, GSpacer, GToolbar } from 'pos-vue-framework';
+import { genScopeId } from '../../utils';
+import { hooks } from '../../OrderView/pos-logic';
 
 export default {
   name: 'PosRestaurantPaymentToolbar2',
-  components: {GToolbar, GBtnBs, GSpacer, GProgressCircular},
-  setup(props, {emit}) {
-    const {paidValue} = PaymentLogicsFactory()
-    const {t} = useI18n()
+  components: { GToolbar, GBtnBs, GSpacer, GProgressCircular },
+  setup(props, { emit }) {
+    const { paidValue } = PaymentLogicsFactory()
+    const { t } = useI18n()
     const processing = ref(false)
     const order = getCurrentOrder()
     const isPayBtnDisabled = computed(() => {
@@ -40,7 +40,7 @@ export default {
       if (!order.table) {
         router.go(-1);
       } else {
-        router.push({path: '/pos-dashboard'})
+        router.push({ path: '/pos-dashboard' })
       }
     }
     const promotion = function () {
@@ -49,23 +49,25 @@ export default {
     }
     return genScopeId(() =>
         <g-toolbar color="#eee" height="100%" elevation="0">
-          <g-btn-bs icon="icon-back" onClick={back}>
-            {t('ui.back')} </g-btn-bs>
-          <g-btn-bs icon="icon-promotion" onClick={promotion}>
-            {t('fnBtn.paymentFunctions.promotion')} </g-btn-bs>
-          <g-spacer>
-          </g-spacer>
-          <g-btn-bs icon="icon-print2" onClick={() => pay(false)} disabled={isPayBtnDisabled.value}>
-            {t('fnBtn.paymentFunctions.bill')}
-          </g-btn-bs>
-          <g-btn-bs class="col-2" background-color="#2979FF" onClick={() => pay(true)}
-                    disabled={isPayBtnDisabled.value}>
-            {
-              (processing.value) ?
-                  <g-progress-circular indeterminate/>
-                  : t('fnBtn.paymentFunctions.pay')
-            }
-          </g-btn-bs>
+          {genScopeId(() => <>
+            <g-btn-bs icon="icon-back" onClick={back}>
+              {t('ui.back')} </g-btn-bs>
+            <g-btn-bs icon="icon-promotion" onClick={promotion}>
+              {t('fnBtn.paymentFunctions.promotion')} </g-btn-bs>
+            <g-spacer>
+            </g-spacer>
+            <g-btn-bs icon="icon-print2" onClick={() => pay(false)} disabled={isPayBtnDisabled.value}>
+              {t('fnBtn.paymentFunctions.bill')}
+            </g-btn-bs>
+            <g-btn-bs class="col-2" background-color="#2979FF" onClick={() => pay(true)}
+                      disabled={isPayBtnDisabled.value}>
+              {
+                (processing.value) ?
+                    <g-progress-circular indeterminate/>
+                    : t('fnBtn.paymentFunctions.pay')
+              }
+            </g-btn-bs>
+          </>)()}
         </g-toolbar>)
   }
 }
