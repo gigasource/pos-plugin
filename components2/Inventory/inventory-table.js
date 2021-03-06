@@ -36,7 +36,7 @@ export function renderMainInventoryTable(props, { emit }) {
 		router.push({ path: '/pos-inventory-stock' })
 	}
 	const removeInventory = async function () {
-		await deleteInventory(selectedInventoryIDs)
+		await deleteInventory(checkBoxSelectedInventoryIDs.value)
 	}
 	const getCategoryText = function (categoryList) {
 		return categoryList.reduce((result, category) => {

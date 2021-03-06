@@ -293,7 +293,7 @@ export function renderInventoryDialog(t) {
             {/* attribute */}
             <div class="column-flex">
               <div>{t('inventory.attribute')}</div>
-              {selectedInventory.value.product.attributes.map((attribute, i) => (
+              {selectedInventory.value.product.attributes && selectedInventory.value.product.attributes.map((attribute, i) => (
                   <div class="row-flex">
                     <g-select
                         menu-class="menu-select-inventory" outlined style="width: 10%" label={t('inventory.attributes')}

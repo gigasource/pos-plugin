@@ -11,6 +11,9 @@ import {customers} from "./customer-logic";
 import { hooks as orderHook } from "../OrderView/pos-logic";
 import _ from 'lodash'
 import {isIOS} from "../AppSharedStates";
+import {v4 as uuidv4} from "uuid";
+
+const token = uuidv4()
 
 export const customerHooks = new Hooks()
 
@@ -51,6 +54,34 @@ orderHook.on('pay', -1, async () => {
 //</editor-fold>
 
 export const autocompleteAddresses = ref([])
+
+async function searchAddress(text, index) {
+  if (!text || text.length < 4) return
+  cms.socket.emit('searchPlace', text, token, (places) => {
+    autocompleteAddresses.value[index].places = places.map(place => ({
+      text: place.description,
+      value: place.place_id,
+    }))
+  })
+}
+
+async function selectAutocompleteAddress(place_id, index) {
+  if (autocompleteAddresses.value[index].places.find(item => item.value === place_id)) {
+    cms.socket.emit('getPlaceDetail', place_id, token, data => {
+      if (!_.isEmpty(data)) {
+        for (const component of data.address_components) {
+          customerDialogData.addresses[index].house = component.types.includes('street_number') ? component.long_name : ''
+          customerDialogData.addresses[index].street = component.types.includes('route') ? component.long_name : ''
+          customerDialogData.addresses[index].zipcode = component.types.includes('postal_code') ? component.long_name : ''
+          customerDialogData.addresses[index].city = component.types.includes('locality') ? component.long_name : ''
+        }
+        customerDialogData.addresses[index].address = data.name
+      }
+    })
+  }
+}
+
+export const debounceSearchAddress = _.debounce(searchAddress, 300)
 
 export function onSelectCustomer(customer) {
   selectingCustomer.value = customer
@@ -153,8 +184,8 @@ export function clearCustomerDialogData() {
 export function renderCustomerInfo() {
   return <div className="dialog-left">
     <div className="row-flex">
-      <g-text-field virtualEvent={isIOS.value} outlined style="flex: 1" label="Name" v-model={customerDialogData.name}/>
-      <g-text-field virtualEvent={isIOS.value} outlined style="flex: 1" label="Phone"
+      <g-text-field required={true} virtualEvent={isIOS.value} outlined style="flex: 1" label="Name" v-model={customerDialogData.name}/>
+      <g-text-field required={true} virtualEvent={isIOS.value} outlined style="flex: 1" label="Phone"
                     v-model={customerDialogData.phone}/>
     </div>
 
