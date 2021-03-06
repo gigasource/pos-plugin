@@ -1,4 +1,3 @@
-
 <script>
 import { KeepAlive, Component, h} from 'vue'
 import viewGeneral from './viewGeneral';
@@ -18,8 +17,10 @@ import CallSystem from './CallSystem/CallSystem';
 import CustomerScreenConfig from './CustomerScreenConfig/CustomerScreenConfig';
 import OnlineOrderSetting from './OnlineOrderSetting/OnlineOrderSetting';
 import PosOrderDeliveryConfig from './DeliverySetting/PosOrderDeliveryConfig'
+import CustomerLedDisplay from './CustomerScreenConfig/CustomerLedDisplay';
+
 export default {
-  components: { PosOrderDeliveryConfig, OnlineOrderSetting, CustomerScreenConfig, CallSystem, PosSettingsScreenToolbar, viewGeneral, viewUser, viewPayment, viewTax, viewCompany, viewUserToolbar, viewTaxToolbar, viewPaymentToolbar, PosSettingsScreenSidebar},
+  components: { CustomerLedDisplay, PosOrderDeliveryConfig, OnlineOrderSetting, CustomerScreenConfig, CallSystem, PosSettingsScreenToolbar, viewGeneral, viewUser, viewPayment, viewTax, viewCompany, viewUserToolbar, viewTaxToolbar, viewPaymentToolbar, PosSettingsScreenSidebar},
   setup() {
     const GeneralSettingView = <viewGeneral style="flex: 1"/>
     const UserSettingView = <viewUser style="flex: 1"/>
@@ -33,6 +34,7 @@ export default {
     const UserToolbar = <viewUserToolbar></viewUserToolbar>
     const PaymentToolbar = <viewPaymentToolbar></viewPaymentToolbar>
     const TaxToolbar = <viewTaxToolbar></viewTaxToolbar>
+    const CustomerLedDisplayView = <customer-led-display/>
     const views = {
       GeneralSettingView,
       UserSettingView,
@@ -42,7 +44,8 @@ export default {
       CallSystemSettingView,
       CustomerScreenSettingView,
       OnlineOrderSettingView,
-      DeliverySettingView
+      DeliverySettingView,
+      CustomerLedDisplayView
     }
 
     const toolbars = {
