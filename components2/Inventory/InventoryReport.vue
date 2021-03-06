@@ -120,7 +120,7 @@ export default {
             <g-select
                 class="mb-1 inventory-report__left__category"
                 text-field-component="GTextFieldBs"
-                items={[{name: 'All'}, ...categories.value]}
+                items={[{ name: 'All' }, ...categories.value]}
                 v-model={selectedCategory.value}
                 item-text="name"
                 return-object
@@ -134,7 +134,7 @@ export default {
 
 
     const renderMainContent = () => {
-      const thStyle = {'border-bottom': '1px solid #E0E0E0'}
+      const thStyle = { 'border-bottom': '1px solid #E0E0E0' }
       const qtyStyle = { width: '80px' }
       return (
           <g-table striped fixed-header style="flex: 1">
@@ -142,17 +142,21 @@ export default {
             <tr style="font-size: 12px;">
               <th class="ta-left pl-2" style={thStyle}>Name</th>
               <th class="ta-right pr-2" style={[qtyStyle, thStyle]}>Unit</th>
-              { (type.value === 'all' || type.value === 'add') && <th class="ta-right pr-2" style={[qtyStyle, thStyle]}>Added</th> }
-              { (type.value === 'all' || type.value === 'remove') && <th class="ta-right pr-2" style={[qtyStyle, thStyle]}>Removed</th> }
+              {(type.value === 'all' || type.value === 'add') &&
+              <th class="ta-right pr-2" style={[qtyStyle, thStyle]}>Added</th>}
+              {(type.value === 'all' || type.value === 'remove') &&
+              <th class="ta-right pr-2" style={[qtyStyle, thStyle]}>Removed</th>}
             </tr>
             </thead>
             <tbody>
-            { sortedInventories.value.map((inventory, i) =>
+            {sortedInventories.value.map((inventory, i) =>
                 <tr style="font-size: 12px" key={`list_${i}`} onClick={() => selectItem(inventory)}>
                   <td class="ta-left pl-2">{inventory.product.name}</td>
                   <td class="ta-right pr-2" style={qtyStyle}>{inventory.unit}</td>
-                  { (type.value === 'all' || type.value === 'add') && <td class="ta-right pr-2" style={qtyStyle}>{$filters.formatCurrency(inventory.add)}</td> }
-                  { (type.value === 'all' || type.value === 'remove') && <td class="ta-right pr-2" style={qtyStyle}>{$filters.formatCurrency(inventory.remove)}</td> }
+                  {(type.value === 'all' || type.value === 'add') &&
+                  <td class="ta-right pr-2" style={qtyStyle}>{$filters.formatCurrency(inventory.add)}</td>}
+                  {(type.value === 'all' || type.value === 'remove') &&
+                  <td class="ta-right pr-2" style={qtyStyle}>{$filters.formatCurrency(inventory.remove)}</td>}
                 </tr>
             )}
             </tbody>
@@ -227,17 +231,6 @@ export default {
     flex-direction: column;
     padding: 6px;
     background-color: #E1E3EB;
-
-    &__cateogry :deep {
-      .bs-tf-wrapper {
-        width: calc(100% - 10px);
-        margin: 4px 5px 8px;
-      }
-
-      .bs-tf-inner-input-group {
-        background-color: #FFF
-      }
-    }
 
     .category {
       flex: 1;
@@ -459,5 +452,14 @@ export default {
       background-color: #F8F8FB;
     }
   }
+}
+</style>
+
+<style lang="css">
+.inventory-report__left__category > .bs-tf-wrapper {
+  background-color: #FFF;
+  border-radius: 4px;
+  margin: 4px 0 0;
+  width: 100%;
 }
 </style>
