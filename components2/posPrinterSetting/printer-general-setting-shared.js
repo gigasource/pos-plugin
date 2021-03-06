@@ -3,7 +3,7 @@ import { printerGeneralSetting } from './pos-printer-be';
 import { watch } from 'vue';
 import { attrComputed } from '../utils';
 import _ from 'lodash';
-import { updateSetting } from '../Settings/settings-shared-logics';
+import { updateSetting } from '../Settings/settings-be';
 import { MAX_NO_ENTIRE_RECEIPT } from './pos-print-shared';
 
 export async function loadPrinterGeneralSetting() {

@@ -6,11 +6,13 @@ import {
   demoLicense,
   dayLeft,
   iframeHeight,
-  iframeWidth, iframeSrc, iframeDragging, showIframe, viewLicense
+  iframeWidth, iframeSrc, iframeDragging, showIframe, showExportDataDialog, viewLicense
 } from './pos-dashboard-function-logics';
 import { appHooks } from '../../AppSharedStates';
 import { genScopeId } from '../../utils';
 import { computed } from 'vue'
+import dialogExportData from '../../Report/dialogExportData';
+
 
 export default {
   setup() {
@@ -71,10 +73,10 @@ export default {
                         showMinimize={false}
                         showMaximize={false}
                         onClose={() => showIframe.value = false}
-                        onDragstart={() => iframeDragging.value = true}
-                        onDragend={() => iframeDragging.value = false}
-                        onResizestart={() => iframeDragging.value = true}
-                        onResizeend={() => iframeDragging.value = false} v-slots={{
+                        onDragStart={() => iframeDragging.value = true}
+                        onDragEnd={() => iframeDragging.value = false}
+                        onResizeStart={() => iframeDragging.value = true}
+                        onResizeEnd={() => iframeDragging.value = false} v-slots={{
             default: () => <>
               { showIframe.value && iframeDragging.value && <div style="height: 100%; width: 100%; position: absolute; background: transparent"></div> }
               { showIframe.value && <iframe src={iframeSrc.value} width="100%" height="100%"></iframe> }
@@ -84,6 +86,9 @@ export default {
           </g-dnd-dialog>
       )
     }
+    function renderExportDataDialog() {
+      return <dialogExportData v-model={showExportDataDialog.value}/>
+    }
 
     return genScopeId(() =>
         <div class="function">
@@ -92,6 +97,7 @@ export default {
           { renderBottomButtons() }
           { renderDemoLicenseWarning() }
           { renderOnlineOrderingSettingDialog() }
+          { renderExportDataDialog() }
         </div>
     )
   }
@@ -200,8 +206,8 @@ export default {
   }
 }
 
-/*Iphone 6/7/8 Plus*/
-@media screen and (max-width: 736px) {
+
+@media screen and (min-width: 668px) and (max-width: 860px) {
   .function {
     &--up,
     &--down {

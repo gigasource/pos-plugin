@@ -2,7 +2,7 @@
 import { username, user } from '../AppSharedStates';
 import { genScopeId, internalValueFactory } from '../utils';
 import { SettingsSidebarFactory } from './settings-ui-logics';
-import { changeView } from './settings-ui-logics';
+import { changeSettingView } from './settings-shared';
 import { ref } from 'vue'
 
 export default {
@@ -15,7 +15,7 @@ export default {
         <g-side-bar-tree-view data={sidebarData.value}
                               auto-collapse={false}
                               v-model={currentTarget.value}
-                              onNodeSelected={node => (node.target && changeView(node.target))}
+                              onNodeSelected={node => (node.target && changeSettingView(node.target))}
         />
     )
 

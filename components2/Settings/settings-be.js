@@ -1,7 +1,6 @@
 import cms from 'cms';
-import { ref } from 'vue'
-import { appHooks, posSettings } from '../AppSharedStates';
-import Hooks from 'schemahandler/hooks/hooks'
+import { appHooks } from '../AppSharedStates';
+
 export async function updatePayment(oldPayment, newPayment) {
   const settingModel = cms.getModel('PosSetting');
   if (oldPayment && !newPayment) {
@@ -9,7 +8,7 @@ export async function updatePayment(oldPayment, newPayment) {
       {},
       {
         $pull: {
-          payment: {_id: oldPayment._id}
+          payment: { _id: oldPayment._id }
         }
       }
     )
@@ -18,7 +17,7 @@ export async function updatePayment(oldPayment, newPayment) {
       {},
       {
         $push: {
-          payment: {...newPayment, editable: true}
+          payment: { ...newPayment, editable: true }
         }
       }
     )
@@ -37,19 +36,9 @@ export async function updatePayment(oldPayment, newPayment) {
   appHooks.emit('settingChange')
 }
 
-export function updateGeneralSetting() {
-
-}
-
 export async function updateSetting(value) {
   const settingModel = cms.getModel('PosSetting');
   await settingModel.findOneAndUpdate({}, value)
   appHooks.emit('settingChange')
 }
 
-export const settingsHooks = new Hooks()
-
-export const currentSettingView = ref('UserSettingView')
-settingsHooks.on('changeSettingView', (val) => {
-  currentSettingView.value = val
-})

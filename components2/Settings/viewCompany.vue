@@ -19,6 +19,7 @@ export default {
       address2: '',
       zipCode: '',
       city: '',
+      country: '',
       telephone: '',
       taxNumber: '',
       ustId: '',
@@ -29,6 +30,7 @@ export default {
       address2: '',
       zipCode: '',
       city: '',
+      country: '',
       telephone: '',
       taxNumber: '',
       ustId: '',
@@ -46,6 +48,7 @@ export default {
       companyInfoModel.address2 = companyInfo.value.address2
       companyInfoModel.zipCode = companyInfo.value.zipCode
       companyInfoModel.city = companyInfo.value.city
+      companyInfoModel.country = companyInfo.value.country
       companyInfoModel.telephone = companyInfo.value.telephone
       companyInfoModel.taxNumber = companyInfo.value.taxNumber
       companyInfoModel.ustId = companyInfo.value.ustId
@@ -59,6 +62,7 @@ export default {
     const zipCode = attrComputed(companyInfo, 'zipCode', '')
     const city = attrComputed(companyInfo, 'city', '')
     const telephone = attrComputed(companyInfo, 'telephone', '')
+    const country = attrComputed(companyInfo, 'country', '')
     const taxNumber = attrComputed(companyInfo, 'taxNumber', '')
     const ustId = attrComputed(companyInfo, 'ustId', '')
     const logo = attrComputed(companyInfo, 'logo', '')
@@ -123,6 +127,7 @@ export default {
       companyInfoDialogData.address2 = address2.value
       companyInfoDialogData.zipCode = zipCode.value
       companyInfoDialogData.city = city.value
+      companyInfoDialogData.country = country.value
       companyInfoDialogData.telephone = telephone.value
       companyInfoDialogData.taxNumber = taxNumber.value
       companyInfoDialogData.ustId = ustId.value
@@ -148,6 +153,7 @@ export default {
       {inputRender('address2', 'address2')}
       {inputRender('zipCode', 'zipCode', true)}
       {inputRender('city', 'city', true)}
+      {inputRender('country', 'country', true)}
       {inputRender('tel', 'telephone', true)}
       {inputRender('taxNo', 'taxNumber', true)}
       {inputRender('ustId', 'ustId')}
@@ -180,12 +186,13 @@ export default {
     )
     const dialogRender = genScopeId(() => <dialog-form-input v-model={dialog.value} onSubmit={update} v-slots={{
       'input': genScopeId(() =>
-          <div class="row-flex flex-wrap justify-around">
+          <div class="row-flex flex-wrap ">
             <pos-textfield-new style="width: 48%" label={t('settings.companyName')} v-model={companyInfoDialogData.name} required/>
             <pos-textfield-new style="width: 48%" label={t('settings.address')} v-model={companyInfoDialogData.address} required/>
             <pos-textfield-new style="width: 48%" label={t('settings.address2')} v-model={companyInfoDialogData.address2}/>
             <pos-textfield-new style="width: 48%" label={t('settings.zipCode')} v-model={companyInfoDialogData.zipCode} required/>
             <pos-textfield-new style="width: 48%" label={t('settings.city')} v-model={companyInfoDialogData.city} required/>
+            <pos-textfield-new style="width: 48%" label={t('settings.country')} v-model={companyInfoDialogData.country} required/>
             <pos-textfield-new style="width: 48%" label={t('settings.tel')} v-model={companyInfoDialogData.telephone} required/>
             <pos-textfield-new style="width: 48%" label={t('settings.taxNo')} v-model={companyInfoDialogData.taxNumber} required/>
             <pos-textfield-new style="width: 48%" label={t('settings.ustId')} v-model={companyInfoDialogData.ustId}/>

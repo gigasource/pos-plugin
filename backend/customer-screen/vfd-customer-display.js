@@ -8,9 +8,8 @@ let spCustomerdisplay = null
 // printToCustomerdisplay({ item: { name: 'Coke', price: 20 }, sum: '20' })
 // printToCustomerdisplay({ line1: 'Hello world!', line2: 'Oops! Goodbye.' })
 
-function printToCustomerdisplay({ line1, line2, sum, item, rabatt }) {
-  let comName = '/dev/tty.usbserial-1440'
-
+module.exports = function printToCustomerdisplay({ line1, line2, sum, item, rabatt }) {
+  let comName = '/dev/tty.usbserial-1440' // TODO: remove hard-coded
   if (!line1) {
     if (item) {
       const price = numeral(item.price).format('0.00');
@@ -26,7 +25,6 @@ function printToCustomerdisplay({ line1, line2, sum, item, rabatt }) {
     } else {
       line1 = '';
     }
-
 
     sum = numeral(sum).format('0.00');
     line2 = `${_.padEnd('Summe:', 20 - sum.length)}${sum}`;
@@ -46,6 +44,7 @@ function printToCustomerdisplay({ line1, line2, sum, item, rabatt }) {
       if (!SerialPort) {
         SerialPort = require('serialport');
       }
+
       SerialPort.list().then(function (serials) {
         if (_.find(serials, { path: comName })) {
           spCustomerdisplay = new SerialPort(comName, {
@@ -53,12 +52,8 @@ function printToCustomerdisplay({ line1, line2, sum, item, rabatt }) {
           });
 
           spCustomerdisplay.on('open', function (err) {
-            console.log('on spCustomerdisplay open')
             spCustomerdisplay.write(`${pre1}${line1}${pre2}${line2}`, function (err, results) {
-              console.log('write result', results, err)
-              spCustomerdisplay.drain(function () {
-                console.log('drain')
-              });
+              spCustomerdisplay.drain(function () {});
             });
           });
 

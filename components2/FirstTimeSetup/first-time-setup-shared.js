@@ -1,6 +1,6 @@
 import { computed, reactive, ref } from 'vue';
 import { online } from '../AppSharedStates';
-import { updateSetting } from '../Settings/settings-shared-logics';
+import { updateSetting } from '../Settings/settings-be';
 
 
 export const errorMessage = ref('No internet connection')

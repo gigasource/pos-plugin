@@ -14,7 +14,7 @@ export default {
     rotate: Boolean,
     cashValue: Number,
     cardValue: Number,
-    modelValue: Number
+    modelValue: Boolean
   },
   emits: ['update:cardValue', 'update:cashValue', 'submit', 'update:modelValue'],
   setup(props, { emit }) {

@@ -8,7 +8,7 @@ import PosRestaurantPaymentToolbar2 from './Helpers/PosRestaurantPaymentToolbar2
 import PaymentLogicsFactory from './payment-logics';
 import { genScopeId } from '../utils';
 import { makeDiscount } from '../OrderView/pos-logic';
-import dialogChangeValue2 from './Helpers/dialogChangeValue2';
+import dialogChangeValue2 from './Helpers/dialogChangeValue';
 
 export default {
   name: 'Payment',
@@ -24,18 +24,8 @@ export default {
       makeDiscount(currentOrder, discount)
     }
     const onOpenDiscountDialog = function () {
-      //todo: check this logic
       showDiscountDialog.value = true
-      // if (moreDiscount.value) {
-      //   console.log(currentOrder.items)
-      //   const originalTotal = currentOrder.items.reduce((acc, item) => (acc + (item.discountResistance ? 0 : item.quantity * item.originalPrice)), 0);
-      //   discountDialog.value.open(originalTotal, currentOrder.discount)
-      // } else {
-      //   showDiscountMessage.value = true
-      //   //todo: hide discount message
-      // }
     }
-    //todo: add onDiscount and print event
     return genScopeId(() => <>
       <div class="payment">
         <div class="payment-main">
@@ -53,7 +43,7 @@ export default {
           <span> {t('payment.alertDiscount')} </span>
         </div>
       </g-snackbar>
-      <dialog-change-value2 v-model={showDiscountDialog.value} onSubmit={discountCurrentOrder}/>
+      <dialog-change-value v-model={showDiscountDialog.value} onSubmit={discountCurrentOrder}/>
     </>)
   }
 }

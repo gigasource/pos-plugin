@@ -3,7 +3,7 @@ import { useI18n } from 'vue-i18n';
 import cms from 'cms';
 import { posSettings, user } from '../../AppSharedStates';
 import axios from 'axios';
-import { updateSetting } from '../settings-shared-logics';
+import { updateSetting } from '../settings-be';
 
 
 export const snackbarRef = ref(null)

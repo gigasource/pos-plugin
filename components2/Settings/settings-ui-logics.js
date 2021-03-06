@@ -1,7 +1,8 @@
 import { useI18n } from 'vue-i18n';
 import { ref, computed } from 'vue'
-import { settingsHooks } from './settings-shared-logics';
 import { appType, currentAppType } from '../AppType';
+import Hooks from 'schemahandler/hooks/hooks';
+import { VIEWS } from './settings-shared';
 
 
 export const SettingsSidebarFactory = () => {
@@ -14,14 +15,14 @@ export const SettingsSidebarFactory = () => {
   })
   const sidebarData = computed(() => {
     const _sidebarData = [
-      { title: sidebar.value.user, icon: 'person', isView: true, key: 'user', target: 'UserSettingView' },
-      { title: sidebar.value.general, icon: 'icon-general_setting', isView: true, key: 'general', target: 'GeneralSettingView' },
+      { title: sidebar.value.user, icon: 'person', isView: true, key: 'user', target: VIEWS.USER_SETTING_VIEW },
+      { title: sidebar.value.general, icon: 'icon-general_setting', isView: true, key: 'general', target: VIEWS.GENERAL_SETTING_VIEW },
       {
         title: sidebar.value.advancedSettings, icon: 'icon-switch', svgIcon: true, key: 'advancedSettings',
         items: [
-          { title: sidebar.value.companyInfo, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'companyInfo', target: 'CompanyInfoSettingView' },
-          { title: sidebar.value.payment, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'payment', target: 'PaymentSettingView' },
-          { title: sidebar.value.tax, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'tax', target: 'TaxSettingView' },
+          { title: sidebar.value.companyInfo, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'companyInfo', target: VIEWS.COMPANY_INFO_SETTING_VIEW },
+          { title: sidebar.value.payment, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'payment', target: VIEWS.PAYMENT_SETTING_VIEW },
+          { title: sidebar.value.tax, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'tax', target: VIEWS.TAX_SETTING_VIEW },
         ]
       },
     ]
@@ -30,13 +31,14 @@ export const SettingsSidebarFactory = () => {
       _sidebarData.push({
         title: sidebar.value.onlineOrderSettings, icon: 'icon-general_setting',
         items: [
-          { title: sidebar.value.settings, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'onlineOrderSettings', target: 'OnlineOrderSettingView' },
-          { title: deliveryMenu.value, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'deliveryConfig', target: 'DeliverySettingView' },
+          { title: sidebar.value.settings, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'onlineOrderSettings', target: VIEWS.ONLINE_ORDER_SETTING_VIEW },
+          { title: deliveryMenu.value, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'deliveryConfig', target: VIEWS.DELIVERY_SETTING_VIEW },
         ]
       })
-      _sidebarData.push({ title: sidebar.value.callSystem, icon: 'icon-telephone', isView: true, key: 'callSystem', target: 'CallSystemSettingView' })
-      _sidebarData.push({ title: sidebar.value.customerScreen, icon: 'icon-screen', isView: true, key: 'customerScreen', target: 'CustomerScreenSettingView' })
+      _sidebarData.push({ title: sidebar.value.callSystem, icon: 'icon-telephone', isView: true, key: 'callSystem', target: VIEWS.CALL_SYSTEM_SETTING_VIEW })
+      _sidebarData.push({ title: sidebar.value.customerScreen, icon: 'icon-screen', isView: true, key: 'customerScreen', target: VIEWS.CUSTOMER_SCREEN_SETTING_VIEW })
     }
+    _sidebarData.push({ title: 'Customer Led Display', icon: 'icon-screen', isView: true, key: 'customerLedDisplay', target: VIEWS.CUSTOMER_LED_DISPLAY_VIEW })
 
     return _sidebarData
   })
@@ -44,23 +46,3 @@ export const SettingsSidebarFactory = () => {
   return { sidebarData }
 }
 
-export function changeView(newView) {
-  settingsHooks.emit('changeSettingView', newView)
-}
-
-const onlineDevice = ref(null)
-const defaultPrepareTime = ref(null)
-const onlineOrderSorting = ref(null)
-
-// todo: implement these functions
-function updateOnlineDevice() {
-}
-
-function updateDefaultPrepareTime() {
-}
-
-function updateOnlineOrderSorting() {
-}
-
-function getOnlineDevice() {
-}

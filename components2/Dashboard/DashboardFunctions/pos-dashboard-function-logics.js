@@ -26,6 +26,7 @@ export const demoLicense = ref(false)
 export const dayLeft = ref(14)
 export const inventoryNotification = ref(0)
 export const posSetting = ref(null)
+export const showExportDataDialog = ref(false)
 
 export const DashboardFunctionFactory = () => {
   const { t, locale, messages, fallbackLocale } = useI18n()
@@ -73,6 +74,7 @@ export const DashboardFunctionFactory = () => {
       { title: customer.value, feature: 'customerInfo', icon: 'icon-customer-info', click: () => changePath('/pos-customer') },
       { title: inventory.value, feature: 'manageInventory', icon: 'icon-inventory', click: () => changePath('/pos-inventory') },
       { title: onlineOrdering.value, feature: 'onlineOrdering', icon: 'icon-online-order-menu', click: openStoreSetting },
+      { title: 'GDPdU/GoBD Data Exportieren', icon: 'icon-online-order-menu', click: () => showExportDataDialog.value = true },
       // { title: support, icon: 'icon-support-2',  click: () => changePath('/pos-support') },
     ],
     [appType.POS_RETAIL] : [
@@ -84,6 +86,7 @@ export const DashboardFunctionFactory = () => {
       { title: inventory.value, feature: 'manageInventory', icon: 'icon-inventory', click: () => changePath('/pos-inventory') },
       { title: 'Product Setting' /*TODO: i18n*/, icon: 'icon-inventory' /*TODO: update icon*/, click: () => changePath('/pos-product-setting') },
       { title: customer.value, feature: 'customerInfo', icon: 'icon-customer-info', click: () => changePath('/pos-customer') },
+      { title: 'GDPdU/GoBD Data Exportieren', icon: 'icon-online-order-menu', click: () => showExportDataDialog.value = true },
     ]
   }))
 

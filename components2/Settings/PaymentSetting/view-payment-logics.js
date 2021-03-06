@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue';
 import { posSettings } from '../../AppSharedStates';
-import { updatePayment } from '../settings-shared-logics';
+import { updatePayment } from '../settings-be';
 import { useI18n } from 'vue-i18n';
 import { internalValueFactory } from '../../utils';
 import { ObjectID } from 'bson';

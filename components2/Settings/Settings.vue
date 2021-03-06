@@ -1,4 +1,3 @@
-
 <script>
 import { KeepAlive, Component, h} from 'vue'
 import viewGeneral from './viewGeneral';
@@ -9,8 +8,6 @@ import viewUser from './UserSetting/viewUser';
 import viewUserToolbar from './UserSetting/viewUserToolbar';
 import viewTaxToolbar from './TaxSetting/viewTaxToolbar';
 import viewPaymentToolbar from './PaymentSetting/viewPaymentToolbar';
-import { currentSettingView } from './settings-shared-logics';
-import { login } from '../Login/LoginLogic';
 import PosSettingsScreenSidebar from './PosSettingsScreenSidebar';
 import { genScopeId } from '../utils';
 import PosSettingsScreenToolbar from './PosSettingsScreenToolbar';
@@ -18,8 +15,11 @@ import CallSystem from './CallSystem/CallSystem';
 import CustomerScreenConfig from './CustomerScreenConfig/CustomerScreenConfig';
 import OnlineOrderSetting from './OnlineOrderSetting/OnlineOrderSetting';
 import PosOrderDeliveryConfig from './DeliverySetting/PosOrderDeliveryConfig'
+import CustomerLedDisplay from './CustomerScreenConfig/CustomerLedDisplay';
+import { VIEWS, currentSettingView } from './settings-shared';
+
 export default {
-  components: { PosOrderDeliveryConfig, OnlineOrderSetting, CustomerScreenConfig, CallSystem, PosSettingsScreenToolbar, viewGeneral, viewUser, viewPayment, viewTax, viewCompany, viewUserToolbar, viewTaxToolbar, viewPaymentToolbar, PosSettingsScreenSidebar},
+  components: { CustomerLedDisplay, PosOrderDeliveryConfig, OnlineOrderSetting, CustomerScreenConfig, CallSystem, PosSettingsScreenToolbar, viewGeneral, viewUser, viewPayment, viewTax, viewCompany, viewUserToolbar, viewTaxToolbar, viewPaymentToolbar, PosSettingsScreenSidebar},
   setup() {
     const GeneralSettingView = <viewGeneral style="flex: 1"/>
     const UserSettingView = <viewUser style="flex: 1"/>
@@ -33,17 +33,18 @@ export default {
     const UserToolbar = <viewUserToolbar></viewUserToolbar>
     const PaymentToolbar = <viewPaymentToolbar></viewPaymentToolbar>
     const TaxToolbar = <viewTaxToolbar></viewTaxToolbar>
-    const views = {
-      GeneralSettingView,
-      UserSettingView,
-      CompanyInfoSettingView,
-      PaymentSettingView,
-      TaxSettingView,
-      CallSystemSettingView,
-      CustomerScreenSettingView,
-      OnlineOrderSettingView,
-      DeliverySettingView
-    }
+    const CustomerLedDisplayView = <customer-led-display/>
+    let views = {}
+    views[VIEWS.GENERAL_SETTING_VIEW] = GeneralSettingView
+    views[VIEWS.USER_SETTING_VIEW] = UserSettingView
+    views[VIEWS.COMPANY_INFO_SETTING_VIEW] = CompanyInfoSettingView
+    views[VIEWS.PAYMENT_SETTING_VIEW] = PaymentSettingView
+    views[VIEWS.TAX_SETTING_VIEW] = TaxSettingView
+    views[VIEWS.CALL_SYSTEM_SETTING_VIEW] = CallSystemSettingView
+    views[VIEWS.CUSTOMER_SCREEN_SETTING_VIEW] = CustomerScreenSettingView
+    views[VIEWS.ONLINE_ORDER_SETTING_VIEW] = OnlineOrderSettingView
+    views[VIEWS.DELIVERY_SETTING_VIEW] = DeliverySettingView
+    views[VIEWS.CUSTOMER_LED_DISPLAY_VIEW] = CustomerLedDisplayView
 
     const toolbars = {
       UserSettingView: UserToolbar,
