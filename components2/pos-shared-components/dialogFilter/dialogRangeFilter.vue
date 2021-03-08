@@ -24,7 +24,7 @@ export default {
     const filter = ref([0, 0])
 
     function submit() {
-      emit('submit', filter);
+      emit('submit', filter.value);
       internalValue.value = false;
     }
 
