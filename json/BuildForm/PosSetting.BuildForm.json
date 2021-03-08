@@ -861,22 +861,6 @@
           "type": "input"
         },
         {
-          "schemaType": "boolean",
-          "key": "sound",
-          "type": "input@switch"
-        },
-        {
-          "schemaType": "string",
-          "key": "soundLoop",
-          "type": "input@select",
-          "optionsType": "onlyValue",
-          "options": [
-            "none",
-            "once",
-            "repeat"
-          ]
-        },
-        {
           "schemaType": "object",
           "key": "services",
           "fields": [
@@ -924,6 +908,30 @@
             }
           ],
           "type": "object"
+        }
+      ]
+    },
+    {
+      "_id": "60459d71bcbbc3d3fbdec92c",
+      "schemaType": "object",
+      "key": "onlineOrderSoundSetting",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "sound",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "string",
+          "key": "soundLoop",
+          "type": "input@select",
+          "optionsType": "onlyValue",
+          "options": [
+            "none",
+            "once",
+            "repeat"
+          ]
         }
       ]
     },
