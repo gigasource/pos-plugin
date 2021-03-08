@@ -259,7 +259,7 @@ export default {
       )
     }
 
-    const renderPopupModifier = () => isProductLayout.value && (
+    const renderPopupModifier = () => isProductLayout.value && selectedProduct.value && (
         <div class="mt-2">
           <div class="row-flex justify-between">
             <div class="product-editor__label">Popup modifiers</div>
