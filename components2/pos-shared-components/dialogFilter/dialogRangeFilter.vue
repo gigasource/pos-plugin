@@ -35,8 +35,7 @@ export default {
           <g-dialog v-model={internalValue.value} width="70%" eager fullscreen={isMobile.value}>
             {execGenScopeId(() => <div class="wrapper">
               <div class="header">
-                <span>
-                  {props.label} </span>
+                <span>{props.label}</span>
                 <g-icon onClick={() => internalValue.value = false} size="20" svg>
                   icon-close
                 </g-icon>
@@ -44,18 +43,18 @@ export default {
               <div>
                 <pos-range-slider min={props.min} max={props.max} v-model={filter.value}></pos-range-slider>
                 <div class="range-value">
-                  <span>
-                    {props.min === 0 ? props.min : '€ ' + props.min} </span>
-                  <span>
-                    {t('common.currency', locale.value)} {props.max} </span>
+                  <span>{props.min === 0 ? props.min : t('common.currency', locale.value) + ' ' + props.min}</span>
+                  <span>{t('common.currency', locale.value)} {props.max}</span>
                 </div>
               </div>
               <g-spacer></g-spacer>
               <div class="buttons">
                 <g-btn uppercase={false} text onClick={() => internalValue.value = false} outlined width="120" style="margin-right: 8px">
-                  {t('ui.cancel')} </g-btn>
+                  {t('ui.cancel')}
+                </g-btn>
                 <g-btn uppercase={false} text onClick={submit} background-color="#2979FF" text-color="#FFFFFF" width="120">
-                  {t('ui.ok')} </g-btn>
+                  {t('ui.ok')}
+                </g-btn>
               </div>
             </div>)}
           </g-dialog>
