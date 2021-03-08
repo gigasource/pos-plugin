@@ -17,7 +17,7 @@ export const orderQuantity = computed(() => {
 })
 
 export const subTotal = computed(() => {
-  dialogOrder.value.items.reduce((sum, item) => sum + orderUtil.getItemPrice(item) * item.quantity, 0)
+  return dialogOrder.value.items.reduce((sum, item) => sum + orderUtil.getItemPrice(item) * item.quantity, 0)
 })
 
 export const paymentMethod = computed(() => {
