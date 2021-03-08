@@ -44,7 +44,7 @@
               <div class="wrapper">
                 <g-icon onClick={() => internalValue.value = false} svg size="20" class="icon">icon-close</g-icon>
                   <div class="screen">
-                    <g-text-field-bs class="bs-tf__pos" v-model={screenValue.value} large label="label" ref={textField} virtual-event={isIOS.value}/>
+                    <g-text-field-bs class="bs-tf__pos" v-model={screenValue.value} large label={props.label} ref={textField} virtual-event={isIOS.value}/>
                     {
                       isMobile.value &&
                       <div class="buttons">
