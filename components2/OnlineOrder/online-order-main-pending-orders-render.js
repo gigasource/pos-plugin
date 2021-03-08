@@ -22,7 +22,7 @@ import {
 
 import { acceptOrder, declineOrder, onDeclinedOrder } from './online-order-main-logic-be'
 //<editor-fold desc="delivery">
-import { selectedCustomer as deliverySelectedCustomer } from "../OrderView/delivery/delivery-shared";
+import {selectedCustomer as deliverySelectedCustomer, phone, selectedCall} from "../OrderView/delivery/delivery-shared";
 import { orderType } from "../OrderView/delivery/delivery-customer-ui";
 //</editor-fold>
 
@@ -37,14 +37,18 @@ function openOrderCancelReasonDialog(order) {
 	showCancelOrderReasonDialog.value = true
 }
 
-export function navigateToDeliveryScreen({ customer, callId }, type, missedCallIndex) {
+export function navigateToDeliveryScreen(call, type, missedCallIndex) {
+	const { customer, callId } = call
 	cancelMissedCallTimeout(callId)
 	if (missedCallIndex) {
 		calls.unshift({ ...missedCalls.value[missedCallIndex], type: 'missed' })
 		deleteMissedCall(missedCallIndex)
 	}
 	selectedCustomer.value = deliverySelectedCustomer.value = customer
+	phone.value = customer.phone
 	orderType.value = type
+	selectedCall.value = call
+	console.log(selectedCall)
 	router.push({ path: '/pos-order-delivery' })
 }
 export function openReservationDialog({ customer, callId }) {
@@ -97,7 +101,7 @@ export function renderPendingOrdersFactory () {
 				{calls.value.map((call, i) =>
 					<div class="pending-orders--call" key={`call_${i}`}>
 						<div class="pending-orders--call-title">
-							<div> {call.customer.name} <span> - </span> {call.customer.phone} </div>
+							<div>{`${call.customer.name ? `${call.customer.name} - ` : ''}${call.customer.phone}`}</div>
 							<g-spacer></g-spacer>
 							<g-icon>icon-call</g-icon>
 						</div>
