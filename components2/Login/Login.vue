@@ -155,8 +155,8 @@ export default {
     }
 
     &__textfield {
-      margin: 0 30%;
-      margin-bottom: 12px;
+      width: 200px;
+      margin: 0 auto 16px;
     }
   }
 
