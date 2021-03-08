@@ -6,7 +6,7 @@ import PaymentLogicsFactory from '../payment-logics';
 import { useRouter } from 'vue-router';
 import { posSettings } from '../../AppSharedStates';
 import { GBtnBs, GProgressCircular, GSpacer, GToolbar } from 'pos-vue-framework';
-import { genScopeId } from '../../utils';
+import { genScopeId, execGenScopeId } from '../../utils';
 import { hooks } from '../../OrderView/pos-logic';
 
 export default {
@@ -49,25 +49,22 @@ export default {
     }
     return genScopeId(() =>
         <g-toolbar color="#eee" height="100%" elevation="0">
-          {genScopeId(() => <>
-            <g-btn-bs icon="icon-back" onClick={back}>
-              {t('ui.back')} </g-btn-bs>
-            <g-btn-bs icon="icon-promotion" onClick={promotion}>
+          {execGenScopeId(() => <>
+            <g-btn-bs elevation="2" icon="icon-back" onClick={back}>{t('ui.back')}</g-btn-bs>
+            <g-btn-bs elevation="2" icon="icon-promotion" onClick={promotion}>
               {t('fnBtn.paymentFunctions.promotion')} </g-btn-bs>
             <g-spacer>
             </g-spacer>
-            <g-btn-bs icon="icon-print2" onClick={() => pay(false)} disabled={isPayBtnDisabled.value}>
+            <g-btn-bs elevation="2" icon="icon-print2" onClick={() => pay(false)} disabled={isPayBtnDisabled.value}>
               {t('fnBtn.paymentFunctions.bill')}
             </g-btn-bs>
-            <g-btn-bs class="col-2" background-color="#2979FF" onClick={() => pay(true)}
+            <g-btn-bs elevation="2" class="col-2" background-color="#2979FF" onClick={() => pay(true)}
                       disabled={isPayBtnDisabled.value}>
               {
-                (processing.value) ?
-                    <g-progress-circular indeterminate/>
-                    : t('fnBtn.paymentFunctions.pay')
+                (processing.value) ? <g-progress-circular indeterminate/> : t('fnBtn.paymentFunctions.pay')
               }
             </g-btn-bs>
-          </>)()}
+          </>)}
         </g-toolbar>)
   }
 }

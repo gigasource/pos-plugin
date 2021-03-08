@@ -5,9 +5,7 @@ import { version } from '../AppSharedStates';
 export default {
   setup() {
     return genScopeId(() =>
-        <div className="version-status">
-          v {version.value}
-        </div>)
+        <div class="version-status">v{version.value}</div>)
   }
 }
 </script>
