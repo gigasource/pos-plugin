@@ -54,7 +54,7 @@ export async function declineOrder(order) {
 	const status = 'declined'
 	const orderStatus = {
 		orderId: order.id,
-		user,
+		user: user.value,
 		status,
 		responseMessage: order.declineReason
 	}
@@ -72,7 +72,7 @@ export async function loadOrders() {
 	kitchenOrders.value = await Order.find({ online: true, status: 'kitchen' })
 }
 
-export async function acceptOrder(order) {
+export async function acceptOrder(order, isDelivery = false) {
 	let deliveryDateTime
 	deliveryDateTime = dayjs().add(order.prepareTime, 'minute')
 	order.deliveryTime = deliveryDateTime.format('HH:mm')
@@ -93,7 +93,7 @@ export async function acceptOrder(order) {
 
 	const orderStatus = {
 		status: status,
-		user,
+		user: user.value,
 		responseMessage: `${displayTextType[order.type]} in ${order.prepareTime} minutes`
 	}
 
@@ -110,7 +110,9 @@ export async function acceptOrder(order) {
 	_.remove(pendingOrders.value, _order => _order._id.toString() === order._id.toString())
 	kitchenOrders.value.push(order)
 
-	cms.socket.emit('updateOrderStatus', order)
+	if (!isDelivery) {
+		cms.socket.emit('updateOrderStatus', order)
+	}
 }
 
 export async function getOnlineOrdersByLimit(page, limit) {

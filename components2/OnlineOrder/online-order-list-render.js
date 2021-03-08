@@ -11,6 +11,7 @@ import isBetween from 'dayjs/plugin/isBetween'
 import dayjs from 'dayjs'
 dayjs.extend(isBetween)
 import _ from 'lodash'
+import {findCustomerWithId} from "../Customer/customer-logic";
 
 //<editor-fold desc="Variables">
 /**
@@ -113,33 +114,35 @@ export function onlineOrderListFactory(props) {
               <tr>{headers.map(header => <th style="white-space: nowrap">{header}</th>)}</tr>
             </thead>
             <tbody>
-              {ordersListByStatus.value.map((order, i) =>
-                <tr key={i} onClick={() => openDialogDetail(order)} style="cursor: pointer">
+              {ordersListByStatus.value.map((order, i) => {
+                const customer = findCustomerWithId(order.customer)
+                return (
+                  <tr key={i} onClick={() => openDialogDetail(order)} style="cursor: pointer">
                   <td class="fw-700">
                     <p style="white-space: nowrap">#{order.dailyId ? order.dailyId : order.id}</p>
-                    { order.forwardedStore && (<g-tooltip
-                        openOnHover={true} color="#616161" transition="0.3" speech-bubble remove-content-on-close
-                         v-slots={{
-                           default: () => <span><b>From: </b>{order.forwardedStore}</span>,
-                           activator: ({on}) => <div
-                               onMouseEnter={on.mouseenter}
-                               onMouseLeave={on.mouseleave}
-                               onClick={on.click}>
-                             <g-icon size="16">icon-delivery-forward</g-icon>
-                           </div>
-                         }}/>)
+                    {order.forwardedStore && (<g-tooltip
+                      openOnHover={true} color="#616161" transition="0.3" speech-bubble remove-content-on-close
+                      v-slots={{
+                        default: () => <span><b>From: </b>{order.forwardedStore}</span>,
+                        activator: ({on}) => <div
+                          onMouseEnter={on.mouseenter}
+                          onMouseLeave={on.mouseleave}
+                          onClick={on.click}>
+                          <g-icon size="16">icon-delivery-forward</g-icon>
+                        </div>
+                      }}/>)
                     }
                   </td>
                   <td>
-                    <p>{order.customer.name}</p>
-                    <p style="white-space: nowrap">{order.customer.phone}</p>
+                    <p>{customer.name}</p>
+                    <p style="white-space: nowrap">{customer.phone}</p>
                   </td>
                   <td>
                     {
-                  (order.customer.address) ?
+                      (order.address) ?
                         <div>
-                          <p style="word-break: break-word">{order.customer.address}</p>
-                          <p>{order.customer.zipCode}</p>
+                          <p style="word-break: break-word">{order.address}</p>
+                          <p>{order.zipCode}</p>
                         </div>
                         : <div style="text-align: center"> -- </div>
                     }
@@ -149,15 +152,15 @@ export function onlineOrderListFactory(props) {
                       <p class="fw-700" style="white-space: nowrap">
                         {t('common.currency', locale.value)}{$filters.formatCurrency(order.payment[0].value)}
                       </p>
-                      <p> <img alt style="height: 18px" src={getImagePayment(order.payment[0].type)}> </img></p>
+                      <p><img alt style="height: 18px" src={getImagePayment(order.payment[0].type)}> </img></p>
                     </div>
                   </td>
                   <td style="white-space: nowrap; text-align: center">{formatDate(order.date)}</td>
                   <td style="white-space: nowrap; text-align: center">{order.deliveryTime}</td>
                   <td>
                     <div class="row-flex justify-center">
-                      { order.type === 'delivery' && <g-icon>icon-delivery-scooter</g-icon> }
-                      { order.type === 'pickup' && <g-icon>icon-take-away</g-icon> }
+                      {order.type === 'delivery' && <g-icon>icon-delivery-scooter</g-icon>}
+                      {order.type === 'pickup' && <g-icon>icon-take-away</g-icon>}
                     </div>
                   </td>
                   <td class={listOnlineOrderStatus.value}>
@@ -170,15 +173,18 @@ export function onlineOrderListFactory(props) {
                       <g-menu v-model={order.showMenu} nudgeBottom={10} close-on-content-click v-slots={{
                         default: () => (
                           <g-card background="white">
-                            <div style="padding: 10px; cursor: pointer" onClick={() => emit('refundOrder', order, status)}>{ refunded }</div>
+                            <div style="padding: 10px; cursor: pointer"
+                                 onClick={() => emit('refundOrder', order, status)}>{refunded}</div>
                           </g-card>
                         ),
-                        activator: ({on}) => <div onClick={withModifiers(on.click, ['stop'])} style={moreMenuStyle}>···</div>
+                        activator: ({on}) => <div onClick={withModifiers(on.click, ['stop'])}
+                                                  style={moreMenuStyle}>···</div>
                       }}/>
                     }
                   </td>
                 </tr>
-              )}
+                )
+              })}
             </tbody>
         </>))()}
       </g-table>

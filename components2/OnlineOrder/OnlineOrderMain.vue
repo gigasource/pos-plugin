@@ -12,12 +12,14 @@ import {
 } from "../utils";
 import dialogCompleteOrder from "./helpers/dialogCompleteOrder";
 import NewReservationDialog from '../Reservation/NewReservationDialog';
+import { loadCustomers } from "../Customer/customer-be-logics";
 
 export default {
   components: {dialogCompleteOrder, NewReservationDialog},
   setup() {
     onBeforeMount(async () => {
       await loadOrders()
+      await loadCustomers()
     })
 
     const {
