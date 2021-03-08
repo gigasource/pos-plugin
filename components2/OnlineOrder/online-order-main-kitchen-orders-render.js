@@ -11,6 +11,9 @@ import {
 import {
 	dialogOrder
 } from './helpers/dialog-complete-order-render'
+import {
+	findCustomerWithId
+} from "../Customer/customer-logic";
 
 export const completeOrderDialogShow = ref(false)
 
@@ -36,6 +39,7 @@ export function renderKitchenOrdersFactory() {
 	}
 
 	function renderKitchenOrdersTitle(order) {
+		const customer = findCustomerWithId(order.customer)
 		return (
 			<g-card-title>
 				{genScopeId(() => <>
@@ -43,8 +47,8 @@ export function renderKitchenOrdersFactory() {
               <span class="fs-small fw-700 text-indigo-accent-2">
                 #{order.dailyId ? order.dailyId : order.id}
               </span>
-    					{order.customer ? order.customer.name : 'No customer name'} -
-    					{order.customer ? order.customer.phone : 'No customer phone'}
+    					{customer ? customer.name : 'No customer name'} -
+    					{customer ? customer.phone : 'No customer phone'}
     				</div>
     				<g-spacer/>
     				<div class="kitchen-orders__timer" onClick={withModifiers(() => openCompleteDialog(order), ['stop'])}>
@@ -72,7 +76,7 @@ export function renderKitchenOrdersFactory() {
     							<g-icon color="#9E9E9E" size="20">icon-place</g-icon>
     						</div>
     						<div class="col-11 text-grey-darken-1">
-    							{`${order.customer.address} ${order.customer.zipCode}`}
+    							{`${order.address} - ${order.zipcode}`}
     						</div>
     					</div>
     				}

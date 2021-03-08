@@ -300,13 +300,20 @@ module.exports = async cms => {
         tax: calOrderTax(val).toFixed(2),
         sum: calOrderTotal(val).toFixed(2)
       }))
-
+      const newCustomer = await cms.getModel('Customer').create({
+        name: customer.name,
+        phone: customer.phone,
+        appType: 'POS_RESTAURANT',
+        address: []
+      })
       const order = {
         dailyId,
         id: newOrderId,
         status: 'inProgress',
         items: formatOrderItems(items),
-        customer,
+        address: customer.address,
+        zipcode: customer.zipcode,
+        customer: newCustomer._id,
         deliveryDate: new Date(),
         payment: [{type: paymentType, value: vSum}],
         type,

@@ -27,6 +27,7 @@ import { orderType } from "../OrderView/delivery/delivery-customer-ui";
 //</editor-fold>
 
 import {$filters} from "../AppSharedStates";
+import {findCustomerWithId} from "../Customer/customer-logic";
 
 export const selectedCustomer = ref({})
 
@@ -48,7 +49,6 @@ export function navigateToDeliveryScreen(call, type, missedCallIndex) {
 	phone.value = customer.phone
 	orderType.value = type
 	selectedCall.value = call
-	console.log(selectedCall)
 	router.push({ path: '/pos-order-delivery' })
 }
 export function openReservationDialog({ customer, callId }) {
@@ -166,6 +166,7 @@ export function renderPendingOrdersFactory () {
 	}
 
 	function renderPendingOrdersTitle(order) {
+		const customer = findCustomerWithId(order.customer)
 		return (
 			<g-card-title>
 				{ genScopeId(() => <>
@@ -174,8 +175,8 @@ export function renderPendingOrdersFactory () {
 						{ (order.type === 'pickup') && <g-icon>icon-take-away</g-icon> }
 						<div class="fs-small-2 ml-1 mr-2" style="max-width: calc(100% - 24px); line-height: 1.2">
 							<span class="fs-small fw-700 text-indigo-accent-2 mr-2">#{order.dailyId}</span>
-							{order.customer ? order.customer.name : 'No customer name'} -
-							{order.customer ? order.customer.phone : 'No customer phone'}
+							{customer ? customer.name : 'No customer name'} -
+							{customer ? customer.phone : 'No customer phone'}
 						</div>
 					</div>
 					<div class="row-flex justify-end align-items-center r" style="flex: 0 0 auto">
@@ -217,7 +218,7 @@ export function renderPendingOrdersFactory () {
 							</g-icon>
 						</div>
 						<div style="max-width: calc(100% - 25px);" class="flex-equal pl-1">
-							{`${order.customer.address} ${order.customer.zipCode}`}
+							{`${order.address} ${order.zipCode}`}
 						</div>
 					</div>
 				}

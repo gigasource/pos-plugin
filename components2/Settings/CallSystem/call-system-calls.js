@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import dayjs from 'dayjs';
 import cms from 'cms';
 import csConstants from '../../../backend/call-system-handler/call-system-contants';
+import _ from 'lodash'
 
 export const calls = ref([])
 export const missedCalls = ref([])
@@ -41,6 +42,9 @@ export function deleteMissedCall(index) {
 export function cancelMissedCallTimeout(callId) {
   cms.socket.emit(csConstants.CancelMissedCallTimeout, callId);
 }
+export function deleteCallWithPhoneNumber(phoneNumber) {
+  _.remove(calls.value, call => call.customer.phone === phoneNumber)
+}
 
 cms.socket.on(csConstants.NewPhoneCall, async (phoneNumber, date, callId) => {
   const customer = await getCustomerInfo(phoneNumber);
@@ -58,6 +62,7 @@ cms.socket.on(csConstants.NewMissedPhoneCall, async (callId) => {
 })
 
 async function getCustomerInfo(phone) {
+  //todo: use singleton
   const customer = await cms.getModel('Customer').findOne({phone})
   if (!customer) {
     return {

@@ -14,7 +14,7 @@ import {
   selectedAddress,
   selectedCustomer,
   dialog,
-  name, phone, address, house, street, city, placeId, clearCustomer, selectedCall
+  name, phone, address, house, street, city, placeId, clearCustomer, selectedCall, zipcode
 } from "./delivery-shared";
 import {
   products,
@@ -32,9 +32,10 @@ import {
 import cms from 'cms'
 import { genScopeId } from '../../utils';
 import PosOrderDeliveryKeyboard from '../Helper/posOrderDeliveryKeyboard2'
-import {createOrder, addItem, changeItemQuantity} from "../pos-logic"
+import {createOrder, addItem, changeItemQuantity, addCustomer} from "../pos-logic"
 import { advanceUpdateCustomer } from "../../Customer/customer-be-logics";
 import {acceptOrder} from "../../OnlineOrder/online-order-main-logic-be";
+import {deleteCallWithPhoneNumber} from "../../Settings/CallSystem/call-system-calls";
 
 export default {
   name: "PosOrderDelivery",
@@ -182,11 +183,14 @@ export default {
     }
 
     async function confirmOrder() {
-      await advanceUpdateCustomer(selectedCustomer.value)
-      order.value.customer = selectedCustomer.value
+      const customer = await advanceUpdateCustomer(_.cloneDeep(selectedCustomer.value))
+      addCustomer(order.value, customer._id)
+      deleteCallWithPhoneNumber(customer.phone)
       order.value.date = dayjs().toDate() //todo: check why this using js date in render
       order.value.payment = [{ value: paymentTotal.value, type: 'cash' }]
-      await acceptOrder(order)
+      order.value.address = address.value
+      order.value.zipcode = zipcode.value
+      await acceptOrder(order.value)
       dialog.value.order = false
       autocompleteAddresses.value = []
       router.push({
