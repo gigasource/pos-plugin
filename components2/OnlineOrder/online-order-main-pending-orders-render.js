@@ -188,8 +188,7 @@ export function renderPendingOrdersFactory () {
 		return (
 			<g-card-text>
 				{
-					(order.note) &&
-					<div class="text-grey-darken-1 i mb-1" style="font-size: 13px; line-height: 16px">
+					(order.note) && <div class="text-grey-darken-1 i mb-1" style="font-size: 13px; line-height: 16px">
 						{t('onlineOrder.note')}: {order.note}
 					</div>
 				}
@@ -207,8 +206,7 @@ export function renderPendingOrdersFactory () {
 					</div>
 				}
 				{
-					(order.items) &&
-					<div>
+					(order.items) && <div>
 						{order.items.map(item =>
 							<div class="row-flex align-items-start">
 								<div style="flex: 0 0 25px; font-weight: 700; font-size: 12px">
@@ -221,23 +219,18 @@ export function renderPendingOrdersFactory () {
 									{getExtraInfo(item)}
 								</span>
 								</div>
-								<div class="fs-small-2 ta-right">
-									€{$filters.formatCurrency(getItemPrice(item), 2)} </div>
+								<div class="fs-small-2 ta-right">€{$filters.formatCurrency(getItemPrice(item), 2)}</div>
 							</div>
 						)} </div>
 				}
 				{
-					(order.type === 'delivery') &&
-					<div class="row-flex">
-						<div class="flex-equal fw-700">
-							{t('onlineOrder.shippingFee')} </div>
-						<div class="fs-small-2 ta-right">
-							€{$filters.formatCurrency(order.shippingFee, 2)} </div>
+					(order.type === 'delivery') && <div class="row-flex">
+						<div class="flex-equal fw-700">{t('onlineOrder.shippingFee')}</div>
+						<div class="fs-small-2 ta-right">€{$filters.formatCurrency(order.shippingFee, 2)}</div>
 					</div>
 				}
 				{
-					(order.discounts && order.discounts.length === 0) &&
-					<div>
+					(order.discounts && order.discounts.length === 0) && <div>
 						{order.discounts.map(discount =>
 							<div class="row-flex align-items-start">
 								<div>
@@ -245,9 +238,7 @@ export function renderPendingOrdersFactory () {
 									{discount.coupon ? `Coupon ` : discount.name}
 								</span>
 									{
-										(discount.coupon) &&
-										<span style="color: #757575; font-style: italic">
-										({discount.coupon})
+										(discount.coupon) && <span style="color: #757575; font-style: italic">({discount.coupon})
 									</span>
 									}
 								</div>
@@ -272,8 +263,7 @@ export function renderPendingOrdersFactory () {
 		return (
 			<>
 				{
-					(order.declineStep2) &&
-					<g-card-actions>
+					(order.declineStep2) && <g-card-actions>
 						<g-text-field-bs label={t('onlineOrder.reasonDecline')} v-model={order.declineReason} v-slots={{
 							'append-inner': () =>
 								<g-icon style="cursor: pointer" onClick={() => openDialogReason(order)}>
@@ -283,10 +273,7 @@ export function renderPendingOrdersFactory () {
 					</g-card-actions>
 				}
 				{
-					(order.confirmStep2 &&
-						((order.type === 'delivery' && order.deliveryTime === 'asap')
-							|| (order.type === 'pickup'))) &&
-					<g-card-actions>
+					(order.confirmStep2 && ((order.type === 'delivery' && order.deliveryTime === 'asap') || (order.type === 'pickup'))) && <g-card-actions>
 						<div class="w-100">
 							<p class="ml-2 mb-1">
 								{t('onlineOrder.settings.timeToComplete2')} (min)
