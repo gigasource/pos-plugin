@@ -114,7 +114,7 @@ export function dialogCompleteOrderFactory(props, { emit }) {
             :
           </div>
           <div class="ta-right">
-            -{t('common.currency', locale.value)}{$filters.formatCurrency(discount.value)}
+            - {t('common.currency', locale.value)} {$filters.formatCurrency(discount.value)}
           </div>
         </div>
     )
@@ -155,7 +155,7 @@ export function dialogCompleteOrderFactory(props, { emit }) {
                 {renderContentItems()}
                 <div class="dashed-gradient"></div>
                 <div class="row-flex justify-between mt-2">
-                  <div>{t('onlineOrder.total')} <b>{orderQuantity.value}</b>{t('onlineOrder.items')}</div>
+                  <div>{t('onlineOrder.total')} <b>{orderQuantity.value}</b> {t('onlineOrder.items')}</div>
                   <div class="ta-right">{t('common.currency', locale.value)} {$filters.formatCurrency(subTotal.value)}</div>
                 </div>
                 {renderContentShippingFee()}
