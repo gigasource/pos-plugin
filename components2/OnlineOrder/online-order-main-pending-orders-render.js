@@ -167,7 +167,7 @@ export function renderPendingOrdersFactory () {
 					<div class="row-flex align-items-center flex-grow-1">
 						{ (order.type === 'delivery') && <g-icon>icon-delivery-scooter</g-icon> }
 						{ (order.type === 'pickup') && <g-icon>icon-take-away</g-icon> }
-						<div class="fs-small-2 ml-1" style="max-width: calc(100% - 24px); line-height: 1.2">
+						<div class="fs-small-2 ml-1 mr-2" style="max-width: calc(100% - 24px); line-height: 1.2">
 							<span class="fs-small fw-700 text-indigo-accent-2 mr-2">#{order.dailyId}</span>
 							{order.customer ? order.customer.name : 'No customer name'} -
 							{order.customer ? order.customer.phone : 'No customer phone'}
@@ -175,7 +175,7 @@ export function renderPendingOrdersFactory () {
 					</div>
 					<div class="row-flex justify-end align-items-center r" style="flex: 0 0 auto">
 						{
-							(order.deliveryTime) && <span class="fw-700 fs-small ml-2 mr-2" style="text-transform: uppercase">
+							(order.deliveryTime) && <span class="fw-700 fs-small mr-2" style="text-transform: uppercase">
 								{order.deliveryTime}
 							</span>
 						}
