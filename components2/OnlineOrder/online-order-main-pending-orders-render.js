@@ -297,38 +297,33 @@ export function renderPendingOrdersFactory () {
 						</div>
 					</g-card-actions>
 				}
-				<g-card-actions>
-					{
-						(!order.confirmStep2 && !order.declineStep2) &&
-						<g-btn-bs height="54" width="60" border-color="#C4C4C4" text-color="black" onClick={withModifiers(() => onDeclinedOrder(order), ['stop'])}>
-							<g-icon size="14">
-								icon-cross-red
-							</g-icon>
-						</g-btn-bs>
-					}
-					{
-						(order.confirmStep2 || order.declineStep2) &&
-						<g-btn-bs height="54" width="60" border-color="#C4C4C4" text-color="black" onClick={withModifiers(() => onBack(order), ['stop'])}>
-							{t('onlineOrder.back')}
-						</g-btn-bs>
-					}
-					{
-						(order.declineStep2) ?
-							<g-btn-bs height="54" background-color="#E0E0E0" text-color="black" style="flex: 1" onClick={() => declineOrder(order)}>
-								Confirm
-							</g-btn-bs>
-							:
-							<g-btn-bs height="54" background-color="#E0E0E0" class="pending-orders--btn-price" text-color="black" style="flex: 1" onClick={withModifiers(() => onClickAccept(order), ['stop'])}>
-								{(paymentIcon.value[order.payment[0].type]
-                    ? <img src={paymentIcon.value[order.payment[0].type]} alt={order.payment[0].type} style="height: 16px" class="mr-2"> </img>
-										: <span class="mr-2"> {order.payment[0].type} </span>
-                )}
-								<span>
-									{t('common.currency', locale.value)}
-									{$filters.formatCurrency(order.payment[0].value)}
-								</span>
-							</g-btn-bs>
-					}
+				<g-card-actions style="padding: 0 0 8px 0">
+					{(
+							order.confirmStep2 || order.declineStep2
+								? <g-btn-bs height="54" width="60" border-color="#C4C4C4" text-color="black" onClick={withModifiers(() => onBack(order), ['stop'])}>
+										{t('onlineOrder.back')}
+									</g-btn-bs>
+								: <g-btn-bs height="54" width="60" border-color="#C4C4C4" text-color="black" onClick={withModifiers(() => onDeclinedOrder(order), ['stop'])}>
+										<g-icon size="14">icon-cross-red</g-icon>
+									</g-btn-bs>
+					)}
+					{(
+							order.declineStep2
+							? <g-btn-bs height="54" background-color="#E0E0E0" text-color="black" style="flex: 1; margin-left: 0"
+							            onClick={() => declineOrder(order)}>Confirm</g-btn-bs>
+							: <g-btn-bs height="54" background-color="#E0E0E0" class="pending-orders--btn-price" text-color="black" style="flex: 1; margin-left: 0"
+							            onClick={withModifiers(() => onClickAccept(order), ['stop'])}>
+									{(
+											paymentIcon.value[order.payment[0].type]
+		                    ? <img src={paymentIcon.value[order.payment[0].type]} alt={order.payment[0].type} style="height: 16px" class="mr-2"> </img>
+												: <span class="mr-2"> {order.payment[0].type} </span>
+	                )}
+									<span>
+										{t('common.currency', locale.value)}
+										{$filters.formatCurrency(order.payment[0].value)}
+									</span>
+								</g-btn-bs>
+						)}
 				</g-card-actions>
 				{
 					(order.forwardedStore) &&
