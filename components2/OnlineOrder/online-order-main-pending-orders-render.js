@@ -9,7 +9,7 @@ import {
 	deleteCall,
 	deleteMissedCall
 } from '../Settings/CallSystem/call-system-calls'
-import { modemDeviceConnected } from '../Settings/CallSystem/call-system-logics'
+import { modemDeviceConnected, currentCallSystemMode, CALL_SYSTEM_MODES } from '../Settings/CallSystem/call-system-logics'
 import { showReservationDialog } from '../Reservation/reservation-shared'
 import {
 	timeoutProgress,
@@ -69,6 +69,11 @@ export async function onClickAccept(order) {
 //<editor-fold desc="pendingOrders">
 export function renderPendingOrdersFactory () {
 	const { t, locale } = useI18n()
+
+	function renderCallSystemWarning() {
+		if (currentCallSystemMode.value !== CALL_SYSTEM_MODES.OFF.value && !modemDeviceConnected.value)
+			return <span style="color: #D32F2F">Modem not connected</span>
+	}
 	function renderPendingOrdersHeader() {
 		return (
 			<div class="header">
@@ -81,7 +86,7 @@ export function renderPendingOrdersFactory () {
 						</g-badge>
 				}
 				<g-spacer/>
-				{ (!modemDeviceConnected.value) &&  <span style="color: #D32F2F">Modem not connected</span> }
+				{ renderCallSystemWarning() }
 			</div>
 		)
 	}

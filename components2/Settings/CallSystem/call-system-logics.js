@@ -3,7 +3,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import csConstants from '../../../backend/call-system-handler/call-system-contants'
 import cms from 'cms'
 
-const CALL_SYSTEM_MODES = Object.freeze({
+export const CALL_SYSTEM_MODES = Object.freeze({
   OFF: { text: 'Off', value: 'off' },
   FRITZBOX: { text: 'Localhost (Fritzbox)', value: 'localhost-fritzbox' },
   DEMO: { text: 'Demo (Fritzbox)', value: 'demo-fritzbox' },
