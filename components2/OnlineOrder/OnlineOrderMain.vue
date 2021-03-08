@@ -127,11 +127,6 @@ export default {
     border-radius: 12px !important;
   }
 
-  &--title {
-    align-items: flex-start !important;
-    flex-wrap: nowrap !important;
-  }
-
   &--call {
     width: 100%;
     background-color: white;
