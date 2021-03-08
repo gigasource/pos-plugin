@@ -9,7 +9,9 @@
         "taxNumber": "9999 9999 9999"
       },
       "onlineDevice": {
-        "id": null,
+        "id": null
+      },
+      "onlineOrderSoundSetting": {
         "sound": true,
         "soundLoop": "repeat"
       },

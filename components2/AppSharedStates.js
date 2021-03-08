@@ -5,6 +5,7 @@ import cms from 'cms';
 import {getCurrentOrder, syncOrderChange} from "./OrderView/pos-logic-be";
 import { initCallSystem } from './Settings/CallSystem/call-system-logics'
 import _ from 'lodash';
+import { initBell } from "./OnlineOrder/online-order-logic-shared";
 
 export const appHooks = new Hooks()
 
@@ -161,3 +162,4 @@ export const storeLocale = computed(() => {
 
 // init call system in the very first moment
 initCallSystem()
+initBell(posSettings)
