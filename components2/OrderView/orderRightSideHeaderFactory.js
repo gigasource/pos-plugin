@@ -1,4 +1,5 @@
 import {editModeOL, saveOrderLayoutSetting, showSplitBtn} from "./order-layout-setting-logic";
+import { Transition } from 'vue'
 import {avatar, isMobile, username} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import {
@@ -70,7 +71,7 @@ export function orderRightSideHeader(props, {emit}) {
         <g-icon>icon-split_check_2</g-icon>
       </g-btn-bs>}
 
-      <transition name="fade">
+      <Transition name="fade">
         {!(isMobile.value && showSplitBtn.value && payPrintMode.value === 'pay' && showIcon.value) &&
         genScopeId(() => <>
           <div class="row-flex align-items-center flex-grow-1">
@@ -118,7 +119,7 @@ export function orderRightSideHeader(props, {emit}) {
           </div>
         </>)()
         }
-      </transition>
+      </Transition>
       <g-spacer/>
       {renderPayBtn()}
 

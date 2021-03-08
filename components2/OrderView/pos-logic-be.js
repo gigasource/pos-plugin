@@ -516,6 +516,7 @@ hooks.on('togglePayPrintBtn:step2', async (cb) => {
 
 export const disablePay = computed(() => {
   if (!order.table) return false;
+  if (!order.items.length) return true
   if (onlyCheckoutPrintedItems.value) {
     return hasOrderChange.value;
   }
