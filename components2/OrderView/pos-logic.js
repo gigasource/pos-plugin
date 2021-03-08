@@ -533,7 +533,7 @@ export function cancelOrder(order) {
 }
 
 export function addUser(order, name, date = new Date()) {
-  order.user.push({name, date});
+  order.user.unshift({name, date});
 }
 
 export function changeCourse(order, query, add = 1) {

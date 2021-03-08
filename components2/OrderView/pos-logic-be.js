@@ -525,6 +525,7 @@ export const disablePay = computed(() => {
 
 hooks.on('printOrder', async () => {
   order.date = new Date();
+  addUser(order, username.value, order.date)
   clearNullQuantityItems(order);
   mergeSameItems(order);
   await makeActionList();
