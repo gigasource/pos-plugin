@@ -625,6 +625,7 @@ hooks.on('pay-split', async (printInvoice) => {
   //todo: discount on split
   //todo: isMobile : show receipt
   order2.date = new Date();
+  addUser(order, username.value, order.date);
   await genMaxId(order2);
   await genBookingNumber(order2);
   if (empty) {
