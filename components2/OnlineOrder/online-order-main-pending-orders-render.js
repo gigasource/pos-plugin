@@ -151,7 +151,7 @@ export function renderPendingOrdersFactory () {
 
 	function renderPendingOrdersTitle(order) {
 		return (
-			<g-card-title class="pending-orders--title">
+			<g-card-title>
 				{ genScopeId(() => <>
 					<div class="row-flex align-items-center flex-grow-1">
 						{ (order.type === 'delivery') && <g-icon>icon-delivery-scooter</g-icon> }
