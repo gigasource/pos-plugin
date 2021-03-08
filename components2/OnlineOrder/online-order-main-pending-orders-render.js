@@ -9,7 +9,7 @@ import {
 	deleteCall,
 	deleteMissedCall
 } from '../Settings/CallSystem/call-system-calls'
-import { modemDeviceConnected } from '../Settings/CallSystem/call-system-logics'
+import { modemDeviceConnected, currentCallSystemMode, CALL_SYSTEM_MODES } from '../Settings/CallSystem/call-system-logics'
 import { showReservationDialog } from '../Reservation/reservation-shared'
 import {
 	timeoutProgress,
@@ -20,7 +20,7 @@ import {
 	getItemPrice
 } from './online-order-main-logic'
 
-import { acceptOrder, declineOrder } from './online-order-main-logic-be'
+import { acceptOrder, declineOrder, onDeclinedOrder } from './online-order-main-logic-be'
 //<editor-fold desc="delivery">
 import {selectedCustomer as deliverySelectedCustomer, phone, selectedCall} from "../OrderView/delivery/delivery-shared";
 import { orderType } from "../OrderView/delivery/delivery-customer-ui";
@@ -30,6 +30,13 @@ import {$filters} from "../AppSharedStates";
 import {findCustomerWithId} from "../Customer/customer-logic";
 
 export const selectedCustomer = ref({})
+
+export const selectingPendingOrder = ref(null)
+export const showCancelOrderReasonDialog = ref(null)
+function openOrderCancelReasonDialog(order) {
+	selectingPendingOrder.value = order
+	showCancelOrderReasonDialog.value = true
+}
 
 export function navigateToDeliveryScreen(call, type, missedCallIndex) {
 	const { customer, callId } = call
@@ -62,6 +69,11 @@ export async function onClickAccept(order) {
 //<editor-fold desc="pendingOrders">
 export function renderPendingOrdersFactory () {
 	const { t, locale } = useI18n()
+
+	function renderCallSystemWarning() {
+		if (currentCallSystemMode.value !== CALL_SYSTEM_MODES.OFF.value && !modemDeviceConnected.value)
+			return <span style="color: #D32F2F">Modem not connected</span>
+	}
 	function renderPendingOrdersHeader() {
 		return (
 			<div class="header">
@@ -74,7 +86,7 @@ export function renderPendingOrdersFactory () {
 						</g-badge>
 				}
 				<g-spacer/>
-				{ (!modemDeviceConnected.value) &&  <span style="color: #D32F2F">Modem not connected</span> }
+				{ renderCallSystemWarning() }
 			</div>
 		)
 	}
@@ -156,20 +168,20 @@ export function renderPendingOrdersFactory () {
 	function renderPendingOrdersTitle(order) {
 		const customer = findCustomerWithId(order.customer)
 		return (
-			<g-card-title class="pending-orders--title">
+			<g-card-title>
 				{ genScopeId(() => <>
 					<div class="row-flex align-items-center flex-grow-1">
 						{ (order.type === 'delivery') && <g-icon>icon-delivery-scooter</g-icon> }
 						{ (order.type === 'pickup') && <g-icon>icon-take-away</g-icon> }
-						<div class="fs-small-2 ml-1" style="max-width: calc(100% - 24px); line-height: 1.2">
-							<span class="fs-small fw-700 text-indigo-accent-2">#{order.dailyId}</span>
+						<div class="fs-small-2 ml-1 mr-2" style="max-width: calc(100% - 24px); line-height: 1.2">
+							<span class="fs-small fw-700 text-indigo-accent-2 mr-2">#{order.dailyId}</span>
 							{customer ? customer.name : 'No customer name'} -
 							{customer ? customer.phone : 'No customer phone'}
 						</div>
 					</div>
 					<div class="row-flex justify-end align-items-center r" style="flex: 0 0 auto">
 						{
-							(order.deliveryTime) && <span class="fw-700 fs-small ml-2 mr-2" style="text-transform: uppercase">
+							(order.deliveryTime) && <span class="fw-700 fs-small mr-2" style="text-transform: uppercase">
 								{order.deliveryTime}
 							</span>
 						}
@@ -193,8 +205,7 @@ export function renderPendingOrdersFactory () {
 		return (
 			<g-card-text>
 				{
-					(order.note) &&
-					<div class="text-grey-darken-1 i mb-1" style="font-size: 13px; line-height: 16px">
+					(order.note) && <div class="text-grey-darken-1 i mb-1" style="font-size: 13px; line-height: 16px">
 						{t('onlineOrder.note')}: {order.note}
 					</div>
 				}
@@ -212,8 +223,7 @@ export function renderPendingOrdersFactory () {
 					</div>
 				}
 				{
-					(order.items) &&
-					<div>
+					(order.items) && <div>
 						{order.items.map(item =>
 							<div class="row-flex align-items-start">
 								<div style="flex: 0 0 25px; font-weight: 700; font-size: 12px">
@@ -226,23 +236,18 @@ export function renderPendingOrdersFactory () {
 									{getExtraInfo(item)}
 								</span>
 								</div>
-								<div class="fs-small-2 ta-right">
-									€{$filters.formatCurrency(getItemPrice(item), 2)} </div>
+								<div class="fs-small-2 ta-right">€{$filters.formatCurrency(getItemPrice(item), 2)}</div>
 							</div>
 						)} </div>
 				}
 				{
-					(order.type === 'delivery') &&
-					<div class="row-flex">
-						<div class="flex-equal fw-700">
-							{t('onlineOrder.shippingFee')} </div>
-						<div class="fs-small-2 ta-right">
-							€{$filters.formatCurrency(order.shippingFee, 2)} </div>
+					(order.type === 'delivery') && <div class="row-flex">
+						<div class="flex-equal fw-700">{t('onlineOrder.shippingFee')}</div>
+						<div class="fs-small-2 ta-right">€{$filters.formatCurrency(order.shippingFee, 2)}</div>
 					</div>
 				}
 				{
-					(order.discounts && order.discounts.length === 0) &&
-					<div>
+					(order.discounts && order.discounts.length === 0) && <div>
 						{order.discounts.map(discount =>
 							<div class="row-flex align-items-start">
 								<div>
@@ -250,9 +255,7 @@ export function renderPendingOrdersFactory () {
 									{discount.coupon ? `Coupon ` : discount.name}
 								</span>
 									{
-										(discount.coupon) &&
-										<span style="color: #757575; font-style: italic">
-										({discount.coupon})
+										(discount.coupon) && <span style="color: #757575; font-style: italic">({discount.coupon})
 									</span>
 									}
 								</div>
@@ -277,21 +280,17 @@ export function renderPendingOrdersFactory () {
 		return (
 			<>
 				{
-					(order.declineStep2) &&
-					<g-card-actions>
+					(order.declineStep2) && <g-card-actions>
 						<g-text-field-bs label={t('onlineOrder.reasonDecline')} v-model={order.declineReason} v-slots={{
 							'append-inner': () =>
-								<g-icon style="cursor: pointer" onClick={() => openDialogReason(order)}>
+								<g-icon style="cursor: pointer" onClick={() => openOrderCancelReasonDialog(order)}>
 									icon-keyboard
 								</g-icon>
 						}}/>
 					</g-card-actions>
 				}
 				{
-					(order.confirmStep2 &&
-						((order.type === 'delivery' && order.deliveryTime === 'asap')
-							|| (order.type === 'pickup'))) &&
-					<g-card-actions>
+					(order.confirmStep2 && ((order.type === 'delivery' && order.deliveryTime === 'asap') || (order.type === 'pickup'))) && <g-card-actions>
 						<div class="w-100">
 							<p class="ml-2 mb-1">
 								{t('onlineOrder.settings.timeToComplete2')} (min)
@@ -304,40 +303,33 @@ export function renderPendingOrdersFactory () {
 						</div>
 					</g-card-actions>
 				}
-				<g-card-actions>
-					{
-						(!order.confirmStep2 && !order.declineStep2) &&
-						<g-btn-bs height="54" width="60" border-color="#C4C4C4" text-color="black" onClick={withModifiers(() => declineOrder(order), ['stop'])}>
-							<g-icon size="14">
-								icon-cross-red
-							</g-icon>
-						</g-btn-bs>
-					}
-					{
-						(order.confirmStep2 || order.declineStep2) &&
-						<g-btn-bs height="54" width="60" border-color="#C4C4C4" text-color="black" onClick={withModifiers(() => onBack(order), ['stop'])}>
-							{t('onlineOrder.back')}
-						</g-btn-bs>
-					}
-					{
-						(order.declineStep2) ?
-							<g-btn-bs height="54" background-color="#E0E0E0" text-color="black" style="flex: 1" onClick={() => declineOrder(order)}>
-								Confirm
-							</g-btn-bs>
-							:
-							<g-btn-bs height="54" background-color="#E0E0E0" class="pending-orders--btn-price" text-color="black" style="flex: 1" onClick={withModifiers(() => onClickAccept(order), ['stop'])}>
-								{
-									(paymentIcon.value[order.payment]) ?
-										<img src={paymentIcon.value[order.payment]} alt={order.payment[0].type} style="height: 16px" class="mr-2"> </img>
-										:
-										<span class="mr-2"> {order.payment[0].type} </span>
-								}
-								<span>
-									{t('common.currency', locale.value)}
-									{$filters.formatCurrency(order.payment[0].value, 2)}
-								</span>
-							</g-btn-bs>
-					}
+				<g-card-actions style="padding: 0 0 8px 0">
+					{(
+							order.confirmStep2 || order.declineStep2
+								? <g-btn-bs height="54" width="60" border-color="#C4C4C4" text-color="black" onClick={withModifiers(() => onBack(order), ['stop'])}>
+										{t('onlineOrder.back')}
+									</g-btn-bs>
+								: <g-btn-bs height="54" width="60" border-color="#C4C4C4" text-color="black" onClick={withModifiers(() => onDeclinedOrder(order), ['stop'])}>
+										<g-icon size="14">icon-cross-red</g-icon>
+									</g-btn-bs>
+					)}
+					{(
+							order.declineStep2
+							? <g-btn-bs height="54" background-color="#E0E0E0" text-color="black" style="flex: 1; margin-left: 0"
+							            onClick={() => declineOrder(order)}>Confirm</g-btn-bs>
+							: <g-btn-bs height="54" background-color="#E0E0E0" class="pending-orders--btn-price" text-color="black" style="flex: 1; margin-left: 0"
+							            onClick={withModifiers(() => onClickAccept(order), ['stop'])}>
+									{(
+											paymentIcon.value[order.payment[0].type]
+		                    ? <img src={paymentIcon.value[order.payment[0].type]} alt={order.payment[0].type} style="height: 16px" class="mr-2"> </img>
+												: <span class="mr-2"> {order.payment[0].type} </span>
+	                )}
+									<span>
+										{t('common.currency', locale.value)}
+										{$filters.formatCurrency(order.payment[0].value)}
+									</span>
+								</g-btn-bs>
+						)}
 				</g-card-actions>
 				{
 					(order.forwardedStore) &&

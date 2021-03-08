@@ -1,6 +1,7 @@
 import { ref, computed, watch } from 'vue'
 import dayjs from 'dayjs'
 import _ from 'lodash'
+import { posSettings } from '../AppSharedStates';
 
 export const hooks = new (require('schemahandler/hooks/hooks'))();
 
@@ -31,7 +32,15 @@ watch(() => pendingOrders.value, (val, preVal) => {
 	})
 })
 
-export const paymentIcon = ref({})
+export const paymentIcon = computed(() => {
+	if (posSettings.value) {
+		return _.reduce(posSettings.value.payment, (output, item) => {
+			output[item.name] = item.icon
+			return output
+		}, {})
+	}
+	return {}
+})
 export const timeoutProgress = ref({})
 export const kitchenOrders = ref([])
 export const sortedKitchenOrders = computed(() => {

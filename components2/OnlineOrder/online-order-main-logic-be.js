@@ -50,6 +50,14 @@ export async function completeOrder(order) {
 	_.remove(kitchenOrders.value, _order => _order._id.toString() === order._id.toString())
 }
 
+export async function onDeclinedOrder(order) {
+	if (order.confirmStep2)
+		return order.confirmStep2 = false
+
+	if (!order.declineStep2)
+		return order.declineStep2 = true
+}
+
 export async function declineOrder(order) {
 	const status = 'declined'
 	const orderStatus = {

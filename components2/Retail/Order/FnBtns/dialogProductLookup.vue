@@ -63,10 +63,10 @@ export default {
       const listener = e => {
         e.stopPropagation()
         const elements = [
-          dialogContentRef.value.querySelector('.g-tf-wrapper'),
+          dialogContentRef.value.querySelector('.bs-tf-wrapper'),
           dialogContentRef.value.querySelector('.keyboard-wrapper')
         ]
-        showKeyboard.value = elements.some(el => el && el.contains(e.target));
+        showKeyboard.value = elements.some(el => el.contains(e.target));
       }
 
       if (newVal) {

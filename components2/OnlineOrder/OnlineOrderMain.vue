@@ -1,6 +1,6 @@
 <script>
-import { onBeforeMount, onActivated, nextTick } from 'vue'
-import { renderPendingOrdersFactory } from "./online-order-main-pending-orders-render";
+import { onBeforeMount } from 'vue'
+import { renderPendingOrdersFactory, selectingPendingOrder, showCancelOrderReasonDialog } from "./online-order-main-pending-orders-render";
 import { renderKitchenOrdersFactory, completeOrderDialogShow } from "./online-order-main-kitchen-orders-render";
 import {
   declineOrder,
@@ -36,7 +36,9 @@ export default {
         {renderKitchenOdrers()}
         {renderReservationDialog()}
         <dialog-complete-order v-model={completeOrderDialogShow.value} onCompleteorder={completeOrder} onDeclineorder={declineOrder}></dialog-complete-order>
-        <dialog-text-filter label="Reason"></dialog-text-filter>
+        <dialog-text-filter label="Reason" v-model={showCancelOrderReasonDialog.value}
+                            defaultValue={selectingPendingOrder.value && selectingPendingOrder.value.declineReason}
+                            onSubmit={reason => selectingPendingOrder.value && (selectingPendingOrder.value.declineReason = reason)}/>
       </div>
     ))
   }
@@ -127,11 +129,6 @@ export default {
     text-align: center;
     background-color: #E1F5FE;
     border-radius: 12px !important;
-  }
-
-  &--title {
-    align-items: flex-start !important;
-    flex-wrap: nowrap !important;
   }
 
   &--call {

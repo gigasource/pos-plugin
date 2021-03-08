@@ -2,6 +2,7 @@
 import {
   dialogCompleteOrderFactory
 } from './dialog-complete-order-render'
+import { genScopeId } from '../../utils';
 
 export default {
   props: {
@@ -12,9 +13,9 @@ export default {
 
     const { renderDialogComplete } = dialogCompleteOrderFactory(props, { emit })
 
-    return () => (
+    return genScopeId(() => (
       renderDialogComplete()
-    )
+    ))
   }
 }
 </script>
