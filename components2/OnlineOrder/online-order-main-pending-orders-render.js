@@ -319,15 +319,13 @@ export function renderPendingOrdersFactory () {
 							</g-btn-bs>
 							:
 							<g-btn-bs height="54" background-color="#E0E0E0" class="pending-orders--btn-price" text-color="black" style="flex: 1" onClick={withModifiers(() => onClickAccept(order), ['stop'])}>
-								{
-									(paymentIcon.value[order.payment]) ?
-										<img src={paymentIcon.value[order.payment]} alt={order.payment[0].type} style="height: 16px" class="mr-2"> </img>
-										:
-										<span class="mr-2"> {order.payment[0].type} </span>
-								}
+								{(paymentIcon.value[order.payment[0].type]
+                    ? <img src={paymentIcon.value[order.payment[0].type]} alt={order.payment[0].type} style="height: 16px" class="mr-2"> </img>
+										: <span class="mr-2"> {order.payment[0].type} </span>
+                )}
 								<span>
 									{t('common.currency', locale.value)}
-									{$filters.formatCurrency(order.payment[0].value, 2)}
+									{$filters.formatCurrency(order.payment[0].value)}
 								</span>
 							</g-btn-bs>
 					}
