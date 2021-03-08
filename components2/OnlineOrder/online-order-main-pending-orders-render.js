@@ -157,7 +157,7 @@ export function renderPendingOrdersFactory () {
 						{ (order.type === 'delivery') && <g-icon>icon-delivery-scooter</g-icon> }
 						{ (order.type === 'pickup') && <g-icon>icon-take-away</g-icon> }
 						<div class="fs-small-2 ml-1" style="max-width: calc(100% - 24px); line-height: 1.2">
-							<span class="fs-small fw-700 text-indigo-accent-2">#{order.dailyId}</span>
+							<span class="fs-small fw-700 text-indigo-accent-2 mr-2">#{order.dailyId}</span>
 							{order.customer ? order.customer.name : 'No customer name'} -
 							{order.customer ? order.customer.phone : 'No customer phone'}
 						</div>
