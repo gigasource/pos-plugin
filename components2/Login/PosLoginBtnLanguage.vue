@@ -36,8 +36,9 @@ export default {
                 </div>)
             ,
             'activator': genScopeId(({ on }) =>
-                <g-btn-bs flat uppercase={false} icon-after="arrow_drop_down" text-color="#3B3B3B" onClick={on.click} height="100%">
+                <g-btn-bs flat uppercase={false} text-color="#3B3B3B" onClick={on.click} height="100%">
                   {currentLang.value && currentLang.value.title}
+                  <g-icon small>arrow_drop_down</g-icon>
                 </g-btn-bs>)
           }}/>
         </div>

@@ -84,7 +84,6 @@ export const DashboardFunctionFactory = () => {
       { title: support.value, icon: 'icon-support-2',  click: () => changePath('/pos-support') },
       { title: monthlyReport.value, feature: 'monthlyReport', icon: 'icon-month_report', click: () => changePath('/pos-month-report') },
       { title: inventory.value, feature: 'manageInventory', icon: 'icon-inventory', click: () => changePath('/pos-inventory') },
-      { title: 'Product Setting' /*TODO: i18n*/, icon: 'icon-inventory' /*TODO: update icon*/, click: () => changePath('/pos-product-setting') },
       { title: customer.value, feature: 'customerInfo', icon: 'icon-customer-info', click: () => changePath('/pos-customer') },
       { title: 'GDPdU/GoBD Data Exportieren', icon: 'icon-online-order-menu', click: () => showExportDataDialog.value = true },
     ]

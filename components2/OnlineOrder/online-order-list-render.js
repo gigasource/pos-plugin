@@ -31,7 +31,7 @@ export const ordersListByStatus = computed(() => {
   return resultList
 })
 export const totalOrder = computed(() => {
-  return ordersListByStatus.length
+  return ordersListByStatus.value.length
 })
 export const totalIncome = computed(() => {
   return _.sumBy(ordersListByStatus.value, order => order.vSum ? Number(order.vSum) : 0)

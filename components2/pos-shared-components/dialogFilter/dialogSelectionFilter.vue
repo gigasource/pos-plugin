@@ -1,5 +1,5 @@
 <script>
-import { genScopeId, internalValueFactory } from '../../utils';
+import { genScopeId, execGenScopeId, internalValueFactory } from '../../utils';
 import { isMobile } from '../../AppSharedStates';
 import { useI18n } from 'vue-i18n';
 import { ref } from 'vue'
@@ -17,40 +17,45 @@ export default {
     const internalValue = internalValueFactory(props, { emit })
     const screenValue = ref(null)
     const combobox = ref(null)
+
     function submit() {
       emit('submit', screenValue.value);
       internalValue.value = false;
     }
+
     const renderFn = genScopeId(() =>
-          <g-dialog v-model={internalValue.value} width="90%" eager fullscreen={ isMobile.value } >
-            <div class="wrapper" >
-              <g-icon onClick={() => internalValue.value = false} svg size="20" class="icon" >
-                icon-close </g-icon>
-              <div class="screen" >
-                <g-combobox multiple={ props.multiple }
-                            items={ props.items }
-                            v-model={screenValue.value}
-                            label={ props.label }
-                            text-field-component="GTextFieldBs"
-                            class="bs-tf__pos"
-                            large ref={combobox}/>
-                {
-                  (!isMobile.value) &&
-                  <div class="buttons" >
-                    <g-btn uppercase={ false } text onClick={() => internalValue.value = false} outlined width="120" class="mr-2" >
-                      {t('ui.cancel')}
-                    </g-btn>
-                    <g-btn uppercase={ false } text onClick={submit} backgroundcolor="#2979FF" text-color="#FFFFFF" width="120" >
-                      {t('ui.ok')}
-                    </g-btn>
-                  </div>
-                }
-              </div>
-              <div class="keyboard" >
-                <pos-keyboard-full v-model={screenValue.value} onEnterPressed={submit}/>
-              </div>
+        <g-dialog v-model={internalValue.value} width="90%" eager fullscreen={isMobile.value}>
+          { execGenScopeId(() =>
+            <div class="wrapper">
+            <g-icon onClick={() => internalValue.value = false} svg size="20" class="icon">
+              icon-close
+            </g-icon>
+            <div class="screen">
+              <g-combobox multiple={props.multiple}
+                          items={props.items}
+                          v-model={screenValue.value}
+                          label={props.label}
+                          text-field-component="GTextFieldBs"
+                          class="bs-tf__pos"
+                          large ref={combobox}/>
+              {
+                (!isMobile.value) &&
+                <div class="buttons">
+                  <g-btn uppercase={false} text onClick={() => internalValue.value = false} outlined width="120" class="mr-2">
+                    {t('ui.cancel')}
+                  </g-btn>
+                  <g-btn uppercase={false} text onClick={submit} backgroundcolor="#2979FF" text-color="#FFFFFF" width="120">
+                    {t('ui.ok')}
+                  </g-btn>
+                </div>
+              }
             </div>
-          </g-dialog>
+            <div class="keyboard">
+              <pos-keyboard-full v-model={screenValue.value} onEnterPressed={submit}/>
+            </div>
+          </div>
+          )}
+        </g-dialog>
     )
     return {
       renderFn,
@@ -63,63 +68,63 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .wrapper {
-    background-color: #FFFFFF;
-    padding: 16px;
-    width: 100%;
-    overflow: scroll;
-    position: relative;
-    display: flex;
-    flex-direction: column;
+.wrapper {
+  background-color: #FFFFFF;
+  padding: 16px;
+  width: 100%;
+  overflow: scroll;
+  position: relative;
+  display: flex;
+  flex-direction: column;
 
-    .icon {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-    }
-
-    .screen {
-      flex: 1;
-    }
+  .icon {
+    position: absolute;
+    top: 16px;
+    right: 16px;
   }
 
-  .g-combobox ::v-deep {
-    .bs-tf-wrapper {
-      width: 50%;
-
-      .bs-tf-label {
-        margin-bottom: 16px;
-        font-size: 16px;
-        line-height: 20px;
-        font-weight: 700;
-        color: #1d1d26;
-      }
-    }
+  .screen {
+    flex: 1;
   }
+}
 
+.g-combobox ::v-deep {
+  .bs-tf-wrapper {
+    width: 50%;
 
-  .buttons {
-    height: 96px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 0 4px;
-
-    .g-btn__outlined {
-      border: 1px solid #979797;
+    .bs-tf-label {
+      margin-bottom: 16px;
+      font-size: 16px;
+      line-height: 20px;
+      font-weight: 700;
       color: #1d1d26;
     }
   }
+}
 
-  .keyboard {
-    background-color: #BDBDBD;
-    padding: 16px;
-    margin: 0 -16px -16px -16px;
-  }
 
-  @media screen and (max-width: 1023px) {
-    .g-combobox ::v-deep .bs-tf-wrapper {
-      width: 100%;
-    }
+.buttons {
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 4px;
+
+  .g-btn__outlined {
+    border: 1px solid #979797;
+    color: #1d1d26;
   }
+}
+
+.keyboard {
+  background-color: #BDBDBD;
+  padding: 16px;
+  margin: 0 -16px -16px -16px;
+}
+
+@media screen and (max-width: 1023px) {
+  .g-combobox ::v-deep .bs-tf-wrapper {
+    width: 100%;
+  }
+}
 </style>

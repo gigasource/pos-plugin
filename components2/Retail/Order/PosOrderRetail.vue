@@ -286,7 +286,7 @@ export default {
           <div class="por__detail">
             {inEditScreenMode.value
                 ? renderScreenSettingPanel()
-                : <div style="height: 100%">
+                : <div style="height: 100%; padding-bottom: 5px; padding-right: 5px">
                     {renderTopRightToolbar()}
                     <pos-retail-cart
                         is-refund-mode={isRefundMode.value}

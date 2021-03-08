@@ -54,7 +54,7 @@ export default {
               <div class="buttons">
                 <g-btn uppercase={false} text onClick={() => internalValue.value = false} outlined width="120" style="margin-right: 8px">
                   {t('ui.cancel')} </g-btn>
-                <g-btn uppercase={false} text onClick={submit} backgroundcolor="#2979FF" text-color="#FFFFFF" width="120">
+                <g-btn uppercase={false} text onClick={submit} background-color="#2979FF" text-color="#FFFFFF" width="120">
                   {t('ui.ok')} </g-btn>
               </div>
             </div>)}

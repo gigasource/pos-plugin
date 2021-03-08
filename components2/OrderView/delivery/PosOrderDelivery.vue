@@ -3,7 +3,7 @@
 import {Touch} from "pos-vue-framework";
 import _ from "lodash";
 import {$filters, avatar, isIOS, isMobile, username} from "../../AppSharedStates";
-import {computed, withModifiers, ref, onActivated} from "vue";
+import {computed, withModifiers, ref, onActivated, onDeactivated} from "vue";
 import {useRouter} from 'vue-router';
 import {isItemDiscounted} from "../pos-ui-shared";
 import { execGenScopeId } from '../../utils';
@@ -11,20 +11,14 @@ import {useI18n} from "vue-i18n";
 import {
   autocompleteAddresses,
   deliveryOrderMode,
-  favorites,
-  openDialog,
   selectedAddress,
   selectedCustomer,
-  showKeyboard,
   dialog,
-  name, phone, address, house, street, city, placeId
+  name, phone, address, house, street, city, placeId, clearCustomer, selectedCall
 } from "./delivery-shared";
 import {
   products,
-  currentOrder,
-  itemsWithQty,
   keyboardConfig,
-  removeItem,
   loadProduct,
   removeModifier,
   loadKeyboard,
@@ -70,6 +64,12 @@ export default {
     onActivated(() => {
       order.value = createOrder()
       order.value.type = orderType.value
+    })
+
+    onDeactivated(() => {
+      clearCustomer()
+      orderType.value = ''
+      selectedCall.value = {}
     })
 
     let debounceUpdatePrice, keyboardEventHandler
@@ -195,7 +195,6 @@ export default {
     }
 
     function chooseProduct(productString) {
-      console.log('chooseProduct', productString)
       if (typeof productString === 'string') {
         let [productId, _quantity] = productString.split(' x ')
         if (!productId) return
@@ -411,7 +410,7 @@ export default {
                     </div>}
                   </div>)}
             </div>
-            <g-btn-bs block large class="elevation-2" icon="icon-print" background-color="#2979FF"
+            <g-btn-bs disabled={order.value.items.length <= 0} block large class="elevation-2" icon="icon-print" background-color="#2979FF"
                       onClick={() => dialog.value.order = true}>
               Send to kitchen
             </g-btn-bs>

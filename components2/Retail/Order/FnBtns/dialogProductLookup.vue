@@ -2,7 +2,7 @@
 import { getInternalValue, Intersect } from 'pos-vue-framework';
 import { computed, getCurrentInstance, onMounted, ref, watch } from 'vue';
 import _ from 'lodash'
-import { genScopeId, execGenScopeId } from '../../../utils';
+import { execGenScopeId, genScopeId } from '../../../utils';
 import { addProductToOrder } from '../temp-logic'
 
 export default {
@@ -29,6 +29,7 @@ export default {
 
     const productNameQuery = ref('')
     const productNameQueryResults = ref([])
+
     async function queryProductsByName() {
       const results = await cms.getModel('Product').filter(product =>
           product.name.toLowerCase().includes(productNameQuery.value.trim().toLowerCase()))
@@ -62,7 +63,7 @@ export default {
       const listener = e => {
         e.stopPropagation()
         const elements = [
-          dialogContentRef.value.querySelector('.g-tf-wrapper'),
+          dialogContentRef.value.querySelector('.bs-tf-wrapper'),
           dialogContentRef.value.querySelector('.keyboard-wrapper')
         ]
         showKeyboard.value = elements.some(el => el.contains(e.target));
@@ -88,19 +89,24 @@ export default {
       lastRowIntersectValue.value = () => productSliceLength += 15
     })
 
+    const headerHeight = 48 + 16;
+    const searchKeyboardHeight = 166;
+
     function renderHeader() {
       return (
           <g-toolbar class="header" color="grey lighten 3" elevation="0">
-            <g-text-field-bs
-                outlined clearable class="w-50" clear-icon="cancel" style="color: #1d1d26"
-                model-value={productNameQuery.value}
-                onUpdate:modelValue={updateSearchResult}
-                onEnter={queryProductsByName}
-                onChange={queryProductsByName}/>
-            <g-spacer/>
-            <g-btn uppercase={false} icon style="box-shadow: none; border-radius: 50%" onClick={close}>
-              <g-icon>clear</g-icon>
-            </g-btn>
+            {execGenScopeId(() => <div class="row-flex align-items-center" style={{ width: '100%', height: headerHeight + 'px' }}>
+              <g-text-field-bs
+                  outlined clearable class="w-50 search-box" clear-icon="cancel" style="color: #1d1d26"
+                  model-value={productNameQuery.value}
+                  onUpdate:modelValue={updateSearchResult}
+                  onEnter={queryProductsByName}
+                  onChange={queryProductsByName}/>
+              <g-spacer/>
+              <g-btn uppercase={false} icon style="box-shadow: none; border-radius: 50%" onClick={close}>
+                <g-icon>clear</g-icon>
+              </g-btn>
+            </div>)}
           </g-toolbar>
       )
     }
@@ -108,7 +114,6 @@ export default {
     function isNotLastProduct(i) {
       return (i < productList.value.length - 1)
     }
-
     function renderProductRow(product, i) {
       return <>
         {
@@ -124,8 +129,9 @@ export default {
             <td>
               {(product.attribute
                   ? <div>
-                      {product.attribute.map((val, attr) => <span key={`${attr}_${val}`} class="td-attr">{attr}: {val}</span>)}
-                    </div>
+                    {product.attribute.map((val, attr) =>
+                        <span key={`${attr}_${val}`} class="td-attr">{attr}: {val}</span>)}
+                  </div>
                   : <div>-</div>)}
             </td>
           </tr>
@@ -140,19 +146,19 @@ export default {
             <td>
               {(product.attribute
                   ? <div>
-                      {product.attribute.map((val, attr) => <span key={`${attr}_${val}`} class="td-attr">{attr}: {val}</span>)}
-                    </div>
+                    {product.attribute.map((val, attr) =>
+                        <span key={`${attr}_${val}`} class="td-attr">{attr}: {val}</span>)}
+                  </div>
                   : <div>-</div>)}
             </td>
           </tr>
         }
       </>
     }
-
     function renderProductTable() {
       return (
-          <g-simple-table fixed-header class={showKeyboard.value ? 'tbLookup' : 'tbLookup__full'} ref={tableRef}>
-            { execGenScopeId(() => <>
+          <g-simple-table fixed-header class={showKeyboard.value ? 'tbLookup' : 'tbLookup__full'} ref={tableRef} style={{ maxHeight: `calc(100% - ${headerHeight}px - ${searchKeyboardHeight}px; overflow-y: scroll` } }>
+            {execGenScopeId(() => <>
               <thead>
               <tr>
                 <th>Name</th>
@@ -164,14 +170,14 @@ export default {
               <tbody>
               {productList.value.map(renderProductRow)}
               </tbody>
-            </>) }
+            </>)}
           </g-simple-table>
       )
     }
 
     function renderProductSearchKeyboard() {
       return (
-          <div v-show={showKeyboard.value} class="keyboard-wrapper">
+          <div v-show={showKeyboard.value} class="keyboard-wrapper" style={{height: searchKeyboardHeight + 'px'}}>
             <pos-keyboard-full v-model={productNameQuery.value}/>
           </div>
       )
@@ -179,12 +185,12 @@ export default {
 
     return genScopeId(() => (
         <g-dialog v-model={internalValue.value} fullscreen ref={dialogRef} eager>
-          { execGenScopeId(() =>
+          {execGenScopeId(() =>
               <div class="dialog-lookup w-100" ref={dialogContentRef}>
                 {renderHeader()}
                 {renderProductTable()}
                 {renderProductSearchKeyboard()}
-              </div>) }
+              </div>)}
         </g-dialog>
     ))
   }
@@ -192,12 +198,17 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.bs-tf-wrapper {
+  border-radius: 4px;
+  border-color: #ced4da;
+  background-color: #FFF;
+}
+
 .dialog-lookup {
   height: 100vh;
   background-color: white;
   display: flex;
   flex-direction: column;
-  border: 16px solid rgba(107, 111, 130, 0.95);
 
   .g-tf-wrapper fieldset {
     border-radius: 0;
@@ -212,14 +223,7 @@ export default {
     overflow: scroll;
 
     &.tbLookup {
-      height: calc(65% - 64px) !important;
-      flex-basis: calc(65% - 64px);
-      flex-grow: 0;
-      flex-shrink: 0;
-
-      &__full {
-        flex-basis: calc(100% - 64px);
-      }
+      flex: 1;
     }
 
     thead tr th {
@@ -260,9 +264,7 @@ export default {
   }
 
   ::v-deep .keyboard-wrapper {
-    flex-basis: 35%;
-    height: 35%;
-    padding: 16px;
+    padding: 5px;
     background-color: #BDBDBD;
 
     .key {
