@@ -20,7 +20,7 @@ import {
 	getItemPrice
 } from './online-order-main-logic'
 
-import { acceptOrder, declineOrder } from './online-order-main-logic-be'
+import { acceptOrder, declineOrder, onDeclinedOrder } from './online-order-main-logic-be'
 //<editor-fold desc="delivery">
 import { selectedCustomer as deliverySelectedCustomer } from "../OrderView/delivery/delivery-shared";
 import { orderType } from "../OrderView/delivery/delivery-customer-ui";
@@ -29,6 +29,13 @@ import { orderType } from "../OrderView/delivery/delivery-customer-ui";
 import {$filters} from "../AppSharedStates";
 
 export const selectedCustomer = ref({})
+
+export const selectingPendingOrder = ref(null)
+export const showCancelOrderReasonDialog = ref(null)
+function openOrderCancelReasonDialog(order) {
+	selectingPendingOrder.value = order
+	showCancelOrderReasonDialog.value = true
+}
 
 export function navigateToDeliveryScreen({ customer, callId }, type, missedCallIndex) {
 	cancelMissedCallTimeout(callId)
@@ -266,7 +273,7 @@ export function renderPendingOrdersFactory () {
 					(order.declineStep2) && <g-card-actions>
 						<g-text-field-bs label={t('onlineOrder.reasonDecline')} v-model={order.declineReason} v-slots={{
 							'append-inner': () =>
-								<g-icon style="cursor: pointer" onClick={() => openDialogReason(order)}>
+								<g-icon style="cursor: pointer" onClick={() => openOrderCancelReasonDialog(order)}>
 									icon-keyboard
 								</g-icon>
 						}}/>
@@ -289,7 +296,7 @@ export function renderPendingOrdersFactory () {
 				<g-card-actions>
 					{
 						(!order.confirmStep2 && !order.declineStep2) &&
-						<g-btn-bs height="54" width="60" border-color="#C4C4C4" text-color="black" onClick={withModifiers(() => declineOrder(order), ['stop'])}>
+						<g-btn-bs height="54" width="60" border-color="#C4C4C4" text-color="black" onClick={withModifiers(() => onDeclinedOrder(order), ['stop'])}>
 							<g-icon size="14">
 								icon-cross-red
 							</g-icon>
