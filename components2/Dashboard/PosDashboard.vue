@@ -8,7 +8,7 @@ import OnlineOrderServices from '../OnlineOrder/OnlineOrderServices';
 import { computed, h, KeepAlive, ref } from 'vue';
 import { fetchRooms, roomsStates } from '../TablePlan/RoomState';
 import { appHooks } from '../AppSharedStates';
-import { activeScreen, selectingRoomId } from './DashboardSharedStates';
+import { activeScreen, DASHBOARD_VIEWS, selectingRoomId } from './DashboardSharedStates';
 import DashboardSidebarFactory from './DashboardSidebar/DashboardSidebarItems';
 import PosOrderManualTable from '../TablePlan/BasicRoom/ManualTable/PosOrderManualTable';
 import PosDashboardFunction from './DashboardFunctions/PosDashboardFunction';
@@ -58,25 +58,24 @@ export default {
             </KeepAlive>
       }
     };
-    const ManualTableView = () => <PosOrderManualTable/>
-    const FunctionsView = () => <PosDashboardFunction/>
-    const OnlineOrderMainView = <OnlineOrderMain/>
-    const OnlineOrderListDeclinedView = <OnlineOrderList status="declined"/>
-    const OnlineOrderListCompletedView = <OnlineOrderList status="completed"/>
-    const OnlineOrderServicesView = <OnlineOrderServices/>
-    const ReservationView = <ReservationsList/>
-    const VirtualPrinter = <VirtualPrinterView/>
-    const DashBoardViews = {
-      KeptAliveRoomViews,
-      ManualTableView,
-      FunctionsView,
-      OnlineOrderMainView,
-      OnlineOrderListDeclinedView,
-      OnlineOrderListCompletedView,
-      OnlineOrderServicesView,
-      ReservationView,
-      VirtualPrinter
-    };
+    const ManualTableView = <PosOrderManualTable key="manualTableView"/>
+    const FunctionsView = <PosDashboardFunction key="FunctionsView"/>
+    const OnlineOrderMainView = <OnlineOrderMain key="OnlineOrderMainView"/>
+    const OnlineOrderListDeclinedView = <OnlineOrderList status="declined" key="OnlineOrderListDeclinedView"/>
+    const OnlineOrderListCompletedView = <OnlineOrderList status="completed" key="OnlineOrderListCompletedView"/>
+    const OnlineOrderServicesView = <OnlineOrderServices key="OnlineOrderServicesView"/>
+    const ReservationView = <ReservationsList key="ReservationView"/>
+    const VirtualPrinter = <VirtualPrinterView key="VirtualPrinter"/>
+    let DashBoardViews = {}
+    DashBoardViews[DASHBOARD_VIEWS.KEPT_ALIVE_ROOM_VIEW] = KeptAliveRoomViews
+    DashBoardViews[DASHBOARD_VIEWS.MANUAL_TABLE_VIEW] = ManualTableView
+    DashBoardViews[DASHBOARD_VIEWS.FUNCTIONS_VIEW] = FunctionsView
+    DashBoardViews[DASHBOARD_VIEWS.ONLINE_ORDER_MAIN_VIEW] = OnlineOrderMainView
+    DashBoardViews[DASHBOARD_VIEWS.ONLINE_ORDER_LIST_DECLINED_VIEW] = OnlineOrderListDeclinedView
+    DashBoardViews[DASHBOARD_VIEWS.ONLINE_ORDER_LIST_COMPETED_VIEW] = OnlineOrderListCompletedView
+    DashBoardViews[DASHBOARD_VIEWS.ONLINE_ORDER_SERVICE_VIEW] = OnlineOrderServicesView
+    DashBoardViews[DASHBOARD_VIEWS.RESERVATION_VIEW] = ReservationView
+    DashBoardViews[DASHBOARD_VIEWS.VIRTUAL_PRINTER] = VirtualPrinter
 
     return () =>
         <div class="row-flex" style="max-height: 100%">

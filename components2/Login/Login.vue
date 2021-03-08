@@ -14,7 +14,7 @@ import StoreIdBtn from './StoreIdBtn'
 import SupportBtn from './SupportBtn'
 import DialogLoginSupport from './dialogLoginSupport'
 import { useI18n } from 'vue-i18n';
-import { dashboardHooks} from '../Dashboard/DashboardSharedStates';
+import { DASHBOARD_VIEWS, dashboardHooks } from '../Dashboard/DashboardSharedStates';
 
 export default {
   components: { DialogLoginSupport, SupportBtn, StoreIdBtn, VersionBtn, PosLoginBtnLanguage, ConnectionStatusBtn, PosLoginKeyboard, PosLoginTextfield, },
@@ -42,7 +42,7 @@ export default {
       incorrectPasscode.value = !(await login(loginPassword.value))
       if (!incorrectPasscode.value) {
         loginPassword.value = ''
-        dashboardHooks.emit('updateScreen', 'FunctionsView')
+        dashboardHooks.emit('updateScreen', DASHBOARD_VIEWS.FUNCTIONS_VIEW)
         router.push('/pos-dashboard')
       }
     }

@@ -1,9 +1,9 @@
 import { computed } from 'vue'
 import _ from 'lodash'
 import { generalSettings, user } from '../../AppSharedStates'
-import { currentAppType, appType } from '../../AppType'
+import { appType, currentAppType } from '../../AppType'
 import { roomsStates } from '../../TablePlan/RoomState'
-import { dashboardHooks } from '../DashboardSharedStates'
+import { DASHBOARD_VIEWS, dashboardHooks } from '../DashboardSharedStates'
 import { useI18n } from 'vue-i18n'
 import { pendingOrders } from '../../OnlineOrder/online-order-main-logic';
 import { todayPendingReservation } from '../../Reservation/reservation-shared'
@@ -19,7 +19,7 @@ const DashboardSidebarFactory = () => {
           icon: 'radio_button_unchecked',
           iconType: 'small',
           onClick() {
-            dashboardHooks.emit('updateScreen', 'KeptAliveRoomViews')
+            dashboardHooks.emit('updateScreen', DASHBOARD_VIEWS.KEPT_ALIVE_ROOM_VIEW)
             dashboardHooks.emit('selectRoom', r.room._id.toString())
           }
         })),
@@ -31,7 +31,7 @@ const DashboardSidebarFactory = () => {
         title: t('sidebar.manualTable'),
         feature: 'manualTable',
         onClick() {
-          dashboardHooks.emit('updateScreen', 'ManualTableView')
+          dashboardHooks.emit('updateScreen', DASHBOARD_VIEWS.MANUAL_TABLE_VIEW)
         }
       },
       {
@@ -47,7 +47,7 @@ const DashboardSidebarFactory = () => {
             title: t('onlineOrder.dashboard'),
             key: 'Orders',
             onClick() {
-              dashboardHooks.emit('updateScreen', 'OnlineOrderMainView')
+              dashboardHooks.emit('updateScreen', DASHBOARD_VIEWS.ONLINE_ORDER_MAIN_VIEW)
             }
           },
           {
@@ -55,7 +55,7 @@ const DashboardSidebarFactory = () => {
             iconType: 'small',
             title: t('onlineOrder.completedOrders'),
             onClick() {
-              dashboardHooks.emit('updateScreen', 'OnlineOrderListCompletedView')
+              dashboardHooks.emit('updateScreen', DASHBOARD_VIEWS.ONLINE_ORDER_LIST_COMPETED_VIEW)
               dashboardHooks.emit('changeOnlineOrderListStatus', 'completed')
             }
           },
@@ -64,7 +64,7 @@ const DashboardSidebarFactory = () => {
             iconType: 'small',
             title: t('onlineOrder.declinedOrders'),
             onClick() {
-              dashboardHooks.emit('updateScreen', 'OnlineOrderListDeclinedView')
+              dashboardHooks.emit('updateScreen', DASHBOARD_VIEWS.ONLINE_ORDER_LIST_DECLINED_VIEW)
               dashboardHooks.emit('changeOnlineOrderListStatus', 'declined')
             }
           },
@@ -74,7 +74,7 @@ const DashboardSidebarFactory = () => {
             feature: 'onlineOrdering',
             key: 'Service',
             onClick() {
-              dashboardHooks.emit('updateScreen', 'OnlineOrderServicesView')
+              dashboardHooks.emit('updateScreen', DASHBOARD_VIEWS.ONLINE_ORDER_SERVICE_VIEW)
             }
           }
         ],
@@ -85,7 +85,7 @@ const DashboardSidebarFactory = () => {
         feature: 'reservation',
         key: 'Reservation',
         onClick() {
-          dashboardHooks.emit('updateScreen', 'ReservationView')
+          dashboardHooks.emit('updateScreen', DASHBOARD_VIEWS.RESERVATION_VIEW)
         }
       },
       {
@@ -93,7 +93,7 @@ const DashboardSidebarFactory = () => {
         title: t('sidebar.functions'),
         feature: 'functions',
         onClick() {
-          dashboardHooks.emit('updateScreen', 'FunctionsView')
+          dashboardHooks.emit('updateScreen', DASHBOARD_VIEWS.FUNCTIONS_VIEW)
         }
       }
     ] : [
@@ -102,7 +102,7 @@ const DashboardSidebarFactory = () => {
         title: t('sidebar.functions'),
         feature: 'functions',
         onClick() {
-          dashboardHooks.emit('updateScreen', 'FunctionsView')
+          dashboardHooks.emit('updateScreen', DASHBOARD_VIEWS.FUNCTIONS_VIEW)
         }
       }
     ]
