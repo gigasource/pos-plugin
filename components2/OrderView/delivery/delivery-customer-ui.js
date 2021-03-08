@@ -4,7 +4,7 @@ import { calls, missedCalls } from '../../Settings/CallSystem/call-system-calls'
 import {
   deliveryOrderMode, favorites, openDialog, selectedCustomer, showKeyboard,
   name, phone, address, zipcode, street, house, city, selectedAddress, placeId, autocompleteAddresses,
-  dialog, dialogMode
+  dialog, dialogMode, selectedCall
 } from "./delivery-shared";
 import _ from "lodash";
 import {v4 as uuidv4} from "uuid";
@@ -33,7 +33,7 @@ export function deliveryCustomerUiFactory() {
   }
 
   const isNewCustomer = computed(() => {
-    return !(selectedCustomer.value && selectedCustomer.value.addresses && selectedCustomer.value.addresses.length > 0)
+    return !(selectedCustomer.value && selectedCustomer.value.name)
   })
 
   function removeAddress(index) {
@@ -111,7 +111,7 @@ export function deliveryCustomerUiFactory() {
             if (component.types.includes('postal_code')) {
               zipcode.value = component.long_name
             }
-            if (component.types.includes('locality')) {
+            if (component.types.includes('locality') || component.types.includes('administrative_area_level_1')) {
               city.value = component.long_name
             }
           }
@@ -133,7 +133,8 @@ export function deliveryCustomerUiFactory() {
             zipcode: zipcode.value,
             house: house.value,
             street: street.value,
-            city: city.value
+            city: city.value,
+            placeId: placeId.value
           }
         ]
       })
@@ -146,7 +147,8 @@ export function deliveryCustomerUiFactory() {
         zipcode: zipcode.value,
         house: house.value,
         street: street.value,
-        city: city.value
+        city: city.value,
+        placeId: placeId.value
       })
     }
     dialog.value.input = false
@@ -164,13 +166,7 @@ export function deliveryCustomerUiFactory() {
   }
 
   function submitCustomer() {
-    if (name.value && phone.value && placeId.value && autocompleteAddresses.value.find(item => item.value === placeId.value) && house.value) {
-      //get exact address + zip code
-      token.value = uuidv4();
-      cms.socket.emit('getZipcode', `${street.value} ${house.value} ${city.value}`, token.value, (_address, _zipcode) => {
-        address.value = _address
-        zipcode.value = _zipcode
-      })
+    if (name.value && phone.value) {
       let customer = {}
       customer.name = name.value
       customer.phone = phone.value
@@ -182,20 +178,24 @@ export function deliveryCustomerUiFactory() {
             zipcode: zipcode.value,
             house: house.value,
             street: street.value,
-            city: city.value
+            city: city.value,
+            placeId: placeId.value
           }
         ]
-      } else {
+      }
+      else if (address.value) {
         customer.addresses = [{
           address: address.value,
           zipcode: zipcode.value,
           house: house.value,
           street: street.value,
-          city: city.value
+          city: city.value,
+          placeId: placeId.value
         }]
       }
       selectedCustomer.value = customer
       selectedAddress.value = customer.addresses.length - 1
+      _.remove(calls.value, call => call.customer.phone === customer.phone)
     }
     hideKeyboard()
   }
@@ -226,7 +226,7 @@ export function deliveryCustomerUiFactory() {
                        color="#536DFE"/>
               <g-spacer/>
               <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#F9A825"
-                        onClick={() => openDialog('edit', item.address, item.zipcode, i)}>
+                        onClick={() => openDialog('edit', item.address, item.zipcode, item.placeId, i)}>
                 <g-icon size="15">icon-reservation_modify</g-icon>
               </g-btn-bs>
               <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#FF4452"
@@ -256,23 +256,26 @@ export function deliveryCustomerUiFactory() {
                         virtualEvent={isIOS.value}/>
         </div>
       </div>
-      <div class="row-flex">
-        <div class="col-9">
-          <g-combobox style="width: 100%" label="Address" v-model={placeId.value} outlined dense
-                      clearable
-                      virtualEvent={isIOS.value} skip-search
-                      items={autocompleteAddresses.value} onUpdate:searchText={debounceSearchAddress}
-                      ref="autocomplete"
-                      onInputClick={() => showKeyboard.value = true} keep-menu-on-blur
-                      menu-class="menu-autocomplete-address"
-                      onUpdate:modelValue={selectAutocompleteAddress}/>
+      {
+        orderType.value === 'delivery' &&
+        <div className="row-flex">
+          <div className="col-9">
+            <g-combobox style="width: 100%" label="Address" v-model={placeId.value} outlined dense
+                        clearable
+                        virtualEvent={isIOS.value} skip-search
+                        items={autocompleteAddresses.value} onUpdate:searchText={debounceSearchAddress}
+                        ref="autocomplete"
+                        onInputClick={() => showKeyboard.value = true} keep-menu-on-blur
+                        menu-class="menu-autocomplete-address"
+                        onUpdate:modelValue={selectAutocompleteAddress}/>
+          </div>
+          <div className="flex-grow-1 ml-1">
+            <g-text-field outlined dense v-model={house.value} label="Nr"
+                          onClick={() => showKeyboard.value = true}
+                          virtualEvent={isIOS.value}/>
+          </div>
         </div>
-        <div class="flex-grow-1 ml-1">
-          <g-text-field outlined dense v-model={house.value} label="Nr"
-                        onClick={() => showKeyboard.value = true}
-                        virtualEvent={isIOS.value}/>
-        </div>
-      </div>
+      }
     </>
   }
   const renderNewCustomerForNonMobile = () => {
@@ -304,13 +307,13 @@ export function deliveryCustomerUiFactory() {
   }
   const renderPendingCalls = () => {
     return (
-        <div class={['delivery-info__call', calls.value[0] && calls.value[0].type === 'missed' ? 'b-red' : 'b-grey']}>
+        <div class={['delivery-info__call', selectedCall.value && selectedCall.value.type === 'missed' ? 'b-red' : 'b-grey']}>
           <div class="delivery-info__call--info">
             <p class="fw-700 fs-small">
               <g-icon size="16" class="mr-1">icon-call</g-icon>
-              {calls.value[0].customer.phone}
+              {selectedCall.value.customer.phone}
             </p>
-            <p class="fs-small text-grey-darken-1">{calls.value[0].customer.name}</p>
+            <p class="fs-small text-grey-darken-1">{selectedCall.value.customer.name}</p>
           </div>
           <div class={['delivery-info__call-btn', orderType.value === 'pickup' && 'delivery-info__call-btn--selected']}
               onClick={() => chooseCustomer('pickup')}>
@@ -391,7 +394,7 @@ export function deliveryCustomerUiFactory() {
 
       <div class="delivery-info--lower">
         {
-          (calls.value && calls.value.length > 0)
+          (selectedCall.value &&selectedCall.value.customer)
               ? renderPendingCalls()
               : [ renderNoPendingCalls(), renderMissedCalls() ]
         }
@@ -409,13 +412,12 @@ export function deliveryCustomerUiFactory() {
                                                 v-model={name.value}/>
                              <pos-textfield-new style="width: 48%" label="Phone"
                                                 v-model={phone.value}/>
-                             <g-combobox style="width: 98%" label="Address"
-                                         text-field-component="PosTextfieldNew"
-                                         modelValue={placeId.value} clearable
-                                         virtualEvent={isIOS.value}
-                                         skip-search
-                                         items={autocompleteAddresses.value}
-                                         onUpdate:searchText={debounceSearchAddress.value}
+                             <g-combobox style="width: 98%" label="Address" v-model={placeId.value} dense
+                                         text-field-component="PosTextfieldNew" clearable
+                                         virtualEvent={isIOS.value} skip-search
+                                         items={autocompleteAddresses.value} onUpdate:searchText={debounceSearchAddress}
+                                         keep-menu-on-blur
+                                         menu-class="menu-autocomplete-address"
                                          onUpdate:modelValue={selectAutocompleteAddress}/>
                              <pos-textfield-new style="width: 23%" label="Street"
                                                 placeholder="Street name (Autofill)"
