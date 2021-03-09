@@ -5,7 +5,7 @@ import PosDashboardSidebar from './DashboardSidebar/PosDashboardSidebar2';
 import OnlineOrderMain from '../OnlineOrder/OnlineOrderMain';
 import OnlineOrderList from '../OnlineOrder/OnlineOrderList'
 import OnlineOrderServices from '../OnlineOrder/OnlineOrderServices';
-import { computed, h, KeepAlive, ref } from 'vue';
+import { computed, h, KeepAlive, onActivated, ref } from 'vue';
 import { fetchRooms, roomsStates } from '../TablePlan/RoomState';
 import { appHooks } from '../AppSharedStates';
 import { activeScreen, DASHBOARD_VIEWS, selectingRoomId } from './DashboardSharedStates';
@@ -14,6 +14,7 @@ import PosOrderManualTable from '../TablePlan/BasicRoom/ManualTable/PosOrderManu
 import PosDashboardFunction from './DashboardFunctions/PosDashboardFunction';
 import VirtualPrinterView from '../VirtualPrinter/VirtualPrinterView';
 import ReservationsList from '../Reservation/ReservationsList';
+import { VIEWS } from '../Settings/settings-shared';
 
 
 export default {
@@ -33,9 +34,13 @@ export default {
     appHooks.emit('orderChange')
     const { sidebarItems } = DashboardSidebarFactory()
     const sidebarSelectingPath = ref('')
-    sidebarItems.value.forEach((item, idx) => {
-      if (item.feature === 'functions') {
-        sidebarSelectingPath.value = `items.${idx}`
+    onActivated(() => {
+      if (activeScreen.value === DASHBOARD_VIEWS.FUNCTIONS_VIEW) {
+        sidebarItems.value.forEach((item, idx) => {
+          if (item.feature === 'functions') {
+            sidebarSelectingPath.value = `items.${idx}`
+          }
+        })
       }
     })
     const sidebarRender = () => <pos-dashboard-sidebar v-model={sidebarSelectingPath.value} items={sidebarItems.value}/>
