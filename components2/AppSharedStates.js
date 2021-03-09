@@ -100,16 +100,15 @@ export const $filters = {
 }
 
 
-// TODO: added to UI somewhere
-//  <g-snackbar v-model={notifyState.show} top right color="#1976d2" timeout={1000}>{notifyState.content}</g-snackbar>
-// snackbar notify
 export const notifyState = reactive({
   show: false,
-  content: null
+  content: null,
+  color: null
 })
 
-export function showNotify(content) {
+export function showNotify(content, color = '#536dfe') {
   notifyState.content = content || 'Saved'
+  notifyState.color = color
   notifyState.show = true
 }
 

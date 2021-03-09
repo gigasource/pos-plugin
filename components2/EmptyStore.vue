@@ -43,12 +43,20 @@ export default {
       cms.socket.emit('screen-loaded')
     })
 
+    function renderSystemSnackbar() {
+      return <g-snackbar
+          top right
+          v-model={notifyState.show}
+          color={notifyState.color}
+          timeout={2000}>
+        {notifyState.content}
+      </g-snackbar>
+    }
+
     return () => {
-      return <div>
-        <g-snackbar v-model={notifyState.show} top right color="#536dfe" timeout={2000}>
-          {notifyState.content}
-        </g-snackbar>
-      </div>
+      return <>
+        {renderSystemSnackbar()}
+      </>
     }
   }
 }
