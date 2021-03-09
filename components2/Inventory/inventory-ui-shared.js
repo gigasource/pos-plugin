@@ -91,7 +91,7 @@ const createEmptyInventory = () => ({
       color: colors[0]
     }]
   },
-  unit: units.value[0],
+  unit: 'piece',
   stock: null
 })
 
