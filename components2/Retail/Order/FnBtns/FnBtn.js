@@ -163,7 +163,7 @@ export function renderDialogSetBtn() {
               <g-icon>close</g-icon>
             </div>
 
-            <g-select label="Function" text-field-component="GTextFieldBs" items={FnBtnNames.value}
+            <g-select label="Function" text-field-component="GTextFieldBs" items={FnBtnNames.value} skip-search
                       v-model={selectedBtn.value.fn}/>
 
             <div style="margin: 5px">
