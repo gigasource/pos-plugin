@@ -3,8 +3,9 @@ import { onBeforeMount, withModifiers } from 'vue';
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { genScopeId } from '../utils';
+import { showNotify } from '../AppSharedStates'
 export default {
-  setup(props, { emit }) {
+  setup() {
     const { t } = useI18n()
     const delivery = ref(null)
     const pickup = ref(null)
@@ -16,9 +17,8 @@ export default {
       getServices()
     })
     function save() {
-      // const newDate = dayjs();
-      emit('showInfoSnackbar', 'Saving...')
-      emit('updateOnlineDeviceServices', {
+      showNotify('Saving...')
+      cms.socket.emit('updateOnlineDeviceServices', {
         // deliveryOffTime: this.delivery ? newDate.add(this.deliveryTimer, 'hour').toDate() : null,
         // pickupOffTime: this.pickup ? newDate.add(this.pickupTimer, 'hour').toDate() : null,
         // noteOffTime: newDate.add(this.offTimer, 'hour').toDate()
@@ -27,27 +27,26 @@ export default {
         noteToCustomers: note.value,
       }, async({ error }) => {
         if (error) {
-          emit('showErrorSnackbar', error)
+          showNotify(error)
           const posSetting = await cms.getModel('PosSetting').findOne()
-          const { delivery, pickup, noteToCustomers } = posSetting.onlineDevice.services
-
-          delivery.value = delivery
-          pickup.value = pickup
-          note.value = noteToCustomers || ''
+          const { delivery: _d, pickup: _p, noteToCustomers: _n } = posSetting.onlineDevice.services
+          delivery.value = _d
+          pickup.value = _p
+          note.value = _n || ''
         } else {
-          emit('showInfoSnackbar', 'Saved Settings!')
+          showNotify('Settings Saved!')
         }
       })
     }
     function getServices() {
-      emit('getOnlineDeviceServices', ({ services, error }) => {
+      cms.socket.emit('getOnlineDeviceServices', ({ services, error }) => {
         if (error) {
-          emit('showErrorSnackbar', error)
+          showNotify(error)
         }
-        const { delivery, pickup, noteToCustomers } = services
-        delivery.value = delivery
-        pickup.value = pickup
-        note.value = noteToCustomers || ''
+        const { delivery: _d, pickup: _p, noteToCustomers: _n } = services
+        delivery.value = _d
+        pickup.value = _p
+        note.value = _n || ''
       })
     }
     function changeNote(val) {
