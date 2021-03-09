@@ -350,8 +350,7 @@ export function renderChangeStockDialog() {
   return <dialog-change-stock v-model={dialog.value.stock}
                               name={selectedInventory.value && selectedInventory.value.name}
                               stock={selectedInventory.value && selectedInventory.value.stock}
-                              onSubmit={updateStock}>
-  </dialog-change-stock>
+                              onSubmit={updateStock}/>
 }
 
 export function renderCategoryDialog() {

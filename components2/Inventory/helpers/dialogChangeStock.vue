@@ -207,14 +207,13 @@ export default {
 
   &-keyboard {
     background: #bdbdbd;
-    padding: 16px;
+    padding: 8px;
   }
 }
 
 @media screen and (max-height: 599px) {
   .dialog {
     width: 400px;
-    padding: 12px;
 
     &-title {
       font-size: 18px;
