@@ -35,6 +35,7 @@ export default {
 
     function changeSortField(field) {
       sortField.value = field
+      showSortMenu.value = false
     }
 
     function back() {
@@ -73,7 +74,7 @@ export default {
           <g-btn-bs icon="icon-back@20" background-color="white" class="elevation-2" onClick={back}>
             {t('ui.back')}
           </g-btn-bs>
-          <g-menu v-model={showSortMenu.value} v-slots={{
+          <g-menu v-model={showSortMenu.value} top v-slots={{
             'default': genScopeId(() =>
                 <div class="bg-white">
                   <g-btn-bs block onClick={() => changeSortField('name')}>
@@ -88,14 +89,10 @@ export default {
                 <g-btn-bs onClick={on.click} icon="icon-sort@20" background-color="white" class="elevation-2">
                   {t('ui.sort')}
                 </g-btn-bs>)
-          }}>
-          </g-menu>
+          }}/>
           <g-spacer/>
           <g-btn-bs background-color="#1271FF" text-color="#FFFFFF" class="elevation-2" onClick={() => onOpenDialog('add')}>
-            <g-icon size="20" color="white" class="mr-2">
-              add_circle
-            </g-icon>
-            Add
+            <g-icon size="20" color="white" class="mr-2">add_circle</g-icon>Add
           </g-btn-bs>
           <g-btn-bs disabled={!selectingCustomer.value} icon="icon-cancel3@20" background-color="white" text-color="#FF4552" class="elevation-2" onClick={() => showDeleteDialog.value = true}>
             {t('ui.delete')}
