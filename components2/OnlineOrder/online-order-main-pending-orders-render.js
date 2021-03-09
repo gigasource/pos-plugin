@@ -218,7 +218,7 @@ export function renderPendingOrdersFactory () {
 							</g-icon>
 						</div>
 						<div style="max-width: calc(100% - 25px);" class="flex-equal pl-1">
-							{`${order.address} ${order.zipCode}`}
+							{`${order.address} ${order.zipcode}`}
 						</div>
 					</div>
 				}
