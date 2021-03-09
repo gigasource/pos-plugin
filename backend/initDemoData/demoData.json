@@ -24,15 +24,15 @@
         {
           "rows": [
             1,
-            1
+            2
           ],
           "cols": [
             1,
-            1
+            2
           ],
           "backgroundColor": "#FFFFFF",
           "text": "Refund order",
-          "fn": "openRefundSearch"
+          "fn": "Refund"
         }
       ]
     }

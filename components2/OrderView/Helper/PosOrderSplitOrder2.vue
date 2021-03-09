@@ -117,6 +117,7 @@ export default {
       if (payment) addSinglePayment(order2, payment);
       cacheSplitId.value = cacheSplitId.value || order.splitId;
       await hooks.emit('pay-split', true)
+      await appHooks.emit('orderChange')
       if (isMobile.value && order.items.length === 0) {
         await openReceiptDialog();
       }

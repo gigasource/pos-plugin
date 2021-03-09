@@ -12,6 +12,7 @@ import dayjs from 'dayjs'
 dayjs.extend(isBetween)
 import _ from 'lodash'
 import {findCustomerWithId} from "../Customer/customer-logic";
+import {loadCustomers} from "../Customer/customer-be-logics";
 
 //<editor-fold desc="Variables">
 /**
@@ -54,7 +55,8 @@ export function openDialogDetail(order) {
 //</editor-fold>
 
 export function onlineOrderListFactory(props) {
-  onBeforeMount(() => {
+  onBeforeMount(async () => {
+    await loadCustomers()
     filter.value.fromDate = dayjs().format('YYYY-MM-DD')
     filter.value.toDate = dayjs().format('YYYY-MM-DD')
   })
@@ -116,6 +118,7 @@ export function onlineOrderListFactory(props) {
             <tbody>
               {ordersListByStatus.value.map((order, i) => {
                 const customer = findCustomerWithId(order.customer)
+                if (!customer || !user.value) return
                 return (
                   <tr key={i} onClick={() => openDialogDetail(order)} style="cursor: pointer">
                   <td class="fw-700">

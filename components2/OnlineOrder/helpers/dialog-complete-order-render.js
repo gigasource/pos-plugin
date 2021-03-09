@@ -5,6 +5,7 @@ import { getExtraInfo, getItemPrice, getShippingFee } from '../online-order-main
 import { $filters } from '../../AppSharedStates'
 import orderUtil from '../../../components/logic/orderUtil';
 import { execGenScopeId } from '../../utils';
+import {findCustomerWithId} from "../../Customer/customer-logic";
 
 export const dialogOrder = ref(null)
 
@@ -49,6 +50,7 @@ export function dialogCompleteOrderFactory(props, { emit }) {
 
   const { t, locale } = useI18n()
   const renderContentInfo = function () {
+    const customer = findCustomerWithId(dialogOrder.value.customer)
     return (
         <div class="row-flex mb-2">
           <div style="flex: 0 0 30px">
@@ -57,7 +59,7 @@ export function dialogCompleteOrderFactory(props, { emit }) {
           </div>
           <p>
             <span class="text-indigo-accent-2 fw-600 mr-2">#{dialogOrder.value.dailyId ? dialogOrder.value.dailyId : dialogOrder.value.id}</span>
-            {dialogOrder.value.customer ? dialogOrder.value.customer.name : 'No customer name'} - {dialogOrder.value.customer ? dialogOrder.value.customer.phone : 'No customer phone'}
+            {customer ? customer.name : 'No customer name'} - {customer ? customer.phone : 'No customer phone'}
           </p>
           <g-spacer></g-spacer>
           <span class="fw-700 fs-large">
@@ -74,7 +76,7 @@ export function dialogCompleteOrderFactory(props, { emit }) {
             <g-icon color="#9E9E9E" size="20">icon-place</g-icon>
           </div>
           <div class="col-10">
-            {`${dialogOrder.value.customer.address} ${dialogOrder.value.customer.zipCode}`}
+            {`${dialogOrder.value.address} ${dialogOrder.value.zipcode}`}
           </div>
         </div>
   }
