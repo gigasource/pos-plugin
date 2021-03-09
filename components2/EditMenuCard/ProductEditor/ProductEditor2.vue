@@ -34,14 +34,14 @@ import dialogProductInfo from "../dialog/dialogProductInfo";
 import dialogTextFilter from "../../pos-shared-components/dialogFilter/dialogTextFilter";
 import { modifierHooks } from '../../Modifiers/dialogEditPopupModifier/modifier-ui-logics';
 import {modifierGroups} from "../../Modifiers/dialogEditPopupModifier/modifier-ui-logics";
-
+import ColorSelector from '../../../components/common/ColorSelector';
 
 const colors = ['#FFFFFF','#CE93D8','#B2EBF2','#C8E6C9','#DCE775','#FFF59D','#FFCC80','#FFAB91']
 
 export default {
   name: 'ProductEditor2.vue',
   props: {},
-  components: {dialogEditPopupModifiers2, dialogProductInfo, dialogTextFilter}, // TODO: update component
+  components: {dialogEditPopupModifiers2, dialogProductInfo, dialogTextFilter, ColorSelector}, // TODO: update component
   setup() {
     const {t} = useI18n()
     const router = useRouter()
