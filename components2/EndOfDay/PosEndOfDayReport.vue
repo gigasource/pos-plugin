@@ -25,7 +25,7 @@ export default {
 .pos-eod-report {
   display: grid;
   grid-template-columns: 75% 25%;
-  grid-template-rows:  1fr 64px;
+  grid-template-rows: calc(100% - 64px) 64px;
   height: 100%;
 
   &__report {
