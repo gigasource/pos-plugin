@@ -65,16 +65,18 @@ export default {
               </g-icon>
               <div class="form">
                 <div class="input">
-                  <pos-textfield-new ref={usernameRef} onClick={() => check.value = 'username'} label={t('settings.userName')} v-model={name.value}/>
-                  <pos-textfield-new ref={passcodeRef} onClick={() => check.value = 'passcode'} label={t('settings.passcode')} v-model={passcode.value}/>
+                  <g-text-field-bs ref={usernameRef} onClick={() => check.value = 'username'} label={t('settings.userName')} v-model={name.value}/>
+                  <g-text-field-bs ref={passcodeRef} onClick={() => check.value = 'passcode'} label={t('settings.passcode')} v-model={passcode.value}/>
                 </div>
                 {
                   (!isMobile.value) &&
                   <div class="action">
                     <g-btn uppercase={false} outlined class="mr-3" width="120" onClick={() => showDialogUserDetail.value = false}>
-                      {t('ui.cancel')} </g-btn>
+                      {t('ui.cancel')}
+                    </g-btn>
                     <g-btn uppercase={false} flat background-color="blue accent 3" text-color="white" width="120" onClick={submit}>
-                      {t('ui.ok')} </g-btn>
+                      {t('ui.ok')}
+                    </g-btn>
                   </div>
                 }
               </div>
