@@ -62,7 +62,7 @@ export default {
 <style scoped lang="scss">
 .customer-led-display {
   padding: 20px;
-  width: 100%;
+  flex: 1 1 0;
   height: 100%;
 }
 </style>
