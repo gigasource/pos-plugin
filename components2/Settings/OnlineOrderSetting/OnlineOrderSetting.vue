@@ -1,25 +1,28 @@
 <script>
 import { useI18n } from 'vue-i18n';
-import { ref, computed, onBeforeMount, onActivated, withModifiers, onUnmounted, onMounted } from 'vue'
-import axios from 'axios';
-import cms from 'cms'
+import { onActivated, onBeforeMount, withModifiers } from 'vue'
 import { genScopeId } from '../../utils';
 import {
-  getWebshopUrl,
+  checkClearOrderPasswd,
   connected,
-  webshopName,
-  webshopAvailable,
-  webshopUrl,
-  disableDataBtn,
-  isTemplateData,
-  deliveryTimes,
   defaultPrepareTime,
+  deliveryTimes,
+  dialog,
+  disableDataBtn,
+  downloadData,
+  getWebshopUrl,
+  isMasterDevice,
+  isTemplateData,
+  onlineDevice,
   OnlineOrderSettingLogicsFactory,
-    passcode,
-    dialog,
-    snackbarRef,
-checkClearOrderPasswd,
-  isMasterDevice, onlineOrderSorting, onlineDevice, updateSound, updateSoundMode, uploadData, downloadData
+  onlineOrderSorting,
+  passcode,
+  snackbarRef,
+  updateSound,
+  updateSoundMode,
+  uploadData,
+  webshopAvailable,
+  webshopName
 } from './online-order-setting-logics'
 import { appHooks } from '../../AppSharedStates';
 import Snackbar from '../../../components/Store/Snackbar';
@@ -31,12 +34,121 @@ export default {
     const { t } = useI18n()
     const { soundModes, orderSorting } = OnlineOrderSettingLogicsFactory()
     onBeforeMount(async () => {
-      getWebshopUrl()
+      await getWebshopUrl()
     })
     onActivated(() => {
       appHooks.emit('settingChange')
       // emit('getOnlineDevice')
     })
+
+    function renderDefaultTimeToCompleteOrderSetting() {
+      return (
+          <>
+            <div>
+              <b> {t('onlineOrder.settings.timeToComplete')} </b>
+            </div>
+            <g-row>
+              <g-grid-select
+                  grid={false}
+                  mandatory
+                  items={deliveryTimes}
+                  v-model={defaultPrepareTime.value}
+                  v-slots={{
+                    default: ({ toggleSelect, item }) =>
+                        <g-btn-bs border-color="#e0e0e0" text-color="black" width="72" height="30" style="margin-top: 8px"
+                                  onClick={withModifiers(() => toggleSelect(item), ['stop'])}>
+                          {item}
+                        </g-btn-bs>,
+                    selected: ({ toggleSelect, item }) =>
+                        <g-btn-bs border-color="#90CAF9" text-color="black" width="72" height="30" background-color="#E3F2FD" style="margin-top: 8px"
+                                  onClick={withModifiers(() => toggleSelect(item), ['stop'])}>
+                          {item}
+                        </g-btn-bs>
+                  }}/>
+            </g-row>
+          </>
+      )
+    }
+    function renderNotificationSoundSetting() {
+      return (
+          <>
+            <div style="margin-top: 16px;">
+              <b> {t('onlineOrder.settings.sound')} </b>
+            </div>
+            <g-switch
+                label={t('onlineOrder.settings.hasSound')}
+                modelValue={onlineDevice.value.sound}
+                onUpdate:modelValue={updateSound}/>
+            <div style="margin-top: 16px;">
+              <b> {t('onlineOrder.settings.playNotificationSound')} </b>
+            </div>
+            <g-grid-select
+                grid={false}
+                item-cols="4"
+                items={soundModes}
+                mandatory
+                modelValue={onlineDevice.value.soundLoop}
+                onUpdate:modelValue={updateSoundMode}
+                v-slots={{
+                  default: ({ toggleSelect, item }) =>
+                      <g-btn-bs border-color="#e0e0e0" text-color="black" height="30" style="margin-top: 8px; white-space: nowrap" onClick={withModifiers(() => toggleSelect(item), ['stop'])}>
+                        {item.text}
+                      </g-btn-bs>,
+                  selected: ({ item }) =>
+                      <g-btn-bs border-color="#90CAF9" text-color="black" height="30" background-color="#E3F2FD" style="margin-top: 8px; white-space: nowrap">
+                        {item.text}
+                      </g-btn-bs>
+                }}/>
+          </>
+      )
+    }
+    function renderOrderSorting() {
+      return (
+          <>
+            <div style="margin-top: 16px;">
+              <b> {t('onlineOrder.settings.sorting')} </b>
+            </div>
+            <g-grid-select grid={false} items={orderSorting} v-model={onlineOrderSorting.value} mandatory v-slots={{
+              default: ({ toggleSelect, item }) =>
+                  <g-btn-bs border-color="#e0e0e0" text-color="black" width="160" height="30" style="margin-top: 8px"
+                            onClick={withModifiers(() => toggleSelect(item), ['stop'])}>
+                    {item.text}
+                  </g-btn-bs>
+              ,
+              selected: ({ toggleSelect, item }) =>
+                  <g-btn-bs border-color="#90CAF9" text-color="black" width="160" height="30" background-color="#E3F2FD" style="margin-top: 8px"
+                            onClick={withModifiers(() => toggleSelect(item), ['stop'])}>
+                    {item.text}
+                  </g-btn-bs>
+            }}/>
+          </>
+      )
+    }
+    function renderGeneralSetting() {
+      return (
+          <div>
+            <div class="online-order-setting__title">
+              {t('onlineOrder.settings.generalSettings')}
+            </div>
+            <div class="online-order-setting__content">
+              {renderDefaultTimeToCompleteOrderSetting()}
+              {renderNotificationSoundSetting()}
+              {renderOrderSorting()}
+            </div>
+          </div>
+      )
+    }
+
+    function renderResetOnlineOrder() {
+      return <>
+        <g-btn class="mt-3" flat background-color="#1271ff" text-color="#fff" uppercase={false} onClick={() => dialog.value = true}>
+          Reset Online Orders
+        </g-btn>
+        <dialog-form-input v-model={dialog.value} onSubmit={checkClearOrderPasswd} v-slots={{
+          input: () => <g-text-field-bs label="Enter your passcode" v-model={passcode.value} clearable/>
+        }}/>
+      </>
+    }
 
     return genScopeId(() =>
         <div class="online-order-setting">
@@ -49,118 +161,44 @@ export default {
               (onlineDevice.value) &&
               <div class="row-flex" style="flex-wrap: wrap">
                 <div class="col-6">
-                  <div>
-                    {t('onlineOrder.settings.status')} </div>
+                  <div>{t('onlineOrder.settings.status')}</div>
                   <div style="font-style: italic">
-                    <span>
-                      {connected.value ? 'Connected' : 'Not connected'}
-                    </span>
-                    {
-                      (connected.value) &&
-                      <span style="color: #4CAF50">
-                        ({webshopName.value || 'Demo'}) </span>
-                    }
+                    <span>{connected.value ? 'Connected' : 'Not connected'} </span>
+                    {(connected.value) && <span style="color: #4CAF50">({webshopName.value || 'Demo'})</span>}
                   </div>
+                  {renderResetOnlineOrder()}
                 </div>
                 <div class="col-6">
+                  <div>{t('onlineOrder.settings.webshopUrl')}</div>
                   <div>
-                    {t('onlineOrder.settings.webshopUrl')} </div>
-                  <div>
-                    <span style="font-style: italic; color: #536DFE">
-                      {onlineDevice.value.url} </span>
+                    <span style="font-style: italic; color: #536DFE">{onlineDevice.value.url} </span>
                     {
-                      (!webshopAvailable.value) &&
-                      <span style="font-style: italic; color: #F44336">
+                      (!webshopAvailable.value) && <span style="font-style: italic; color: #F44336">
                         - {t('onlineOrder.settings.notAvailable')}
                       </span>
                     }
                   </div>
-                </div>
-                <div class="col-6 mt-3">
-                  <g-btn flat background-color="#1271ff" text-color="#fff" uppercase={false} onClick={() => dialog.value = true}>
-                    Reset Online Orders
-                  </g-btn>
-                </div>
-                <div class="col-6 mt-3">
-                  <div class="row-flex">
+                  <div class="row-flex mt-3">
                     {
-                      (isMasterDevice.value) &&
-                      <g-btn flat background-color="#1271ff" text-color="#fff" uppercase={false} disabled={disableDataBtn.value} onClick={uploadData}>
+                      (isMasterDevice.value) && <g-btn
+                          flat background-color="#1271ff" text-color="#fff" uppercase={false}
+                          disabled={disableDataBtn.value} onClick={uploadData}>
                         Upload demo data
                       </g-btn>
                     }
                     <g-switch style="margin: 0 !important;" class="ml-3" label="Template Data" v-model={isTemplateData.value}></g-switch>
                   </div>
-                  <g-btn class="mt-2" flat background-color="#1271ff" text-color="#fff" uppercase={false} disabled={disableDataBtn.value} onClick={downloadData}>
+                  <g-btn
+                      class="mt-2" flat background-color="#1271ff" text-color="#fff" uppercase={false}
+                      disabled={disableDataBtn.value} onClick={downloadData}>
                     Import demo data
                   </g-btn>
                 </div>
               </div>
             }
-            <g-divider style="margin-top: 20px"></g-divider>
+            <g-divider style="margin-top: 20px"/>
           </div>
-
-
-          <div class="online-order-setting__title">
-            {t('onlineOrder.settings.generalSettings')}
-          </div>
-          <div class="online-order-setting__content">
-            <div>
-              <b> {t('onlineOrder.settings.timeToComplete')} </b>
-            </div>
-            <g-row>
-              <g-grid-select grid={false} items={deliveryTimes} v-model={defaultPrepareTime.value} mandatory v-slots={{
-                'default': ({ toggleSelect, item }) =>
-                    <g-btn-bs border-color="#e0e0e0" text-color="black" width="72" height="30" style="margin-top: 8px" onClick={withModifiers(() => toggleSelect(item), ['stop'])}>
-                      {item}
-                    </g-btn-bs>
-                ,
-                'selected': ({ toggleSelect, item }) =>
-                    <g-btn-bs border-color="#90CAF9" text-color="black" width="72" height="30" background-color="#E3F2FD" style="margin-top: 8px" onClick={withModifiers(() => toggleSelect(item), ['stop'])}>
-                      {item}
-                    </g-btn-bs>
-              }}></g-grid-select>
-            </g-row>
-            <div style="margin-top: 16px;">
-              <b> {t('onlineOrder.settings.sound')} </b>
-            </div>
-            <g-switch label={t('onlineOrder.settings.hasSound')} modelValue={onlineDevice.value.sound} onUpdate:modelValue={updateSound}></g-switch>
-            <div style="margin-top: 16px;">
-              <b> {t('onlineOrder.settings.playNotificationSound')} </b>
-            </div>
-            <g-grid-select grid={false} item-cols="4" items={soundModes} mandatory modelValue={onlineDevice.value.soundLoop} onUpdate:modelValue={updateSoundMode} v-slots={{
-              'default': ({ toggleSelect, item }) =>
-                  <g-btn-bs border-color="#e0e0e0" text-color="black" height="30" style="margin-top: 8px; white-space: nowrap" onClick={withModifiers(() => toggleSelect(item), ['stop'])}>
-                    {item.text}
-                  </g-btn-bs>
-              ,
-              'selected': ({ item }) =>
-                  <g-btn-bs border-color="#90CAF9" text-color="black" height="30" background-color="#E3F2FD" style="margin-top: 8px; white-space: nowrap">
-                    {item.text}
-                  </g-btn-bs>
-            }}>
-            </g-grid-select>
-            <div style="margin-top: 16px;">
-              <b> {t('onlineOrder.settings.sorting')} </b>
-            </div>
-            <g-grid-select grid={false} items={orderSorting} v-model={onlineOrderSorting.value} mandatory v-slots={{
-              'default': ({ toggleSelect, item }) =>
-                  <g-btn-bs border-color="#e0e0e0" text-color="black" width="160" height="30" style="margin-top: 8px" onClick={withModifiers(() => toggleSelect(item), ['stop'])}>
-                    {item.text}
-                  </g-btn-bs>
-              ,
-              'selected': ({ toggleSelect, item }) =>
-                  <g-btn-bs border-color="#90CAF9" text-color="black" width="160" height="30" background-color="#E3F2FD" style="margin-top: 8px" onClick={withModifiers(() => toggleSelect(item), ['stop'])}>
-                    {item.text}
-                  </g-btn-bs>
-            }}>
-            </g-grid-select>
-          </div>
-          <dialog-form-input v-model={dialog.value} onSubmit={checkClearOrderPasswd} v-slots={{
-            'input': () =>
-                <g-text-field-bs label="Enter your passcode" v-model={passcode.value} clearable/>
-          }}>
-          </dialog-form-input>
+          {renderGeneralSetting()}
           <Snackbar ref={snackbarRef}></Snackbar>
         </div>)
   }
