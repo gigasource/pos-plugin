@@ -165,7 +165,9 @@ export function deliveryCustomerUiFactory() {
     }
   }
 
+  // this only used when add new customer
   function submitCustomer() {
+    //todo: fix this function logic
     if (name.value && phone.value) {
       let customer = {}
       customer.name = name.value
@@ -195,7 +197,6 @@ export function deliveryCustomerUiFactory() {
       }
       selectedCustomer.value = customer
       selectedAddress.value = customer.addresses.length - 1
-      _.remove(calls.value, call => call.customer.phone === customer.phone)
     }
     hideKeyboard()
   }
