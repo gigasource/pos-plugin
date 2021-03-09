@@ -1,7 +1,6 @@
 import { useI18n } from 'vue-i18n';
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { appType, currentAppType } from '../AppType';
-import Hooks from 'schemahandler/hooks/hooks';
 import { VIEWS } from './settings-shared';
 
 

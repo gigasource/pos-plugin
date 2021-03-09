@@ -1,10 +1,8 @@
 <script>
-import { ref, withModifiers } from 'vue'
+import { withModifiers } from 'vue'
 import { useI18n } from 'vue-i18n';
-import { PaymentDialogLogicsFactory } from './view-payment-logics';
-import { genScopeId } from '../../utils';
-import { selectedPayment} from './view-payment-logics';
-import { getScopeAttrs } from '../../../utils/helpers';
+import { PaymentDialogLogicsFactory, selectedPayment } from './view-payment-logics';
+import { execGenScopeId, genScopeId } from '../../utils';
 
 export default {
   props: {
@@ -16,41 +14,46 @@ export default {
   emits: ['update:modelValue'],
   setup(props, { emit }) {
     const { t } = useI18n()
-    const  { isEditing, paymentName, showKeyboard, back, save, iconSrc, openPaymentDialog, internalValue} = PaymentDialogLogicsFactory(props, { emit })
+    const { isEditing, paymentName, showKeyboard, back, save, iconSrc, openPaymentDialog, internalValue } = PaymentDialogLogicsFactory(props, { emit })
     const renderFn = genScopeId(() =>
-      <g-dialog v-model={internalValue.value} fullscreen eager>
-        <div class="dialog-payment w-100"{ ...getScopeAttrs()}>
-          <div class="form" onClick={() => showKeyboard.value = false}>
-            <p class="ml-1 mb-3">
-              {isEditing.value && selectedPayment.value
-                  ? t('settings.editPayment')
-                  : t('settings.createPayment')}
-            </p>
-            <g-text-field-bs class="bs-tf__pos" style="width: 268px" label="Name" placeholder="Payment name"
-                             onClick={withModifiers(() => showKeyboard.value = !showKeyboard.value, ['stop'])}
-                             v-model={paymentName.value}></g-text-field-bs>
-            <pos-file-input-image label="Icon" v-model={iconSrc.value}></pos-file-input-image>
-          </div>
-          {
-            (showKeyboard.value) &&
-            <div class="keyboard-wrapper">
-              <pos-keyboard-full v-model={paymentName.value}></pos-keyboard-full>
-            </div>
-          }
-          <g-toolbar bottom color="grey lighten 3">
-            <g-btn uppercase={false} background-color="white" text-color="#1d1d26" class="ma-3" onClick={back}>
-              <g-icon class="mr-2" svg>
-                icon-back
-              </g-icon>
-              {t('ui.back')}
-            </g-btn>
-            <g-spacer></g-spacer>
-            <g-btn uppercase={false} background-color="blue accent 3" text-color="white" class="ma-2" onClick={save}>
-              {t('ui.save')}
-            </g-btn>
-          </g-toolbar>
-        </div>
-      </g-dialog>)
+        <g-dialog v-model={internalValue.value} fullscreen eager>
+          {execGenScopeId(() =>
+              <div class="dialog-payment w-100">
+                <div class="form" onClick={() => showKeyboard.value = false}>
+                  <p class="ml-1 mb-3">
+                    {isEditing.value && selectedPayment.value
+                        ? t('settings.editPayment')
+                        : t('settings.createPayment')}
+                  </p>
+                  <g-text-field-bs class="bs-tf__pos"
+                                   style="width: 268px"
+                                   label="Name"
+                                   placeholder="Payment name"
+                                   onClick={withModifiers(() => showKeyboard.value = !showKeyboard.value, ['stop'])}
+                                   v-model={paymentName.value}
+                  />
+                  <pos-file-input-image label="Icon" v-model={iconSrc.value}/>
+                </div>
+                {
+                  (showKeyboard.value) &&
+                  <div class="keyboard-wrapper">
+                    <pos-keyboard-full v-model={paymentName.value}/>
+                  </div>
+                }
+                <g-toolbar bottom color="grey lighten 3">
+                  <g-btn uppercase={false} background-color="white" text-color="#1d1d26" class="ma-3" onClick={back}>
+                    <g-icon class="mr-2" svg>
+                      icon-back
+                    </g-icon>
+                    {t('ui.back')}
+                  </g-btn>
+                  <g-spacer/>
+                  <g-btn uppercase={false} background-color="blue accent 3" text-color="white" class="ma-2" onClick={save}>
+                    {t('ui.save')}
+                  </g-btn>
+                </g-toolbar>
+              </div>)}
+        </g-dialog>)
     return {
       renderFn, openPaymentDialog
     }

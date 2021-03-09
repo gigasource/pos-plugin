@@ -1,16 +1,14 @@
 <script>
-import {isMobile} from '../../AppSharedStates';
-import {computed, ref} from 'vue'
-import {useI18n} from 'vue-i18n';
-import {TaxCategoryDialogLogicsFactory} from './view-tax-logics';
-import {genScopeId} from '../../utils';
-import {getScopeAttrs} from '../../../utils/helpers';
+import { isMobile } from '../../AppSharedStates';
+import { useI18n } from 'vue-i18n';
+import { TaxCategoryDialogLogicsFactory } from './view-tax-logics';
+import { genScopeId } from '../../utils';
 
 export default {
   emits: ['update:modelValue'],
-  setup(props, {emit}) {
-    const {t} = useI18n()
-    const {internalValue, submit, open, isValid, rules, taxType, taxName, taxValue} = TaxCategoryDialogLogicsFactory(props, {emit})
+  setup(props, { emit }) {
+    const { t } = useI18n()
+    const { internalValue, submit, open, isValid, rules, taxType, taxName, taxValue } = TaxCategoryDialogLogicsFactory(props, { emit })
 
 
     const formRender = () => <div class="form">
@@ -33,22 +31,21 @@ export default {
         </div>
       }
     </div>
-    const renderFn = () => <>
-      <g-dialog v-model={internalValue.value} overlay-color="#6b6f82" overlay-opacity="0.95" width="90%" eager
-                fullscreen={isMobile.value}>
-        {genScopeId(() => <>
-          <div class="dialog-new-tax w-100">
-            <g-icon onClick={() => internalValue.value = false} svg size="20" class="icon">
-              icon-close
-            </g-icon>
-            {formRender()}
-            <div class="bg-grey-lighten-1 pa-2">
-              <pos-keyboard-full onEnterPressed={submit}/>
+    const renderFn = () =>
+        <g-dialog v-model={internalValue.value} overlay-color="#6b6f82" overlay-opacity="0.95" width="90%" eager
+                  fullscreen={isMobile.value}>
+          {genScopeId(() => <>
+            <div class="dialog-new-tax w-100">
+              <g-icon onClick={() => internalValue.value = false} svg size="20" class="icon">
+                icon-close
+              </g-icon>
+              {formRender()}
+              <div class="bg-grey-lighten-1 pa-2">
+                <pos-keyboard-full onEnterPressed={submit}/>
+              </div>
             </div>
-          </div>
-        </>)()}
-      </g-dialog>
-    </>
+          </>)()}
+        </g-dialog>
     return {
       renderFn,
       open

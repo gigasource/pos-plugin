@@ -21,7 +21,7 @@ export default {
             </g-icon>
             {t('ui.back')}
           </g-btn>
-          <g-spacer></g-spacer>
+          <g-spacer/>
           {slots.default && slots.default()}
         </g-toolbar>)
   }

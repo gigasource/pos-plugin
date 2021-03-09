@@ -89,7 +89,7 @@ export default {
                         Upload demo data
                       </g-btn>
                     }
-                    <g-switch style="margin: 0 !important;" class="ml-3" label="Template Data" v-model={isTemplateData.value}></g-switch>
+                    <g-switch style="margin: 0 !important;" class="ml-3" label="Template Data" v-model={isTemplateData.value}/>
                   </div>
                   <g-btn class="mt-2" flat background-color="#1271ff" text-color="#fff" uppercase={false} disabled={disableDataBtn.value} onClick={downloadData}>
                     Import demo data
@@ -97,7 +97,7 @@ export default {
                 </div>
               </div>
             }
-            <g-divider style="margin-top: 20px"></g-divider>
+            <g-divider style="margin-top: 20px"/>
           </div>
 
 
@@ -119,7 +119,7 @@ export default {
                     <g-btn-bs border-color="#90CAF9" text-color="black" width="72" height="30" background-color="#E3F2FD" style="margin-top: 8px" onClick={withModifiers(() => toggleSelect(item), ['stop'])}>
                       {item}
                     </g-btn-bs>
-              }}></g-grid-select>
+              }}/>
             </g-row>
             <div style="margin-top: 16px;">
               <b> {t('onlineOrder.settings.sound')} </b>
@@ -153,15 +153,13 @@ export default {
                   <g-btn-bs border-color="#90CAF9" text-color="black" width="160" height="30" background-color="#E3F2FD" style="margin-top: 8px" onClick={withModifiers(() => toggleSelect(item), ['stop'])}>
                     {item.text}
                   </g-btn-bs>
-            }}>
-            </g-grid-select>
+            }}/>
           </div>
           <dialog-form-input v-model={dialog.value} onSubmit={checkClearOrderPasswd} v-slots={{
             'input': () =>
                 <g-text-field-bs label="Enter your passcode" v-model={passcode.value} clearable/>
-          }}>
-          </dialog-form-input>
-          <Snackbar ref={snackbarRef}></Snackbar>
+          }}/>
+          <Snackbar ref={snackbarRef}/>
         </div>)
   }
 }

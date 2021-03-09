@@ -1,6 +1,6 @@
 <script>
-import { username, user } from '../AppSharedStates';
-import { genScopeId, internalValueFactory } from '../utils';
+import { user, username } from '../AppSharedStates';
+import { genScopeId } from '../utils';
 import { SettingsSidebarFactory } from './settings-ui-logics';
 import { changeSettingView } from './settings-shared';
 import { ref } from 'vue'

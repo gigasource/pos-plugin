@@ -2,7 +2,6 @@
 import { useI18n } from 'vue-i18n';
 import { genScopeId, isSameId } from '../../utils';
 import { init, listTaxCategories, onSelectTax, selectedTaxCategory } from './view-tax-logics';
-//todo: remove
 export default {
   components: {},
   setup() {
@@ -22,13 +21,13 @@ export default {
           <td> {tax.type} </td>
         </tr>)
     return genScopeId(() =>
-      <div>
-        <g-simple-table striped>
-          { headerRender()}
-          {listTaxCategories.value.map((tax, i) => taxItemRender(tax, i)()
-          )}
-        </g-simple-table>
-      </div>)
+        <div>
+          <g-simple-table striped>
+            {headerRender()}
+            {listTaxCategories.value.map((tax, i) => taxItemRender(tax, i)()
+            )}
+          </g-simple-table>
+        </div>)
   }
 }
 </script>

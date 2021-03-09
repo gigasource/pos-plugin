@@ -1,19 +1,19 @@
 <script>
-import { computed, ref, withModifiers, watch } from 'vue'
 import { useI18n } from 'vue-i18n';
 import {
-  selectedTaxCategory,
+  dialogRef,
+  onDeleteTaxCategory,
   onOpenDialogDelete,
   onOpenDialogEditTaxCategory,
   onOpenTaxCategoryDialog,
-  showDialogConfirmDelete,
-  onDeleteTaxCategory,
-    dialogRef
+  selectedTaxCategory,
+  showDialogConfirmDelete
 } from './view-tax-logics';
 import { genScopeId } from '../../utils';
 import dialogNewTaxCategory from './dialogNewTaxCategory';
+
 export default {
-  components: { dialogNewTaxCategory},
+  components: { dialogNewTaxCategory },
   setup() {
     const { t } = useI18n()
     return genScopeId(() => <>
@@ -32,7 +32,7 @@ export default {
       <g-btn uppercase={false} background-color="#4CAF50" text-color="#FFFFFF" onClick={onOpenTaxCategoryDialog}>
         + {t('settings.createTax')}
       </g-btn>
-      <dialog-confirm-delete type=" tax category " label={selectedTaxCategory.value ? selectedTaxCategory.value.name: ''} v-model={showDialogConfirmDelete.value} onSubmit={onDeleteTaxCategory}/>
+      <dialog-confirm-delete type=" tax category " label={selectedTaxCategory.value ? selectedTaxCategory.value.name : ''} v-model={showDialogConfirmDelete.value} onSubmit={onDeleteTaxCategory}/>
       <dialogNewTaxCategory ref={dialogRef}/>
     </>)
   }
