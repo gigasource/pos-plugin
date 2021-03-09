@@ -358,7 +358,6 @@ export async function assignTableToOrder2(table) {
 }
 
 export function cancelSplitOrder() {
-  delete order.splitId;
   clearSecondOrder();
   //restore
   order.items.splice(0, order.items.length, ...tempItemsSnapshot);

@@ -7,6 +7,10 @@ import cms from 'cms'
 
 const Customer = cms.getModel(CUSTOMER_COLLECTION_NAME)
 
+cms.socket.on('update:newCustomer', (newCustomer) => {
+  customers.value.push(newCustomer)
+})
+
 export async function loadCustomers() {
   customers.value = await Customer.find({ appType: currentAppType.value })
 }

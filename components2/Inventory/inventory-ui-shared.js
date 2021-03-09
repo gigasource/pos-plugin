@@ -91,7 +91,7 @@ const createEmptyInventory = () => ({
       color: colors[0]
     }]
   },
-  unit: null,
+  unit: 'piece',
   stock: null
 })
 
@@ -209,10 +209,11 @@ export function renderInventoryDialog(t) {
     [appType.POS_RESTAURANT]: () => (
         <div class="row-flex flex-wrap justify-around mt-3" key={dialog.value.inventory}>
           <div style={{display:'grid', gridTemplateColumns: '3fr 1fr 1fr' }}>
-            <pos-textfield-new label="Name" v-model={selectedInventory.value.product.name}/>
-            <pos-textfield-new disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
+            <g-text-field-bs label="Name" v-model={selectedInventory.value.product.name}/>
+            <g-text-field-bs disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
                                label={t('inventory.stock')} v-model={selectedInventory.value.stock}/>
             <g-select menu-class="menu-select-inventory" outlined label={t('inventory.unit')}
+                      text-field-component="GTextFieldBs"
                       items={units.value} v-model={selectedInventory.value.unit}/>
           </div>
           <g-select
@@ -222,7 +223,7 @@ export function renderInventoryDialog(t) {
             chips
             deletableChips
             style="width: 100%"
-            text-field-component="g-text-field-bs"
+            text-field-component="GTextFieldBs"
             menu-class="menu-select-inventory" outlined
             items={categoriesWithParentName.value} item-text="name" return-object
             modelValue={selectedInventory.value.product.category}
@@ -349,8 +350,7 @@ export function renderChangeStockDialog() {
   return <dialog-change-stock v-model={dialog.value.stock}
                               name={selectedInventory.value && selectedInventory.value.name}
                               stock={selectedInventory.value && selectedInventory.value.stock}
-                              onSubmit={updateStock}>
-  </dialog-change-stock>
+                              onSubmit={updateStock}/>
 }
 
 export function renderCategoryDialog() {

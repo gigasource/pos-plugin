@@ -3,7 +3,7 @@ import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 // import { user } from './AppSharedStates';
 import cms from 'cms'
-import { appHooks } from './AppSharedStates'
+import { appHooks, notifyState } from './AppSharedStates'
 import { useDeviceManagementSystem } from './online-order-pairing'
 
 // This file is for emitting screen-loaded
@@ -42,8 +42,22 @@ export default {
       }, 500)
       cms.socket.emit('screen-loaded')
     })
+
+    function renderSystemSnackbar() {
+      return <g-snackbar
+          top right
+          v-model={notifyState.show}
+          color={notifyState.color}
+          timeout={2000}>
+        {notifyState.content}
+      </g-snackbar>
+    }
+
+    return () => {
+      return <>
+        {renderSystemSnackbar()}
+      </>
+    }
   }
-
-
 }
 </script>

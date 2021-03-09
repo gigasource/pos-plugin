@@ -71,6 +71,7 @@ export async function declineOrder(order) {
 		_id: order._id
 	}, order)
 	_.remove(pendingOrders.value, _order => _order._id.toString() === order._id.toString())
+	_.remove(kitchenOrders.value, _order => _order._id.toString() === order._id.toString())
 
 	cms.socket.emit('updateOrderStatus', order)
 }

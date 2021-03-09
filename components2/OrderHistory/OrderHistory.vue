@@ -122,14 +122,14 @@ export default {
     const renderToolbar = () =>
         <g-toolbar height={'50px'} color="#eeeeee" elevation="0">
           {execGenScopeId(() => <>
-            <g-btn-bs elevation="2" icon="icon-back" onClick={back}>
+            <g-btn-bs style="margin-left: 0; font-size: 12px" elevation="2" icon="icon-back" onClick={back}>
               {t('ui.back')}
             </g-btn-bs>
             <g-spacer/>
-            <g-btn-bs elevation="2" icon="icon-remove-square" onClick={() => openDialog('confirm')}>
+            <g-btn-bs style="margin-right: 0; font-size: 12px" elevation="2" icon="icon-remove-square" onClick={() => openDialog('confirm')}>
               {t('orderHistory.deleteOrder')}
             </g-btn-bs>
-            <g-btn-bs elevation="2" background-color="blue-accent-3" icon="icon-print2" onClick={print}>
+            <g-btn-bs style="margin-right: 0; font-size: 12px" elevation="2" background-color="blue-accent-3" icon="icon-print2" onClick={print}>
               {t('ui.print')}
             </g-btn-bs>
           </>)}

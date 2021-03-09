@@ -29,6 +29,7 @@ import {loadCustomers} from "../../Customer/customer-be-logics";
 import {renderCustomerInfo, customerDialogData, clearCustomerDialogData, onCreateCustomer} from "../../Customer/customer-ui-logics-shared";
 import PosKeyboardFull from "../../pos-shared-components/PosKeyboardFull";
 import { barcodeHook, setHandleKeyupBarcode, removeHandleKeyupBarcode } from "../../Product/barcode-listener";
+import {loadInventories} from "../../Inventory/inventory-logic-be";
 
 export default {
   name: 'PosOrderRetail',
@@ -50,6 +51,7 @@ export default {
       await loadCustomers()
       await loadCategories()
       await loadProducts()
+      await loadInventories()
     })
 
     //<editor-fold desc="activated and deactivated">

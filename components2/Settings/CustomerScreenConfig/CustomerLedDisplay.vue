@@ -21,10 +21,11 @@ export default {
 
     function renderGGridSelectItem(selected) {
       const borderColor = selected ? '#90CAF9' : '#e0e0e0'
-      const backgroundColorProp = selected ? { 'background-color': '#E3F2FD' } : {}
+      const backgroundColorProp = selected ? '#e3f2fd' : 'rgb(0, 0, 0, 0)'
       return ({ toggleSelect, item }) => {
         return <g-btn-bs
-            border-color={borderColor} text-color="black" width="72" height="30" {...{ backgroundColorProp: backgroundColorProp }}
+            border-color={borderColor} text-color="black" width="72" height="30"
+            background-color={backgroundColorProp}
             onClick={withModifiers(() => toggleSelect(item), ['stop'])}>
           {item.text}
         </g-btn-bs>
@@ -62,7 +63,7 @@ export default {
 <style scoped lang="scss">
 .customer-led-display {
   padding: 20px;
-  width: 100%;
+  flex: 1 1 0;
   height: 100%;
 }
 </style>

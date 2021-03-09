@@ -10,7 +10,7 @@ import {
   prepareMoveItemsOrder,
   returnItem
 } from "../pos-logic-be";
-import {activeOrders, avatar, isMobile, username} from "../../AppSharedStates";
+import {activeOrders, avatar, isMobile, username, appHooks} from "../../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import {itemsRenderFactory} from "../pos-ui-shared";
 import {useRouter} from "vue-router";
@@ -54,6 +54,7 @@ export default {
       if (table) {
         await assignTableToOrder2(table);
         await hooks.emit('move-items');
+        appHooks.emit('orderChange')
         internalValue.value = false
       }
     }

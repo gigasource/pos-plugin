@@ -993,3 +993,9 @@ body::-webkit-scrollbar {
   background-position: center;
 }
 
+.icon-customer-led-display {
+  background-image: url("../assets/customer-led-display.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

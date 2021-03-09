@@ -29,7 +29,7 @@
 </template>
 
 <script>
-  import { isMobile} from '../../composition/usePosLogic';
+  import { isMobile } from '../AppSharedStates';
 
   export default {
     name: "dialogFormInput",
@@ -91,7 +91,7 @@
           this.$emit('change-keyboard-type', val)
         }
       },
-      isMobile() { return isMobile }
+      isMobile() { return isMobile.value }
     },
     methods: {
       changeKeyboardType(val) {

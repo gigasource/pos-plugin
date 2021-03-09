@@ -5,7 +5,7 @@ import { posSettings, user } from '../../AppSharedStates';
 import axios from 'axios';
 import { updateSetting } from '../settings-be';
 
-
+// TODO: using SystemSnackbar (see EmptyStore.vue)
 export const snackbarRef = ref(null)
 
 export const connected = computed(() => {
@@ -116,7 +116,6 @@ export async function checkClearOrderPasswd() {
   await cms.getModel('Order').deleteMany({ online: true })
   showInfoSnackbar('Deleted all online orders!')
 }
-
 
 function showErrorSnackbar(error, timeout = 5000) {
   const contentFn = () => (

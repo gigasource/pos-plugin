@@ -1,5 +1,5 @@
 <script>
-  import {isMobile, isIOS} from '../../../composition/usePosLogic';
+  import {isMobile, isIOS} from '../../AppSharedStates';
   import { getCurrentInstance, withScopeId } from 'vue'
 
   export default {
@@ -25,10 +25,10 @@
     },
     computed: {
       isMobile() {
-        return isMobile
+        return isMobile.value
       },
       isIOS() {
-        return isIOS
+        return isIOS.value
       },
       internalValue: {
         get() {

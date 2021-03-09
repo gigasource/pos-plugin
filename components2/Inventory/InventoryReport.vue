@@ -24,7 +24,6 @@ export default {
     })
     const menu = ref(false)
     const type = ref('all')
-    const display = ref('list')
     const selectedItem = ref({
       name: '',
       unit: '',
@@ -125,6 +124,8 @@ export default {
                 item-text="name"
                 return-object
             ></g-select>
+
+            <g-spacer/>
 
             {/*reason*/}
             <g-btn-bs block style="margin: 0" class="elevation-1" background-color="white" icon="icon-back" onClick={back}>{t('ui.back')}</g-btn-bs>
