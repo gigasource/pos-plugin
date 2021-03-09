@@ -58,15 +58,14 @@ export function orderRightSideHeader(props, {emit}) {
   }
 
   const {renderPayBtn} = payPrintBtnFactory();
-
   const renderHeader = () => (
     <div class="order-detail__header">
       {isMobile.value && showSplitBtn.value && payPrintMode.value === 'pay' && showIcon.value &&
       <g-spacer style="flex: 4 0 0"/>}
       {isMobile.value && showSplitBtn.value && payPrintMode.value === 'pay' && showIcon.value &&
       <g-btn-bs background-color="#FFCB3A"
-                border-color="#f0f0f0" width="75"
-                style="transition-delay: 0.6s; padding: 4px" onClick={splitOrder}>
+                width="75"
+                style="transition-delay: 0.6s; padding: 5px; border: none" onClick={splitOrder}>
         <g-icon>icon-split_check_2</g-icon>
       </g-btn-bs>}
 
