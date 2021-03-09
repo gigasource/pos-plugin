@@ -38,7 +38,7 @@ export const SettingsSidebarFactory = () => {
       _sidebarData.push({ title: sidebar.value.callSystem, icon: 'icon-telephone', isView: true, key: 'callSystem', target: VIEWS.CALL_SYSTEM_SETTING_VIEW })
       _sidebarData.push({ title: sidebar.value.customerScreen, icon: 'icon-screen', isView: true, key: 'customerScreen', target: VIEWS.CUSTOMER_SCREEN_SETTING_VIEW })
     }
-    _sidebarData.push({ title: 'Customer Led Display', icon: 'icon-screen', isView: true, key: 'customerLedDisplay', target: VIEWS.CUSTOMER_LED_DISPLAY_VIEW })
+    _sidebarData.push({ title: 'Customer Led Display', icon: 'icon-customer-led-display', isView: true, key: 'customerLedDisplay', target: VIEWS.CUSTOMER_LED_DISPLAY_VIEW })
 
     return _sidebarData
   })
