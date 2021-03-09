@@ -9,6 +9,9 @@ export default PosEndOfDayDatePicker;
 /*@import "../../style/colors";*/
 .g-picker {
   background-color: #eee;
+  :deep &__body {
+    height: 100%;
+  }
 }
 
 button {
@@ -82,12 +85,14 @@ $primary-transition: 0.5s cubic-bezier(0.25, 0.8, 0.5, 1) !default;
   }
 }
 
+$headerHeight: 50px;
+
 /*HEADER*/
 :deep(.g-date-picker-header) {
   padding: 8px 0 8px 0;
   margin-left: 12px;
   margin-right: 12px;
-  height: 50px;
+  height: $headerHeight;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -163,13 +168,14 @@ $primary-transition: 0.5s cubic-bezier(0.25, 0.8, 0.5, 1) !default;
 :deep(.g-date-picker-table) {
   position: relative;
   padding: 0 16px;
-  height: 100%;
+  height: calc(100% - 50px /*$headerHeight*/ - 20px /*bottom margin*/);
   background-color: #eeeeee;
 
   table {
     transition: $primary-transition;
     table-layout: fixed;
     width: 100%;
+    height: 100%;
 
     thead {
       tr:first-child {
@@ -182,8 +188,10 @@ $primary-transition: 0.5s cubic-bezier(0.25, 0.8, 0.5, 1) !default;
     }
   }
 
+  $tableHeaderHeight: 32px;
+
   tr {
-    height: 32px;
+    height: $tableHeaderHeight;
   }
 
   td, th {
@@ -200,8 +208,11 @@ $primary-transition: 0.5s cubic-bezier(0.25, 0.8, 0.5, 1) !default;
     border-top: 1px solid #E0E0E0;
   }
 
+  tbody {
+    height: calc(100% - 32px /*$tableHeaderHeight*/)
+  }
+
   td {
-    height: 13.4vh;
     border: 1px solid #E0E0E0;
     position: relative;
     color: #9E9E9E;
