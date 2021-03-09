@@ -24,7 +24,6 @@ export default {
     })
     const menu = ref(false)
     const type = ref('all')
-    const display = ref('list')
     const selectedItem = ref({
       name: '',
       unit: '',
