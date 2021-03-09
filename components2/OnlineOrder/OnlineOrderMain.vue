@@ -27,13 +27,13 @@ export default {
       renderReservationDialog
     } = renderPendingOrdersFactory()
     const {
-      renderKitchenOdrers
+      renderKitchenOrders
     } = renderKitchenOrdersFactory()
 
     return genScopeId(() => (
       <div class="main">
         {renderPendingOrders()}
-        {renderKitchenOdrers()}
+        {renderKitchenOrders()}
         {renderReservationDialog()}
         <dialog-complete-order v-model={completeOrderDialogShow.value} onCompleteorder={completeOrder} onDeclineorder={declineOrder}></dialog-complete-order>
         <dialog-text-filter label="Reason" v-model={showCancelOrderReasonDialog.value}

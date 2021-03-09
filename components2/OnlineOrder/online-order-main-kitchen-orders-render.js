@@ -137,7 +137,7 @@ export function renderKitchenOrdersFactory() {
 		)
 	}
 
-	function renderKitchenOdrers() {
+	function renderKitchenOrders() {
 		return (
 			<div class="kitchen-orders pl-2">
 				{renderKitchenOrdersHeader()}
@@ -147,7 +147,7 @@ export function renderKitchenOrdersFactory() {
 	}
 
 	return {
-		renderKitchenOdrers,
+		renderKitchenOrders,
 		renderKitchenOrdersHeader
 	}
 }
