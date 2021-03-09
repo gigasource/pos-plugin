@@ -222,7 +222,6 @@ export function renderInventoryDialog(t) {
             chips
             deletableChips
             style="width: 100%"
-            text-field-component="g-text-field-bs"
             menu-class="menu-select-inventory" outlined
             items={categoriesWithParentName.value} item-text="name" return-object
             modelValue={selectedInventory.value.product.category}
