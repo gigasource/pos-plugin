@@ -7,6 +7,7 @@ import { DASHBOARD_VIEWS, dashboardHooks } from '../DashboardSharedStates'
 import { useI18n } from 'vue-i18n'
 import { pendingOrders } from '../../OnlineOrder/online-order-main-logic';
 import { todayPendingReservation } from '../../Reservation/reservation-shared'
+import { loadOrders } from '../../OnlineOrder/online-order-main-logic-be';
 
 const DashboardSidebarFactory = () => {
   const { t } = useI18n()
@@ -112,6 +113,8 @@ const DashboardSidebarFactory = () => {
     return generalSettings.value.useVirtualPrinter
   })
 
+  loadOrders()
+
   const sidebarItems = computed(() => {
     let _sidebarItems = _.cloneDeep(defaultSidebarItems.value)
     if (currentAppType.value === appType.POS_RESTAURANT && user.value && user.value.role !== 'admin') {
@@ -140,7 +143,6 @@ const DashboardSidebarFactory = () => {
       })
     }
 
-    //todo: fix badge count hard code ( 1 | 2)
     return currentAppType.value === appType.POS_RESTAURANT ? _sidebarItems.map(item => {
       switch (item.key) {
         case 'Reservation':
