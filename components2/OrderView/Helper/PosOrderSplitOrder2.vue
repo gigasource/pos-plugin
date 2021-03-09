@@ -146,7 +146,7 @@ export default {
               :
               <div class="splitter__header">
                 <p>
-                  Total:
+                  {t('payment.total')}:
                   <span style="font-size: 18px; color: #ff4452">
                     {$filters.formatCurrency(order2.vSum)}
                   </span>

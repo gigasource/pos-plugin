@@ -102,6 +102,7 @@ module.exports = {
       other: 'Khác',
       newPrice: 'Giá mới',
       discountBy: 'Giảm giá',
+      confirm: 'Xác nhận'
     },
 
     fnBtn: {
@@ -150,7 +151,7 @@ module.exports = {
       datetime: 'Ngày/Giờ',
       sales: 'Sales',
       total: 'Tổng',
-      currency: '$',
+      currency: '₫',
       currencyDecimal: '2',
       discount: 'Giảm giá',
       tax: 'Thuế',
@@ -201,8 +202,33 @@ module.exports = {
       each: 'Mỗi',
       savedList: 'Danh sách đã lưu',
       splitOrder: 'Tách đơn',
-      moveItem: 'Chuyển đồ',
-      voucher: 'Phiếu giảm giá'
+      moveItem: 'Chuyển món',
+      voucher: 'Phiếu giảm giá',
+      editScreen: 'Cài đặt màn',
+      takeAway: 'Mang đi',
+      items: 'Món'
+    },
+
+    productViewSetting: {
+      product: 'Sản phẩm',
+      fontSize: 'Kích cỡ chữ',
+      minimizeOnlyTextRow: 'Thu nhỏ hàng chữ',
+      hideTextRow: 'Ẩn hàng chữ',
+      narrowEmptyColumn: 'Thu nhỏ cột trống',
+      hideEmptyColumn: 'Ẩn cột trống',
+      shrinkProductTitle: 'Thu nhỏ tên món',
+      category: 'Nhóm sản phẩm',
+      mode: 'Chế độ',
+      horizontal: 'Ngang',
+      vertical: 'Dọc',
+      singleRowCategory: 'Chỉ 1 hàng',
+      differentWidth: 'Chiều rộng tuỳ biến',
+      differentHeight: 'Chiều cao tuỳ biến',
+      height: 'Cao',
+      width: 'Rộng',
+      sidebar: 'Thanh bên',
+      smallSidebar: 'Thu gọn',
+      save: 'Lưu'
     },
 
     orderHistory: {
@@ -229,7 +255,10 @@ module.exports = {
       enterTender: 'Hãy nhập số tiền thu của khách',
       cash: 'Tiền mặt',
       card: 'Thẻ',
-      multi: 'Tiền mặt & thẻ'
+      multi: 'Tiền mặt & thẻ',
+      multiPayment: 'Tiền mặt & thẻ',
+      total: 'Tổng hoá đơn',
+      cardPayment: 'Thẻ'
     },
 
     settings: {
@@ -421,11 +450,12 @@ module.exports = {
       onlineOrders: 'Đơn hàng trực tuyến',
       pendingOrders: 'Đơn hàng đang xử lý',
       sentToKitchen: 'Gửi tới bếp',
+      sendToKitchen: 'Gửi vào bếp',
       dashboard: 'Tổng quan',
       orderDetails: 'Chi tiết đơn hàng',
       completedOrders: 'Đơn hàng đã hoàn thành',
       declinedOrders: 'Đơn hàng bị từ chối',
-      no: 'Không.',
+      no: 'Stt',
       customer: 'Khách hàng',
       address: 'Địa chỉ',
       amount: 'Số lượng',
@@ -548,6 +578,18 @@ module.exports = {
         fri: 'Thứ sáu',
         sat: 'Thứ bảy',
         sun: 'Chủ nhật',
+      },
+      callSystem: {
+        modemNotConnected: 'Chưa kết nối Modem',
+        missed: 'Nhỡ',
+        noPendingCall: 'Không có cuộc gọi',
+        empty: 'Trống'
+      },
+      newReservationDialog: {
+        customerName: 'Tên khách hàng',
+        typeCustomerName: 'Nhập tên khách hàng',
+        typeCustomerPhoneNumber: 'Số điện thoại',
+        addNotes: 'Thêm ghi chú'
       }
     },
 
@@ -619,6 +661,11 @@ module.exports = {
     },
     editablePlan: {
       existedTableNameErrorMsg: 'Bàn "{tableName}" đã tồn tại. Vui lòng chon tên khác! Ví dụ: "{suggestionName}"'
+    },
+    customer: {
+      phone: 'Số điện thoại',
+      address: 'Địa chỉ',
+      name: 'Tên khách hàng'
     }
   }
 }

@@ -86,12 +86,12 @@ export function orderRightSideHeader(props, {emit}) {
               default: () => <g-expand-x-transition>
                 {genScopeId(() => (
                   <div class="order-detail__menu">
-                    <g-btn-bs icon="icon-blue-cog" onClick={() => editModeOL.value = true}>Edit Screen</g-btn-bs>
+                    <g-btn-bs icon="icon-blue-cog" onClick={() => editModeOL.value = true}>{t('order.editScreen')}</g-btn-bs>
                     <g-btn-bs icon="icon-voucher" onClick={showVoucherDialog}>{t('order.voucher')}</g-btn-bs>
                     <g-btn-bs icon="icon-move-items" onClick={moveItems}>{t('order.moveItem')}</g-btn-bs>
 
                     <g-btn-bs icon="icon-delivery" background-color={order.takeAway ? '#2979FF' : '#FFF'}
-                              onClick={toggleTakeAwayOrder}>Take Away
+                              onClick={toggleTakeAwayOrder}>{t('order.takeAway')}
                     </g-btn-bs>
                     <g-btn-bs icon="icon-split_check_2" onClick={splitOrder}>{t('order.splitOrder')}</g-btn-bs>
                     {actionList.value.length > 0 && <g-btn-bs disabled={!hasOrderChange.value} icon="icon-print"

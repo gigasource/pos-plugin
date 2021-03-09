@@ -102,6 +102,7 @@ module.exports = {
       other: 'Abbrechen',
       newPrice: 'New Price',
       discountBy: 'Discount by',
+      confirm: 'Bestätigen'
     },
 
     fnBtn: {
@@ -203,7 +204,32 @@ module.exports = {
       savedList: 'Saved List',
       splitOrder: 'Geteilte bestellung',
       moveItem: 'Artikel verchieben',
-      voucher: 'Gutschein'
+      voucher: 'Gutschein',
+      editScreen: 'Bildschirm bearbeiten',
+      takeAway: 'Mitnehmen',
+      items: 'Artikels'
+    },
+
+    productViewSetting: {
+      product: 'Produkt',
+      fontSize: 'Schriftgröße',
+      minimizeOnlyTextRow: 'Nur die Textzeile minimieren',
+      hideTextRow: 'Extzeile ausblenden',
+      narrowEmptyColumn: 'Leere Spalte verkleinern',
+      hideEmptyColumn: 'Leer Leere Spalte ausblenden',
+      shrinkProductTitle: 'Produkttitel verkleinern',
+      category: 'Kategorie',
+      mode: 'Modus',
+      horizontal: 'Horizontal',
+      vertical: 'Vertikal',
+      singleRowCategory: 'Einzeilige Kategorie',
+      differentWidth: 'Unterschiedliche Breite',
+      differentHeight: 'Unterschiedliche Höhe',
+      height: 'Höhe',
+      width: 'Breite',
+      sidebar: 'Seitenleiste',
+      smallSidebar: 'Kleine Seitenleiste',
+      save: 'Speichern'
     },
 
     orderHistory: {
@@ -228,7 +254,10 @@ module.exports = {
       enterTender: 'Bitte geben Sie das angebotene Bargeld ein',
       cash: 'Bargeld',
       card: 'Karte',
-      multi: 'Mehr'
+      multi: 'Mehr',
+      multiPayment: 'Mehrfachzahlung - Bar & Karte',
+      total: 'Gesamt',
+      cardPayment: 'Kartenzahlung'
     },
 
     settings: {
@@ -417,6 +446,7 @@ module.exports = {
       onlineOrders: 'Online Bestellungen',
       pendingOrders: 'offene Bestellung',
       sentToKitchen: 'In Bearbeitung (Küche)',
+      sendToKitchen: 'In die Küche senden',
       dashboard: 'Übersicht',
       orderDetails: 'Bestelldetails',
       completedOrders: 'abgeschlossene Bestellungen',
@@ -544,6 +574,18 @@ module.exports = {
         fri: 'Fre',
         sat: 'Sam',
         sun: 'Son',
+      },
+      callSystem: {
+        modemNotConnected: 'Modem nicht verbunden',
+        missed: 'Verpasst',
+        noPendingCall: 'Keine schwebenden Anrufe',
+        empty: 'leer'
+      },
+      newReservationDialog: {
+        customerName: 'Kundenname',
+        typeCustomerName: 'Kundenname',
+        typeCustomerPhoneNumber: 'Telefonnummer',
+        addNotes: 'Notizen hinzufügen'
       }
     },
 
@@ -608,6 +650,11 @@ module.exports = {
     },
     editablePlan: {
       existedTableNameErrorMsg: 'Nr. "{tableName}" Tisch war bereits vorhanden, bitte wählen Sie andere Tische! z.B: "{suggestionName}"'
+    },
+    customer: {
+      phone: 'Telefonnummer',
+      name: 'Kundenname',
+      address: 'Adresse'
     }
   }
 }

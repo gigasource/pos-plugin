@@ -3,7 +3,7 @@ import {Touch} from 'pos-vue-framework';
 
 import {useRoute, useRouter} from 'vue-router'
 import {autoLoadOrderLayoutSetting, editModeOL} from "./order-layout-setting-logic";
-import {getRootStyle, renderOLSetting} from "./order-layout-setting-ui";
+import {getRootStyle, renderOLSetting, init} from "./order-layout-setting-ui";
 import {clearOrder, getCurrentOrder, overlay, prepareOrder, syncOrderChange} from "./pos-logic-be";
 import {hooks} from './pos-logic'
 import {orderRightSideItemsTable} from "./orderRightSideItemsTable";
@@ -12,6 +12,7 @@ import {genScopeId} from "../utils";
 import {onActivated, onDeactivated} from "vue";
 import dialogConfigOrderItem from "./Helper/dialogConfigOrderItem";
 import {activeOrders} from "../AppSharedStates";
+import { useI18n } from 'vue-i18n';
 
 export default {
   name: "posOrder2",
@@ -25,7 +26,7 @@ export default {
   },
   setup(props, {emit}) {
     const router = useRouter()
-
+    init()
     onActivated(async () => {
       const route = useRoute()
       if (route.params.id) {

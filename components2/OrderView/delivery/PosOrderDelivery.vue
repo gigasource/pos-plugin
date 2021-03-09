@@ -1,13 +1,13 @@
 <script>
 //todo: !important move this to onlineOrder directory
-import {Touch} from "pos-vue-framework";
-import _ from "lodash";
-import {$filters, avatar, isIOS, isMobile, username} from "../../AppSharedStates";
-import {computed, withModifiers, ref, onActivated, onDeactivated} from "vue";
-import {useRouter} from 'vue-router';
-import {isItemDiscounted} from "../pos-ui-shared";
+import { Touch } from 'pos-vue-framework';
+import _ from 'lodash';
+import { $filters, avatar, isIOS, isMobile, username } from '../../AppSharedStates';
+import { computed, withModifiers, ref, onActivated, onDeactivated } from 'vue';
+import { useRouter } from 'vue-router';
+import { isItemDiscounted } from '../pos-ui-shared';
 import { execGenScopeId } from '../../utils';
-import {useI18n} from "vue-i18n";
+import { useI18n } from 'vue-i18n';
 import {
   autocompleteAddresses,
   deliveryOrderMode,
@@ -15,7 +15,7 @@ import {
   selectedCustomer,
   dialog,
   name, phone, address, house, street, city, placeId, clearCustomer, selectedCall, zipcode
-} from "./delivery-shared";
+} from './delivery-shared';
 import {
   products,
   keyboardConfig,
@@ -26,25 +26,27 @@ import {
 import {
   renderCustomerSection,
   renderCustomerDialogs,
-  orderType
-} from "./delivery-customer-ui";
+  orderType,
+  init
+} from './delivery-customer-ui';
 
 import cms from 'cms'
 import { genScopeId } from '../../utils';
 import PosOrderDeliveryKeyboard from '../Helper/posOrderDeliveryKeyboard2'
-import {createOrder, addItem, changeItemQuantity, addCustomer} from "../pos-logic"
-import { advanceUpdateCustomer } from "../../Customer/customer-be-logics";
-import {acceptOrder} from "../../OnlineOrder/online-order-main-logic-be";
-import {deleteCallWithPhoneNumber} from "../../Settings/CallSystem/call-system-calls";
+import { createOrder, addItem, changeItemQuantity, addCustomer } from '../pos-logic'
+import { advanceUpdateCustomer } from '../../Customer/customer-be-logics';
+import { acceptOrder } from '../../OnlineOrder/online-order-main-logic-be';
+import { deleteCallWithPhoneNumber } from '../../Settings/CallSystem/call-system-calls';
 
 export default {
-  name: "PosOrderDelivery",
+  name: 'PosOrderDelivery',
   directives: {
     Touch
   },
   components: { PosOrderDeliveryKeyboard },
   setup() {
-    const {t, locale} = useI18n();
+    const { t, locale } = useI18n();
+    init()
     const selectedProduct = ref()
     const modifiers = ref([])
     const type = ref('')
@@ -220,6 +222,7 @@ export default {
     }
 
     const autocomplete = ref('')
+
     function keyboardHandler(event) {
       event.stopPropagation()
       if (event.key === 'p') {
@@ -255,7 +258,7 @@ export default {
       const index = products.value.findIndex(p => p._id === selectedProduct.value._id)
       await cms.getModel('Product').findOneAndUpdate({
         _id: selectedProduct.value._id
-      }, {price})
+      }, { price })
       await loadProduct();
       selectedProduct.value = products.value[index]
     }
@@ -394,7 +397,8 @@ export default {
                         <p class="item-detail__name">{item.id}. {item.name}</p>
                         <p>
                           <span class={['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']}>{$filters.formatCurrency(item.originalPrice)}</span>
-                          {isItemDiscounted(item) && <span class="item-detail__price--new">{t('common.currency', locale)} {$filters.formatCurrency(item.price)}</span>}
+                          {isItemDiscounted(item) &&
+                          <span class="item-detail__price--new">{t('common.currency', locale)} {$filters.formatCurrency(item.price)}</span>}
                         </p>
                       </div>
                       <div class="item-action">
@@ -405,18 +409,18 @@ export default {
                     </div>
                     {item.modifiers && <div> {
                       item.modifiers.map((modifier, index) =>
-                        <div key={`${item._id}_${index}`}>
-                          <g-chip label small text-color="#616161" close
-                                  onClose={() => removeModifier(item, index)}>
-                            {modifier.name} | {t('common.currency', locale)} {$filters.formatCurrency(modifier.price)}
-                          </g-chip>
-                        </div>)}
+                          <div key={`${item._id}_${index}`}>
+                            <g-chip label small text-color="#616161" close
+                                    onClose={() => removeModifier(item, index)}>
+                              {modifier.name} | {t('common.currency', locale)} {$filters.formatCurrency(modifier.price)}
+                            </g-chip>
+                          </div>)}
                     </div>}
                   </div>)}
             </div>
             <g-btn-bs disabled={order.value.items.length <= 0} block large class="elevation-2" icon="icon-print" background-color="#2979FF"
                       onClick={() => dialog.value.order = true}>
-              Send to kitchen
+              {t('onlineOrder.sendToKitchen')}
             </g-btn-bs>
           </div>
       )
@@ -432,7 +436,7 @@ export default {
     const renderConfirmOrderDialog = () => {
       return (
           <g-dialog v-model={dialog.value.order} width="500" eager>
-            {execGenScopeId(()=> <g-card class="dialog r">
+            {execGenScopeId(() => <g-card class="dialog r">
               {
                 execGenScopeId(() => <div>
                   <g-icon class="dialog-icon--close" onClick={closeDialogConfirm} size="20">icon-close</g-icon>
@@ -451,13 +455,17 @@ export default {
                   <div class="ma-2">Time to complete (minute)</div>
                   <div class="mb-3">
                     <g-btn-bs class="elevation-1" backgroundColor={order.value.prepareTime === 15 ? '#BBDEFB' : 'white'}
-                              onClick={() => order.value.prepareTime = 15}>15</g-btn-bs>
+                              onClick={() => order.value.prepareTime = 15}>15
+                    </g-btn-bs>
                     <g-btn-bs class="elevation-1" backgroundColor={order.value.prepareTime === 30 ? '#BBDEFB' : 'white'}
-                              onClick={() => order.value.prepareTime = 30}>30</g-btn-bs>
+                              onClick={() => order.value.prepareTime = 30}>30
+                    </g-btn-bs>
                     <g-btn-bs class="elevation-1" backgroundColor={order.value.prepareTime === 45 ? '#BBDEFB' : 'white'}
-                              onClick={() => order.value.prepareTime = 45}>45</g-btn-bs>
+                              onClick={() => order.value.prepareTime = 45}>45
+                    </g-btn-bs>
                     <g-btn-bs class="elevation-1" backgroundColor={order.value.prepareTime === 60 ? '#BBDEFB' : 'white'}
-                              onClick={() => order.value.prepareTime = 60}>60</g-btn-bs>
+                              onClick={() => order.value.prepareTime = 60}>60
+                    </g-btn-bs>
                   </div>
                   <g-btn-bs disabled={disabledConfirm.value} block large background-color="#2979FF"
                             onClick={confirmOrder}>
@@ -472,62 +480,63 @@ export default {
     const renderChoiceDialog = () => {
       return (
           <g-dialog v-model={dialog.value.choice} eager width="500">
-            { execGenScopeId(()=> <g-card class="dialog r">
-              { execGenScopeId(() => <>
-              <g-icon class="dialog-icon--close" onClick={() => dialog.value.choice = false} size="20">icon-close</g-icon>
-              <div class="dialog-title">Select options</div>
-              {(selectedProduct.value && selectedProduct.value.choices) &&
-              <div class="dialog-content" key={dialog.value.choice}>
-                {selectedProduct.value.choices.map((choice, index) =>
-                    <div class="dialog-content__choice" key={index}>
-                      <div class="dialog-content__choice-name">
-                        <span class="fw-700">{choice.name}</span>
-                        <span class="text-red ml-1">{choice.mandatory ? '*' : ''}</span>
-                      </div>
-                      <div class="dialog-content__choice-option">
-                        {(choice.select === 'one' && choice.mandatory) ?
-                            <g-radio-group v-model={modifiers.value[index]}>
-                              {choice.options.map(option =>
-                                  <g-radio color="#536DFE" value={option} key={option._id}
-                                           label={`${option.name} (${t('common.currency', locale)}${$filters.formatCurrency(option.price)} )`}/>)}
-                            </g-radio-group>
-                            : choice.options.map(option =>
-                                <g-checkbox v-model={modifiers.value[index]}
-                                            color="#536DFE"
-                                            value={option}
-                                            label={getCheckboxLabel(option)}
-                                            key={option._id}
-                                />
-                            )}
-                      </div>
-                    </div>)}
-              </div>}
-              <div class="dialog-action">
-                <div class="row-flex align-items-center" style="line-height: 2">
-                  <g-icon onClick={withModifiers(() => changeQuantity(-1), ['stop'])} color="#424242" size="28">remove_circle_outline</g-icon>
-                  <span style="margin-left: 4px; margin-right: 4px; min-width: 20px; text-align: center">{selectedProductQuantity.value}</span>
-                  <g-icon onClick={withModifiers(() => changeQuantity(1), ['stop'])} color="#424242" size="28">add_circle</g-icon>
+            {execGenScopeId(() => <g-card class="dialog r">
+              {execGenScopeId(() => <>
+                <g-icon class="dialog-icon--close" onClick={() => dialog.value.choice = false} size="20">icon-close</g-icon>
+                <div class="dialog-title">Select options</div>
+                {(selectedProduct.value && selectedProduct.value.choices) &&
+                <div class="dialog-content" key={dialog.value.choice}>
+                  {selectedProduct.value.choices.map((choice, index) =>
+                      <div class="dialog-content__choice" key={index}>
+                        <div class="dialog-content__choice-name">
+                          <span class="fw-700">{choice.name}</span>
+                          <span class="text-red ml-1">{choice.mandatory ? '*' : ''}</span>
+                        </div>
+                        <div class="dialog-content__choice-option">
+                          {(choice.select === 'one' && choice.mandatory) ?
+                              <g-radio-group v-model={modifiers.value[index]}>
+                                {choice.options.map(option =>
+                                    <g-radio color="#536DFE" value={option} key={option._id}
+                                             label={`${option.name} (${t('common.currency', locale)}${$filters.formatCurrency(option.price)} )`}/>)}
+                              </g-radio-group>
+                              : choice.options.map(option =>
+                                  <g-checkbox v-model={modifiers.value[index]}
+                                              color="#536DFE"
+                                              value={option}
+                                              label={getCheckboxLabel(option)}
+                                              key={option._id}
+                                  />
+                              )}
+                        </div>
+                      </div>)}
+                </div>}
+                <div class="dialog-action">
+                  <div class="row-flex align-items-center" style="line-height: 2">
+                    <g-icon onClick={withModifiers(() => changeQuantity(-1), ['stop'])} color="#424242" size="28">remove_circle_outline</g-icon>
+                    <span style="margin-left: 4px; margin-right: 4px; min-width: 20px; text-align: center">{selectedProductQuantity.value}</span>
+                    <g-icon onClick={withModifiers(() => changeQuantity(1), ['stop'])} color="#424242" size="28">add_circle</g-icon>
+                  </div>
+                  <g-spacer/>
+                  <g-btn-bs min-width="80" height="100%" text-color="#424242" onClick={() => dialog.value.choice = false}>Cancel</g-btn-bs>
+                  <g-btn-bs width="80" height="100%" rounded text-color="#FFFFFF" background-color="#536DFE"
+                            disabled={unavailableToAdd.value} onClick={addProduct}>OK
+                  </g-btn-bs>
                 </div>
-                <g-spacer/>
-                <g-btn-bs min-width="80" height="100%" text-color="#424242" onClick={() => dialog.value.choice = false}>Cancel</g-btn-bs>
-                <g-btn-bs width="80" height="100%" rounded text-color="#FFFFFF" background-color="#536DFE"
-                          disabled={unavailableToAdd.value} onClick={addProduct}>OK</g-btn-bs>
-              </div>
-              </>) }
+              </>)}
             </g-card>)}
           </g-dialog>
       )
     }
 
     return genScopeId(() => <div class="delivery">
-      { renderCustomerSection() }
-      { renderSelectCartItemSection() }
-      { renderCartSection() }
+      {renderCustomerSection()}
+      {renderSelectCartItemSection()}
+      {renderCartSection()}
 
       <>
-        { renderConfirmOrderDialog() }
-        { renderChoiceDialog() }
-        { renderCustomerDialogs() }
+        {renderConfirmOrderDialog()}
+        {renderChoiceDialog()}
+        {renderCustomerDialogs()}
       </>
     </div>)
   }
@@ -849,6 +858,7 @@ export default {
     }
   }
 }
+
 .dialog {
   padding: 12px;
   padding-top: 36px;
@@ -942,6 +952,7 @@ export default {
     border-radius: 0 0 4px 4px;
   }
 }
+
 .menu-missed {
   background: #FFFFFF;
   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.08);
@@ -965,6 +976,7 @@ export default {
     }
   }
 }
+
 .keyboard {
   position: fixed;
   left: 33%;

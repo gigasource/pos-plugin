@@ -102,6 +102,7 @@ module.exports = {
       other: 'Other',
       newPrice: 'New Price',
       discountBy: 'Discount by',
+      confirm: 'Confirm'
     },
 
     fnBtn: {
@@ -202,7 +203,32 @@ module.exports = {
       savedList: 'Saved List',
       splitOrder: 'Split order',
       moveItem: 'Move items',
-      voucher: 'Voucher'
+      voucher: 'Voucher',
+      editScreen: 'Edit Screen',
+      takeAway: 'Take Away',
+      items: 'Items'
+    },
+
+    productViewSetting: {
+      product: 'Product',
+      fontSize: 'Font size',
+      minimizeOnlyTextRow: 'Minimize only text row',
+      hideTextRow: 'Hide text row',
+      narrowEmptyColumn: 'Narrow empty column',
+      hideEmptyColumn: 'Hide empty column',
+      shrinkProductTitle: 'Shrink product title',
+      category: 'Category',
+      mode: 'Mode',
+      horizontal: 'Horizontal',
+      vertical: 'Vertical',
+      singleRowCategory: 'Single row category',
+      differentWidth: 'Different width',
+      differentHeight: 'Different height',
+      height: 'Height',
+      width: 'Width',
+      sidebar: 'Sidebar',
+      smallSidebar: 'Small sidebar',
+      save: 'Save'
     },
 
     orderHistory: {
@@ -216,7 +242,8 @@ module.exports = {
       filter: 'Filter',
       deleteOrder: 'Delete Order',
       type: 'Type',
-      tableNo: 'Table No.'
+      tableNo: 'Table No.',
+
     },
 
     payment: {
@@ -229,7 +256,10 @@ module.exports = {
       enterTender: 'Please enter tendered cash',
       cash: 'Cash',
       card: 'Card',
-      multi: 'Multi'
+      multi: 'Multi',
+      multiPayment: 'Multi Payment',
+      total: 'Total',
+      cardPayment: 'Card Payment'
     },
 
     settings: {
@@ -421,6 +451,7 @@ module.exports = {
       onlineOrders: 'Online Orders',
       pendingOrders: 'Pending Orders',
       sentToKitchen: 'Sent to Kitchen',
+      sendToKitchen: 'Send to kitchen',
       dashboard: 'Dashboard',
       orderDetails: 'Order Details',
       completedOrders: 'Completed Orders',
@@ -549,7 +580,22 @@ module.exports = {
         fri: 'Fri',
         sat: 'Sat',
         sun: 'Sun',
+      },
+      callSystem: {
+        modemNotConnected: 'Modem not connected',
+        missed: 'Missed',
+        noPendingCall:'No pending calls',
+        empty: 'Empty'
+      },
+      newReservationDialog: {
+        customerName: 'Customer Name',
+        typeCustomerName: 'Customer name',
+        typeCustomerPhoneNumber: 'Phone number',
+        addNotes: 'Notes'
       }
+    },
+
+    orderDelivery: {
     },
 
     printing: {
@@ -620,6 +666,11 @@ module.exports = {
     },
     editablePlan: {
       existedTableNameErrorMsg: 'Table "{tableName}" already existed, please select another name! E.g: "{suggestionName}"'
+    },
+    customer: {
+      phone: '',
+      address: '',
+      name: ''
     }
   }
 }

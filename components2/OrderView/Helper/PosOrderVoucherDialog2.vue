@@ -58,7 +58,7 @@ export default {
         <g-tabs vertical items={tabs.value} v-model={tab.value} active-text-color="#1471FF" slider-color="#1471FF">
           <g-tab-item item={tabs.value[0]}>
             {genScopeId(() => <>
-              <pos-textfield-new class="mb-3 mt-4" label={t('restaurant.voucherValue')} placeholder="Voucher value"
+              <pos-textfield-new class="mb-3 mt-4" label={t('restaurant.voucherValue')} placeholder={t('restaurant.voucherValue')}
                                  v-model={voucherValue.value} ref={refs[0]}/>
               <div class="row-flex justify-center">
                 <pos-keyboard-full class="keyboard" width="100%" type="numeric"
@@ -68,7 +68,7 @@ export default {
           </g-tab-item>
           <g-tab-item item={tabs.value[1]}>
             {genScopeId(() => <>
-              <pos-textfield-new class="mb-3 mt-4" label={t('restaurant.voucherValue')} placeholder="Voucher value"
+              <pos-textfield-new class="mb-3 mt-4" label={t('restaurant.voucherValue')} placeholder={t('restaurant.voucherValue')}
                                  v-model={voucherValue.value} ref={refs[1]}/>
               <div class="row-flex justify-center">
                 <pos-keyboard-full class="keyboard" width="100%" type="numeric"

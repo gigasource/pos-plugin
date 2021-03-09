@@ -72,7 +72,7 @@ export function renderPendingOrdersFactory () {
 
 	function renderCallSystemWarning() {
 		if (currentCallSystemMode.value !== CALL_SYSTEM_MODES.OFF.value && !modemDeviceConnected.value)
-			return <span style="color: #D32F2F">Modem not connected</span>
+			return <span style="color: #D32F2F">{t('onlineOrder.callSystem.modemNotConnected')}</span>
 	}
 	function renderPendingOrdersHeader() {
 		return (
