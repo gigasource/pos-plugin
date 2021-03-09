@@ -306,13 +306,14 @@ module.exports = async cms => {
         appType: 'POS_RESTAURANT',
         address: []
       })
+      cms.socket.emit('update:newCustomer', newCustomer)
       const order = {
         dailyId,
         id: newOrderId,
         status: 'inProgress',
         items: formatOrderItems(items),
         address: customer.address,
-        zipcode: customer.zipcode,
+        zipcode: customer.zipCode,
         customer: newCustomer._id,
         deliveryDate: new Date(),
         payment: [{type: paymentType, value: vSum}],
