@@ -219,28 +219,32 @@ export default {
       }
 
       return (
-          <div class="row-flex mt-2 product-editor__tax">
-            <div class="col-6">
-              <div class="product-editor__label">{t('restaurant.product.dineInTax')}</div>
-              <g-grid-select
-                  mandatory
-                  v-model={selectedProduct.value.taxCategory}
-                  item-value="_id"
-                  items={dineInTaxes.value}
-                  itemCols="auto"
-                  v-slots={dineInTaxSlots}/>
-            </div>
+          <div class="mt-2 product-editor__tax">
+            { dineInTaxes.value && (dineInTaxes.value.length > 0) &&
+              <div>
+                <div class="product-editor__label">{t('restaurant.product.dineInTax')}</div>
+                <g-grid-select
+                    mandatory
+                    v-model={selectedProduct.value.taxCategory}
+                    item-value="_id"
+                    items={dineInTaxes.value}
+                    itemCols="auto"
+                    v-slots={dineInTaxSlots}/>
+              </div>
+            }
 
-            <div class="col-6">
-              <div class="product-editor__label">{t('restaurant.product.takeAwayTax')}</div>
-              <g-grid-select
-                  mandatory
-                  v-model={selectedProduct.value.taxCategory2}
-                  item-value="_id"
-                  items={takeAwayTaxes.value}
-                  itemCols="auto"
-                  v-slots={takeAwayTaxSlots}/>
-            </div>
+            { takeAwayTaxes.value && (takeAwayTaxes.value.length > 0) &&
+              <div>
+                <div class="product-editor__label">{t('restaurant.product.takeAwayTax')}</div>
+                <g-grid-select
+                    mandatory
+                    v-model={selectedProduct.value.taxCategory2}
+                    item-value="_id"
+                    items={takeAwayTaxes.value}
+                    itemCols="auto"
+                    v-slots={takeAwayTaxSlots}/>
+              </div>
+            }
           </div>
       )
     }
