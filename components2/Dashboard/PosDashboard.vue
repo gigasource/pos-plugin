@@ -1,20 +1,19 @@
 <script>
-import RestaurantRoom from '../TablePlan/BasicRoom/RestaurantRoom';
-import EditableRoom from '../EditTablePlan/EditableRoom/EditableRoom';
-import PosDashboardSidebar from './DashboardSidebar/PosDashboardSidebar2';
-import OnlineOrderMain from '../OnlineOrder/OnlineOrderMain';
+import { computed, h, KeepAlive, ref } from 'vue'
+import { appHooks } from '../AppSharedStates'
+import { fetchRooms, roomsStates } from '../TablePlan/RoomState'
+import { activeScreen, selectingRoomId } from './DashboardSharedStates'
+import DashboardSidebarFactory from './DashboardSidebar/DashboardSidebarItems'
+import RestaurantRoom from '../TablePlan/BasicRoom/RestaurantRoom'
+import EditableRoom from '../EditTablePlan/EditableRoom/EditableRoom'
+import PosDashboardSidebar from './DashboardSidebar/PosDashboardSidebar2'
+import OnlineOrderMain from '../OnlineOrder/OnlineOrderMain'
 import OnlineOrderList from '../OnlineOrder/OnlineOrderList'
-import OnlineOrderServices from '../OnlineOrder/OnlineOrderServices';
-import { computed, h, KeepAlive, ref } from 'vue';
-import { fetchRooms, roomsStates } from '../TablePlan/RoomState';
-import { appHooks } from '../AppSharedStates';
-import { activeScreen, selectingRoomId } from './DashboardSharedStates';
-import DashboardSidebarFactory from './DashboardSidebar/DashboardSidebarItems';
-import PosOrderManualTable from '../TablePlan/BasicRoom/ManualTable/PosOrderManualTable';
-import PosDashboardFunction from './DashboardFunctions/PosDashboardFunction';
-import VirtualPrinterView from '../VirtualPrinter/VirtualPrinterView';
-import ReservationsList from '../Reservation/ReservationsList';
-
+import OnlineOrderServices from '../OnlineOrder/OnlineOrderServices'
+import PosOrderManualTable from '../TablePlan/BasicRoom/ManualTable/PosOrderManualTable'
+import PosDashboardFunction from './DashboardFunctions/PosDashboardFunction'
+import VirtualPrinterView from '../VirtualPrinter/VirtualPrinterView'
+import ReservationsList from '../Reservation/ReservationsList'
 
 export default {
   name: 'Dashboard',
@@ -88,7 +87,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>
