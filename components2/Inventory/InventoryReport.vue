@@ -125,6 +125,8 @@ export default {
                 return-object
             ></g-select>
 
+            <g-spacer/>
+
             {/*reason*/}
             <g-btn-bs block style="margin: 0" class="elevation-1" background-color="white" icon="icon-back" onClick={back}>{t('ui.back')}</g-btn-bs>
           </div>
