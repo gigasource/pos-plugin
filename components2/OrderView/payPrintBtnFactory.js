@@ -81,10 +81,9 @@ export function payPrintBtnFactory() {
               {!showIcon.value && <div class="animation-wrapper">
                 <span>{$t('common.currency', locale)} {$filters.formatCurrency(order.vSum)}</span>
               </div>}
-
             </Transition>
             <Transition name="back">
-              {showIcon.value && <div class="animation-wrapper bg-pink">
+              {showIcon.value && <div class="animation-wrapper">
                 <g-icon>icon-wallet</g-icon>
               </div>}
             </Transition>
