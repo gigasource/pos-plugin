@@ -245,7 +245,7 @@ export default {
               </div>
           )
         }}/>
-        <dialog-number-filter v-model={dialog.value.low} label="Low-stock threshold" onSubmit={getLowStockItems}/>
+        <dialog-number-filter v-model={dialog.value.low} label={t('inventory.lowStock')} onSubmit={getLowStockItems}/>
         <dialog-change-stock v-model={dialog.value.add} removable={false} name={name.value} stock={stock.value} onSubmit={updateStock}/>
         {
           (showKeyboard.value) &&

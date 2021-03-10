@@ -107,7 +107,7 @@ export function orderRightSideHeader(props, {emit}) {
             <div style={{'display': isMobile.value ? 'block' : 'flex', 'flex': 2}} class="ml-1 align-items-baseline">
               <p class="order-detail__header-username">{username.value}</p>
               {order.table && <p style="line-height: 19px">
-                <span class="order-detail__header-title">Table</span>
+                <span class="order-detail__header-title">{t('restaurant.table')}</span>
                 <span class="order-detail__header-value">{order.table}</span>
               </p>}
             </div>

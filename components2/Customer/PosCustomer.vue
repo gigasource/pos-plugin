@@ -48,10 +48,10 @@ export default {
             {genScopeId(() =>
                 <>
                   <tr>
-                    <th class="sticky"> {t('onlineOrder.refundDialog.name')} </th>
-                    <th class="sticky"> {t('onlineOrder.refundDialog.phone')} </th>
-                    <th class="sticky"> {t('onlineOrder.refundDialog.address')} </th>
-                    <th className="sticky"> {t('onlineOrder.refundDialog.spending')} </th>
+                    <th class="sticky"> {t('customer.name')} </th>
+                    <th class="sticky"> {t('customer.phone')} </th>
+                    <th class="sticky"> {t('customer.address')} </th>
+                    <th class="sticky"> {t('customer.spending')} </th>
                   </tr>
                   {sortedCustomer.value.map((customer, i) =>
                       <tr key={i} onClick={() => onSelectCustomer(customer)} class={[selectingCustomer.value && selectingCustomer.value._id === customer._id && 'bordered']}>

@@ -340,7 +340,7 @@ export function deliveryCustomerUiFactory() {
   const renderNoPendingCalls = () => {
     return (
       <div class="delivery-info__call--empty">
-        <p class="fw-700">Empty</p>
+        <p class="fw-700">{t('common.empty')}</p>
         <p class="text-grey-darken-1">{t('onlineOrder.callSystem.noPendingCall')}</p>
       </div>
     )

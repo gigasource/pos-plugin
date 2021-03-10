@@ -160,7 +160,8 @@ module.exports = {
       subtotal: 'Subtotal',
       added: 'Added',
       removed: 'Removed',
-      all: 'All'
+      all: 'All',
+      empty: 'Empty'
     },
 
     //reports
@@ -448,6 +449,8 @@ module.exports = {
       table: 'Table',
       wall: 'Wall',
       room: 'Room',
+      roomName: 'Room name',
+      tableName: 'Table name',
       addRoom: 'Add New Room',
       takeAway: 'Take Away',
       createVoucher: 'Create voucher',
@@ -653,7 +656,10 @@ module.exports = {
       paid: 'PAID'
     },
 
-    service: {},
+    service: {
+      note: 'Note',
+      addNote: 'Note...'
+    },
 
     inventory: {
       basicMode: 'Basic mode',
@@ -694,6 +700,7 @@ module.exports = {
         category: 'Category',
         stock: 'Stock'
       },
+      lowStock: 'Low-stock threshold',
       price: 'Price',
       costPrice: 'Cost Price'
     },
@@ -711,7 +718,8 @@ module.exports = {
     customer: {
       phone: 'Phone',
       address: 'Address',
-      name: 'Name'
+      name: 'Name',
+      spending: 'Spending'
     },
     status: {
       connected: 'Connected',
@@ -737,7 +745,8 @@ module.exports = {
     },
     product: {
       unit: 'Unit',
-      name: 'Name'
+      name: 'Name',
+      price: 'Price'
     }
   }
 }

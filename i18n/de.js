@@ -160,7 +160,8 @@ module.exports = {
       subtotal: 'Netto',
       added: 'Hinzugefügt ',
       removed: 'Entfernt',
-      all: 'Alles'
+      all: 'Alles',
+      empty: 'leer'
     },
 
     //<editor-fold desc="reports">
@@ -441,6 +442,8 @@ module.exports = {
       table: 'Tisch',
       wall: 'Wand',
       room: 'Room',
+      roomName: 'Raumname',
+      tableName: 'Tabellenname',
       addRoom: 'Raum erstellen',
       takeAway: 'Take Away',
       createVoucher: 'Gutschein erstellen',
@@ -642,6 +645,10 @@ module.exports = {
       currency: 'EUR',
       shippingFee: 'Liefergebühr',
     },
+    service: {
+      note: 'Notiz',
+      addNote: 'Notizen hinzufügen'
+    },
     inventory: {
       basicMode: 'Grundmodus',
       basicNote: 'Die Grundeinstellungen eines Gerichts, einschließlich Name, Preis, Drucker usw. ändern.',
@@ -680,7 +687,8 @@ module.exports = {
         name: 'Name',
         category: 'Kategorie',
         stock: 'Lager'
-      }
+      },
+      lowStock: 'Niedrige Lagerbestandsschwelle'
     },
     discount: {
       percent: 'Prozent',
@@ -696,7 +704,8 @@ module.exports = {
     customer: {
       phone: 'Telefonnummer',
       name: 'Kundenname',
-      address: 'Adresse'
+      address: 'Adresse',
+      spending: 'Spending'
     },
     status: {
       connected: 'Verbunden',
@@ -722,7 +731,8 @@ module.exports = {
     },
     product: {
       unit: 'Einheit',
-      name: 'Name'
+      name: 'Name',
+      price: 'Preis'
     }
   }
 }
