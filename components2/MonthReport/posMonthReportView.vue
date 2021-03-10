@@ -4,12 +4,14 @@ import {printMonthReport} from './month-report-shared';
 import PosMonthReport from './PosMonthReport';
 import PosMonthSelect from './PosMonthSelect';
 import PosMonthReportSetting from './PosMonthReportSetting';
+import { useI18n } from 'vue-i18n';
 
 export default {
   name: 'PosMonthReportView',
   components: {PosMonthReport, PosMonthSelect, PosMonthReportSetting},
   setup() {
     //todo: ReportsStore, printMonthlyReport
+    const { t } = useI18n()
     return genScopeId(() =>
         <div class="pos-month-report">
           <g-toolbar class="pos-month-report__toolbar">
@@ -17,7 +19,7 @@ export default {
               <g-icon>
                 icon-back
               </g-icon>
-              <span class="ml-2">Back </span>
+              <span class="ml-2">{t('ui.back')} </span>
             </g-btn>
             <g-spacer>
             </g-spacer>
@@ -26,7 +28,8 @@ export default {
                 icon-printer_2
               </g-icon>
               <span class="ml-2">
-                Print report </span>
+                {t('report.printReport')}
+              </span>
             </g-btn>
           </g-toolbar>
           <pos-month-report-setting class="pos-month-report__setting"/>

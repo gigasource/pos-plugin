@@ -142,10 +142,10 @@ export default {
     function renderResetOnlineOrder() {
       return <>
         <g-btn class="mt-3" flat background-color="#1271ff" text-color="#fff" uppercase={false} onClick={() => dialog.value = true}>
-          Reset Online Orders
+          {t('onlineOrder.resetOnlineOrders')}
         </g-btn>
         <dialog-form-input v-model={dialog.value} onSubmit={checkClearOrderPasswd} v-slots={{
-          input: () => <g-text-field-bs label="Enter your passcode" v-model={passcode.value} clearable/>
+          input: () => <g-text-field-bs label={t('permission.enterPasscode')} v-model={passcode.value} clearable/>
         }}/>
       </>
     }
@@ -163,7 +163,7 @@ export default {
                 <div class="col-6">
                   <div>{t('onlineOrder.settings.status')}</div>
                   <div style="font-style: italic">
-                    <span>{connected.value ? 'Connected' : 'Not connected'} </span>
+                    <span>{connected.value ? t('status.connected') : t('status.notConnected')} </span>
                     {(connected.value) && <span style="color: #4CAF50">({webshopName.value || 'Demo'})</span>}
                   </div>
                   {renderResetOnlineOrder()}
@@ -183,15 +183,15 @@ export default {
                       (isMasterDevice.value) && <g-btn
                           flat background-color="#1271ff" text-color="#fff" uppercase={false}
                           disabled={disableDataBtn.value} onClick={uploadData}>
-                        Upload demo data
+                        {t('onlineOrder.uploadDemoData')}
                       </g-btn>
                     }
-                    <g-switch style="margin: 0 !important;" class="ml-3" label="Template Data" v-model={isTemplateData.value}></g-switch>
+                    <g-switch style="margin: 0 !important;" class="ml-3" label={t('onlineOrder.templateData')} v-model={isTemplateData.value}></g-switch>
                   </div>
                   <g-btn
                       class="mt-2" flat background-color="#1271ff" text-color="#fff" uppercase={false}
                       disabled={disableDataBtn.value} onClick={downloadData}>
-                    Import demo data
+                    {t('onlineOrder.importDemoData')}
                   </g-btn>
                 </div>
               </div>

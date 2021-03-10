@@ -27,8 +27,8 @@ export default {
                   </p>
                   <g-text-field-bs class="bs-tf__pos"
                                    style="width: 268px"
-                                   label="Name"
-                                   placeholder="Payment name"
+                                   label={t('settings.paymentName')}
+                                   placeholder={t('settings.paymentNameExample')}
                                    onClick={withModifiers(() => showKeyboard.value = !showKeyboard.value, ['stop'])}
                                    v-model={paymentName.value}
                   />

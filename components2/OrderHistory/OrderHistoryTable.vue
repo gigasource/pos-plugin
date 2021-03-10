@@ -54,7 +54,7 @@ export default {
         <g-icon size="12"> mdi-filter</g-icon>
       </th>
       <th class="ta-center" onClick={() => openDialog('payment')}>
-        Payment
+        {t('order.payment')}
         <g-icon size="12"> mdi-filter </g-icon>
       </th>
       <th class="ta-left" onClick={() => openDialog('staff')}>

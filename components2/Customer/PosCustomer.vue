@@ -78,10 +78,10 @@ export default {
             'default': genScopeId(() =>
                 <div class="bg-white">
                   <g-btn-bs block onClick={() => changeSortField('name')}>
-                    Name
+                    {t('customer.name')}
                   </g-btn-bs>
                   <g-btn-bs block onClick={() => changeSortField('phone')}>
-                    Phone
+                    {t('customer.phone')}
                   </g-btn-bs>
                 </div>)
             ,
@@ -92,7 +92,7 @@ export default {
           }}/>
           <g-spacer/>
           <g-btn-bs background-color="#1271FF" text-color="#FFFFFF" class="elevation-2" onClick={() => onOpenDialog('add')}>
-            <g-icon size="20" color="white" class="mr-2">add_circle</g-icon>Add
+            <g-icon size="20" color="white" class="mr-2">add_circle</g-icon>{t('ui.add')}
           </g-btn-bs>
           <g-btn-bs disabled={!selectingCustomer.value} icon="icon-cancel3@20" background-color="white" text-color="#FF4552" class="elevation-2" onClick={() => showDeleteDialog.value = true}>
             {t('ui.delete')}

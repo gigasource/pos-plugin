@@ -8,9 +8,9 @@ export default {
     init()
     const { t } = useI18n()
     const headerRender = genScopeId(() => <tr>
-      <th>Name</th>
+      <th>{t('settings.taxName')}</th>
       <th>{t('common.tax')} </th>
-      <th>Type</th>
+      <th>{t('settings.taxType')}</th>
     </tr>)
 
     const taxItemRender = (tax, idx) => genScopeId(() =>

@@ -150,7 +150,7 @@ export default {
       <dialog-text-filter v-model={dialog.staff} label={t('orderHistory.staff')} onSubmit={applyStaffFilter}/>
       <dialog-range-filter v-model={dialog.amount} max={1000} label={t('orderHistory.amount')} onSubmit={applyRangeFilter}/>
       <dialog-selection-filter v-model={dialog.type} label={t('orderHistory.type')} items={orderTypes.value} onSubmit={setTypeFilter}/>
-      <dialog-selection-filter v-model={dialog.payment} label="Payment Method" items={paymentMethods.value} onSubmit={setPaymentFilter}/>
+      <dialog-selection-filter v-model={dialog.payment} label={t('payment.paymentMethod')} items={paymentMethods.value} onSubmit={setPaymentFilter}/>
       <dialog-number-filter v-model={dialog.table} label={t('orderHistory.tableNo')} onSubmit={setTableFilter}/>
       <dialog-text-filter v-model={dialog.forward} label="Forward Store" onSubmit={setForwardFilter}/>
 

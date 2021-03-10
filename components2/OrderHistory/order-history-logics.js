@@ -191,7 +191,7 @@ export async function updateLimit(val) {
 export async function setPaymentFilter(payment) {
   if (!payment) return
   const filter = {
-    title: 'Payment Method',
+    title: t('payment.paymentMethod'),
     text: payment,
     condition: { payment: { $elemMatch: { type: payment } } }
   }

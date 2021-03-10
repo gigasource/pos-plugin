@@ -18,6 +18,7 @@ import {
 
 import { modifierHooks } from './modifier-ui-logics';
 import cms from 'cms';
+import { useI18n } from 'vue-i18n';
 
 export default {
   props: {
@@ -26,6 +27,7 @@ export default {
   emits: ['update:modelValue'],
   setup(props, { emit }) {
     //todo:
+    const { t } = useI18n()
     const internalValue = internalValueFactory(props, { emit })
 
     const groupPrinters = ref([])
@@ -108,7 +110,7 @@ export default {
                     class="mr-2">
               add
             </g-icon>
-            <span> Group </span>
+            <span> {t('modifier.group')} </span>
           </g-btn>
         </div>
 
@@ -138,7 +140,7 @@ export default {
                     <g-icon color="#fff" size="18" class="mr-2">
                       add
                     </g-icon>
-                    <span> Item </span>
+                    <span> {t('modifier.item')} </span>
                   </g-btn>
                 </div>
               </>
@@ -148,7 +150,7 @@ export default {
                  onClick={() => onCreateItem(`groups.${currentGroupIdx.value}.categories`, 'category')}
                  v-show={currentGroup.value}>
             <g-icon color="#fff" size="18" class="mr-2"> add</g-icon>
-            <span> Category </span>
+            <span> {t('modifier.category')} </span>
           </g-btn>
         </div>
 
@@ -167,28 +169,30 @@ export default {
               file_copy
             </g-icon>
             <span>
-              Duplicate this modifier </span>
+              {t('modifier.duplicate')}
+            </span>
           </g-btn>
           <g-btn uppercase={false} flat background-color="#FF4452" text-color="#fff" style="margin: 8px 4px 0 4px" onClick={onDeleteActiveItem}>
             <g-icon color="#fff" size="18" class="mr-2">
               delete
             </g-icon>
             <span>
-              Delete this modifier </span>
+              {t('modifier.deleteGroup')}
+            </span>
           </g-btn>
         </>
 
     const renderToolbarForModifierCategory = () => (activeItem.value && activeItem.value.type === 'category') &&
         <>
-          <g-switch label="Mandatory" v-model={activeItem.value.mandatory}/>
-          <g-switch label="Select one only" v-model={activeItem.value.selectOne}/>
-          <g-text-field-bs label="Name" required v-model={activeItem.value.name} v-slots={{
+          <g-switch label={t('modifier.mandatory')} v-model={activeItem.value.mandatory}/>
+          <g-switch label={t('modifier.selectOnlyOne')} v-model={activeItem.value.selectOne}/>
+          <g-text-field-bs label={t('modifier.name')} required v-model={activeItem.value.name} v-slots={{
             'append-inner': genScopeId(() =>
                 <g-icon style="cursor: pointer" onClick={withModifiers(() => openDialog(categoryNameRef), ['stop'])}>
                   icon-keyboard
                 </g-icon>)
           }}/>
-          <g-text-field-bs label="No. of free items" v-model={activeItem.value.freeItems} v-slots={{
+          <g-text-field-bs label={t('modifier.noOfFreeItems')} v-model={activeItem.value.freeItems} v-slots={{
             'append-inner': genScopeId(() =>
                 <g-icon style="cursor: pointer" onClick={withModifiers(() => openDialog(categoryFreeItemsRef), ['stop'])}>
                   icon-keyboard
@@ -196,26 +200,26 @@ export default {
           }}/>
           <g-btn uppercase={false} flat background-color="#FF4452" text-color="#fff" style="margin: 8px 4px 0 4px" onClick={onDeleteActiveItem}>
             <g-icon color="#fff" size="18" class="mr-2"> delete</g-icon>
-            <span> Delete this category </span>
+            <span> {t('modifier.deleteCategory')} </span>
           </g-btn>
         </>
 
     const renderToolbarForModifierItem = () => (activeItem.value && activeItem.value.type === 'modifier') &&
         <>
-          <g-text-field-bs label="Name" required v-model={activeItem.value.name} v-slots={{
+          <g-text-field-bs label={t('modifier.name')} required v-model={activeItem.value.name} v-slots={{
             'append-inner': () =>
                 <g-icon style="cursor: pointer" onClick={withModifiers(() => openDialog(itemNameRef), ['stop'])}>
                   icon-keyboard
                 </g-icon>
             ,
           }}/>
-          <g-text-field-bs label="Price" v-model={VModel_number(activeItem.value, 'price').value} v-slots={{
+          <g-text-field-bs label={t('modifier.price')} v-model={VModel_number(activeItem.value, 'price').value} v-slots={{
             'append-inner': genScopeId(() =>
                 <g-icon style="cursor: pointer" onClick={withModifiers(() => openDialog(itemPriceRef), ['stop'])}>
                   icon-keyboard
                 </g-icon>)
           }}/>
-          <g-text-field-bs label="Max items" v-model={VModel_number(activeItem.value, 'max').value} v-slots={{
+          <g-text-field-bs label={t('modifier.maxItems')} v-model={VModel_number(activeItem.value, 'max').value} v-slots={{
             'append-inner': genScopeId(() =>
                 <g-icon style="cursor: pointer" onClick={withModifiers(() => openDialog(itemMaxRef), ['stop'])}>
                   icon-keyboard
@@ -243,7 +247,7 @@ export default {
             </div>}
           <g-btn uppercase={false} flat background-color="#FF4452" text-color="#fff" style="margin: 8px 4px 0 4px" onClick={onDeleteActiveItem}>
             <g-icon color="#fff" size="18" class="mr-2"> delete</g-icon>
-            <span> Delete this item </span>
+            <span> {t('modifier.deleteItem')} </span>
           </g-btn>
         </>
     const renderSidebar = () =>
@@ -256,7 +260,7 @@ export default {
           <g-spacer/>
           <div class="row-flex" style="position: sticky; z-index: 1">
             <g-btn flat background-color="#ff4452" text-color="#fff" border-radius="0" onClick={close} style="flex: 1; margin: 0">
-              Close
+              {t('ui.close')}
             </g-btn>
           </div>
         </div>
@@ -267,21 +271,21 @@ export default {
               <div class="mb-4">
                 {
                   (activeItem.value && activeItem.value.type === 'group') ?
-                      <pos-textfield-new ref={groupNameRef} label="Name" v-model={formInputData.name} required clearable/>
+                      <pos-textfield-new ref={groupNameRef} label={t('modifier.name')} v-model={formInputData.name} required clearable/>
                       :
                       (
                           (activeItem.value && activeItem.value.type === 'category') ?
                               <div class="row-flex flex-wrap justify-between">
-                                <pos-textfield-new ref={categoryNameRef} label="Name" required clearable v-model={formInputData.name} onClick={withModifiers(() => changeKeyboard('alpha'), ['native', 'stop'])}/>
-                                <pos-textfield-new ref={categoryFreeItemsRef} label="No. of free items" clearable v-model={formInputData.freeItems} onClick={withModifiers(() => changeKeyboard('numeric'), ['native', 'stop'])}/>
+                                <pos-textfield-new ref={categoryNameRef} label={t('modifier.name')} required clearable v-model={formInputData.name} onClick={withModifiers(() => changeKeyboard('alpha'), ['native', 'stop'])}/>
+                                <pos-textfield-new ref={categoryFreeItemsRef} label={t('modifier.noOfFreeItems')} clearable v-model={formInputData.freeItems} onClick={withModifiers(() => changeKeyboard('numeric'), ['native', 'stop'])}/>
                               </div>
                               :
                               (
                                   (activeItem.value && activeItem.value.type === 'modifier') &&
                                   <div class="row-flex flex-wrap justify-between">
-                                    <pos-textfield-new ref={itemNameRef} style="width: 48%" label="Name" required clearable v-model={formInputData.name} onClick={withModifiers(() => changeKeyboard('alphanumeric'), ['native', 'stop'])}/>
-                                    <pos-textfield-new ref={itemPriceRef} style="width: 48%" label="Price" clearable v-model={formInputData.price} onClick={withModifiers(() => changeKeyboard('numeric'), ['native', 'stop'])}/>
-                                    <pos-textfield-new ref={itemMaxRef} style="width: 48%" label="Max items" clearable v-model={formInputData.max} onClick={withModifiers(() => changeKeyboard('numeric'), ['native', 'stop'])}/>
+                                    <pos-textfield-new ref={itemNameRef} style="width: 48%" label={t('modifier.name')} required clearable v-model={formInputData.name} onClick={withModifiers(() => changeKeyboard('alphanumeric'), ['native', 'stop'])}/>
+                                    <pos-textfield-new ref={itemPriceRef} style="width: 48%" label={t('modifier.price')} clearable v-model={formInputData.price} onClick={withModifiers(() => changeKeyboard('numeric'), ['native', 'stop'])}/>
+                                    <pos-textfield-new ref={itemMaxRef} style="width: 48%" label={t('modifier.maxItems')} clearable v-model={formInputData.max} onClick={withModifiers(() => changeKeyboard('numeric'), ['native', 'stop'])}/>
                                   </div>
                               )
                       )

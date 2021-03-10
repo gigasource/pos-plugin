@@ -139,13 +139,13 @@ export default {
                 {quickDiscount.value.map((discount, i) =>
                     <div key={i} onClick={() => selectCustomDiscount(discount)}
                          class={['discount-quick__item', custom.value === +discount && 'discount-quick__item--selected']}>
-                      <span> {t('common.currency', locale.value)} {discount} </span>
+                      <span> {t('common.currency')} {discount} </span>
                     </div>)}
               </div>
               {
                 (percent.value || amount.value || custom.value) ?
                 <g-btn-bs background-color="#ff4452" icon="icon-delete2" onClick={removeDiscount}>
-                  Remove discount
+                  {t('discount.removeDiscount')}
                 </g-btn-bs> : null
               }
             </div>

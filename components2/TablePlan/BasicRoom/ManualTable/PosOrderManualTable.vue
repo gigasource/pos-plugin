@@ -45,7 +45,7 @@ export default {
                 <div class="table waves-effect waves-red"
                      onClick={withModifiers(() => routeToOrder(order.table), ['stop'])}>
                   <div style={`font-size: 10px; position: absolute; top: 2px`}>
-                    {t('common.currency', locale.value)}{order.vSum}
+                    {t('common.currency')}{order.vSum}
                   </div>
                   <div> {order.table} </div>
                   <div style="font-size: 10px; position: absolute; bottom: 2px">
@@ -55,7 +55,7 @@ export default {
             )}
           </div>
           <div class="keyboard">
-            <pos-textfield-new label="Table" v-model={tableNameInput.value} ref={textFieldRef}/>
+            <pos-textfield-new label={t('restaurant.table')} v-model={tableNameInput.value} ref={textFieldRef}/>
             <pos-keyboard-full onEnterPressed={addTable}/>
           </div>
         </div>

@@ -441,18 +441,18 @@ export default {
                 execGenScopeId(() => <div>
                   <g-icon class="dialog-icon--close" onClick={closeDialogConfirm} size="20">icon-close</g-icon>
                   <div class="mx-2">
-                    <b>Name: </b> {selectedCustomer.value && selectedCustomer.value.name}
+                    <b>{t('customer.name')}: </b> {selectedCustomer.value && selectedCustomer.value.name}
                   </div>
                   <div class="mx-2">
-                    <b>Phone: </b> {selectedCustomer.value && selectedCustomer.value.phone}
+                    <b>{t('customer.phone')}: </b> {selectedCustomer.value && selectedCustomer.value.phone}
                   </div>
                   <div class="mx-2">
-                    <b>Address: </b> {selectedCustomerAddress.value}
+                    <b>{t('customer.address')}: </b> {selectedCustomerAddress.value}
                   </div>
-                  <g-text-field-bs label="Delivery note:" v-model={order.value.note} v-slots={{
+                  <g-text-field-bs label={`${t('onlineOrder.deliveryNote')}:`} v-model={order.value.note} v-slots={{
                     'append-inner': () => <g-icon onClick={() => dialog.value.note = true}>icon-keyboard</g-icon>
                   }}/>
-                  <div class="ma-2">Time to complete (minute)</div>
+                  <div class="ma-2">{t('onlineOrder.timeToComplete')})</div>
                   <div class="mb-3">
                     <g-btn-bs class="elevation-1" backgroundColor={order.value.prepareTime === 15 ? '#BBDEFB' : 'white'}
                               onClick={() => order.value.prepareTime = 15}>15
@@ -469,7 +469,7 @@ export default {
                   </div>
                   <g-btn-bs disabled={disabledConfirm.value} block large background-color="#2979FF"
                             onClick={confirmOrder}>
-                    Confirm - {t('common.currency', locale)}{$filters.formatCurrency(paymentTotal.value)}
+                    {t('dialogs.confirm')} - {t('common.currency', locale)}{$filters.formatCurrency(paymentTotal.value)}
                   </g-btn-bs>
                 </div>)
               }

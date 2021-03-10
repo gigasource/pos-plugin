@@ -13,12 +13,12 @@ export default {
 
     const formRender = () => <div class="form">
       <div class="input">
-        <g-text-field-bs class="bs-tf__pos" label="Name" v-model={taxName.value} suffix="%"/>
+        <g-text-field-bs class="bs-tf__pos" label={t('settings.taxName')} v-model={taxName.value} suffix="%"/>
         <g-text-field-bs class="bs-tf__pos"
                          label={t('common.tax')}
                          v-model={taxValue.value} rules={[rules.value.number, rules.value.range]}
                          suffix="%"/>
-        <g-text-field-bs class="bs-tf__pos" label="Type" v-model={taxType.value}/>
+        <g-text-field-bs class="bs-tf__pos" label={t('settings.taxType')} v-model={taxType.value}/>
       </div>
       {
         (!isMobile.value) &&

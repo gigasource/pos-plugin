@@ -7,10 +7,12 @@ import Snackbar from '../../../components/Store/Snackbar';
 import { genScopeId } from '../../utils';
 import { prepareMockData } from './delivery-mock-data'
 import posOrderDeliveryKeyboard from '../../OrderView/Helper/posOrderDeliveryKeyboard2';
+import { useI18n } from 'vue-i18n';
 
 export default {
   components: { Snackbar, posOrderDeliveryKeyboard },
   setup() {
+    const { t } = useI18n()
     appHooks.emit("settingChange")
     const keyboardDeliveryConfig = computed(() => (posSettings.value && posSettings.value.keyboardDeliveryConfig) || [])
     const position = ref({})
@@ -63,15 +65,15 @@ export default {
       <div class="row-flex flex-grow-1">
         <div>
           <div class="mb-2">
-            <p class="fw-600">Delivery Menu</p>
+            <p class="fw-600">{t('onlineOrder.deliveryMenu')}</p>
             <div>
               <g-btn-bs style="margin: 0" background-color="#1271FF" onClick={fetchMenu}>Fetch</g-btn-bs>
               <g-btn-bs style="width: 80px" background-color="#1271FF" onClick={prepareMockData}>Fake</g-btn-bs>
             </div>
           </div>
-          <div class="mb-2 fw-600">Delivery keyboard</div>
+          <div class="mb-2 fw-600">{t('onlineOrder.deliveryKeyboard')}</div>
           <div class="row-flex align-items-center mb-2">
-            <p class="mr-2">External rows</p>
+            <p class="mr-2">{t('onlineOrder.externalRows')}</p>
             <input-number width="148" modelValue={keyboardDeliveryConfig.value.length} onUpdate:modelValue={changeExtraRows}/>
           </div>
           <g-spacer/>

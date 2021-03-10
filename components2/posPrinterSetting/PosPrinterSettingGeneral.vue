@@ -22,7 +22,7 @@ export default {
             <g-checkbox color="#1271FF" label={t('settings.multipleInvoicePrinter')} v-model={useMultiPrinterForInvoicePrinter.value}/>
             <g-checkbox color="#1271FF" label={t('settings.multipleEntirePrinter')} v-model={useMultiPrinterForEntirePrinter.value}/>
             <g-checkbox color="#1271FF" label={t('settings.showDineInTax')} v-model={showDineInTax.value}/>
-            <g-checkbox color="#1271FF" label="Merge items after printing to kitchen" v-model={mergeAfterPrint.value}/>
+            <g-checkbox color="#1271FF" label={t('settings.mergeItems')} v-model={mergeAfterPrint.value}/>
           </div>
           <div class="setting-title">
             {t('settings.entireReceiptNo')}

@@ -15,11 +15,13 @@ import {
   loadData
 } from './call-system-logics';
 import { genScopeId } from '../../utils';
+import { useI18n } from 'vue-i18n';
 
 export default {
   setup() {
     loadData()
 
+    const { t } = useI18n()
     const callSystemModesRender = genScopeId(() => <div class="row-flex align-items-center justify-start">
         <g-select label="Caller Id"
                   style="width: 250px" class="mt-2 mb-4 call_system"
@@ -71,7 +73,7 @@ export default {
 
           <div class="row-flex">
             <g-spacer/>
-            <g-btn-bs style="margin-right:0" width="80" background-color="#2979FF" onClick={switchMode}>Save</g-btn-bs>
+            <g-btn-bs style="margin-right:0" width="80" background-color="#2979FF" onClick={switchMode}>{t('dialogs.save')}</g-btn-bs>
           </div>
 
           <dialog-text-filter v-model={dialog.value.ip} label="Call System IP" defaultValue={ipAddresses.value[currentCallSystemMode.value]} onSubmit={changeIp}></dialog-text-filter>
