@@ -72,11 +72,14 @@ export default {
     })
 
     async function  updateProductIngredient() {
-      const _ingredients = ingredients.value.map(item => ({
-        inventory: detailInventories.value.find(inventory => inventory.product.name === item.name)._id,
-        name: item.name,
-        amount: Number(item.amount)
-      }))
+      const _ingredients = ingredients.value.map(item => {
+        const detailInvt = detailInventories.value.find(inventory => inventory.product.name === item.name)
+        return {
+          inventory: detailInvt && detailInvt._id,
+          name: item.name,
+          amount: Number(item.amount)
+        }
+      })
       if(_.some(_.countBy(_ingredients, 'inventory'), item => item > 1))
         return
       await cms.getModel('Product').findOneAndUpdate({ _id: selectedProduct.value._id }, { ingredients: _ingredients })
