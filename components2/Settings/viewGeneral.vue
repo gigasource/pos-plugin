@@ -1,7 +1,7 @@
 <script>
 import { attrComputed, genScopeId } from '../utils';
-import { appHooks, posSettings } from '../AppSharedStates';
-import { computed, ref, withModifiers, watch } from 'vue'
+import { appHooks } from '../AppSharedStates';
+import { ref, watch, computed } from 'vue'
 import cms from 'cms'
 import { useI18n } from 'vue-i18n';
 import { updateSetting } from './settings-be';
@@ -24,7 +24,7 @@ export default {
       }
       generalSettings.value = _generalSettings
     })
-    const quickPayButtonActions = ['auto', 'pay', 'receipt']
+    const quickPayButtonActions = computed(() => ['auto', 'pay', 'receipt'].map(i => t(`settings.generalSetting.${i}`)))
     const dialog = ref({ googleMapApiKey: false })
     const barcode = attrComputed(generalSettings, 'barcode')
     const favoriteArticle = attrComputed(generalSettings, 'favoriteArticle')
@@ -43,7 +43,7 @@ export default {
     const isMaster = attrComputed(generalSettings, 'isMaster', false)
     const masterIp = attrComputed(generalSettings, 'masterIp', '')
     //todo: should not watch like this, should add handler for update:modelValue
-    watch(() => generalSettings.value,(val, oldV) => {
+    watch(() => generalSettings.value, (val, oldV) => {
       if (val) {
         updateSetting({ generalSetting: val })
       }
@@ -63,10 +63,12 @@ export default {
     cms.socket.on('connectedToMaster', (val) => { // val is true or false which is status of client socket
       isConnectToMaster.value = val
     })
+
     function updateIsMaster(val) {
       isMaster.value = val
       cms.socket.emit('setMasterFe', val)
     }
+
     function updateMasterIp(val) {
       masterIp.value = val
       cms.socket.emit('setMasterFe', false, masterIp.value)
@@ -86,75 +88,80 @@ export default {
         <g-switch v-model={automaticCashdrawer.value}></g-switch>
       </div>
       <div class="row-flex align-items-center justify-between">
-        <span> Quick pay/print button </span>
-        <g-switch v-model={quickBtn.value}></g-switch>
+        <span> {t('settings.generalSetting.quickPayButton')} </span>
+        <g-switch v-model={quickBtn.value}>quick</g-switch>
       </div>
       <div class="row-flex align-items-center justify-between">
-        <span> Only checkout printed items </span>
+        <span> {t('settings.generalSetting.onlyCheckoutPrintedItems')} </span>
         <g-switch v-model={onlyCheckoutPrintedItems.value}></g-switch>
       </div>
       <div class="row-flex align-items-center justify-between">
-        <span> Using virtual printer </span>
+        <span> {t('settings.generalSetting.usingVirtualPrinter')} </span>
         <g-switch v-model={useVirtualPrinter.value}></g-switch>
       </div>
       <div class="row-flex align-items-center justify-between">
-        <span> Pay button prints receipt </span>
+        <span> {t('settings.generalSetting.payButtonPrintsReceipt')} </span>
         <g-switch v-model={printReceiptWithPay.value}></g-switch>
       </div>
       <div class="row-flex align-items-center justify-between">
         <span> Show tutorial button </span>
         <g-switch v-model={showTutorial.value}></g-switch>
       </div>
-      <div className="row-flex align-items-center justify-between">
+      <div class="row-flex align-items-center justify-between">
         <span> Is master </span>
         <g-switch modelValue={isMaster.value} onUpdate:modelValue={updateIsMaster}></g-switch>
       </div>
     </div>)
 
     const rightSideRender = genScopeId(() => <div class="flex-grow-1 offset-1">
-      <div className="row-flex align-items-center justify-center">
+      <div class="row-flex align-items-center justify-center">
         <pos-time-picker label={t('settings.beginHour')} v-model={beginHour.value} v-slots={{
           'append': () => <g-icon> access_time </g-icon>
         }}>
         </pos-time-picker>
       </div>
-      <g-select text-field-component="GTextFieldBs" text-field-class="bs-tf__pos" class="mt-2" items={['tablet', 'mobile']} label="Delivery order mode" v-model={deliveryOrderMode.value}/>
+      <g-select text-field-component="GTextFieldBs" text-field-class="bs-tf__pos" class="mt-2" items={['tablet', 'mobile']} label={t('settings.generalSetting.deliveryOrderMode')} v-model={deliveryOrderMode.value}/>
       <div class="row-flex align-items-center justify-between">
         Google Map API Key
       </div>
       <g-text-field-bs class="google-map-api-input bs-tf__pos" v-model={googleMapApiKey.value} v-slots={{
         'append-inner': () =>
             <g-icon onClick={() => dialog.value.googleMapApiKey = true}> icon-keyboard </g-icon>
-      }}>
-      </g-text-field-bs>
+      }}/>
       <dialog-text-filter v-model={dialog.value.googleMapApiKey} label="Google Map API Key" defaultValue={googleMapApiKey.value} onSubmit={(value) => googleMapApiKey.value = value}/>
-      <div className="row-flex align-items-center justify-between">
+      <div class="row-flex align-items-center justify-between">
         Master IP
       </div>
-      <g-text-field-bs disable={isMaster.value} className="google-map-api-input bs-tf__pos" v-model={masterIp.value} v-slots={{
+      <g-text-field-bs disable={isMaster.value} class="google-map-api-input bs-tf__pos" v-model={masterIp.value} v-slots={{
         'append-inner': () =>
             <g-icon onClick={() => dialog.value.masterIp = isMaster.value ? false : true}> icon-keyboard </g-icon>
-      }}>
-      </g-text-field-bs>
-      <dialog-text-filter v-model={dialog.value.masterIp} label="Master IP"
-                          defaultValue={masterIp.value} onSubmit={(value) => updateMasterIp(value)}/>
-      <div className="row-flex align-items-center justify-between" style="color:red">
-        {isConnectToMaster.value ? 'Connected' : 'No connection'}
+      }}/>
+      <dialog-text-filter v-model={dialog.value.masterIp}
+                          label="Master IP"
+                          defaultValue={masterIp.value}
+                          onSubmit={(value) => updateMasterIp(value)}/>
+      <div class="row-flex align-items-center justify-between" style="color:red">
+        {isConnectToMaster.value ? t('status.connected') : t('status.notConnected')}
       </div>
       <div class="row-flex align-items-center justify-between">
-        Quick pay button's action
+        {t('settings.generalSetting.quickPayAction')}
       </div>
       <div class="row-flex align-items-center justify-start">
-        <g-grid-select class="mt-2" items={quickPayButtonActions} mandatory grid={false} v-model={quickBtnAction.value} v-slots={{
+        <g-grid-select class="mt-2" items={quickPayButtonActions.value} mandatory grid={false} v-model={quickBtnAction.value} v-slots={{
           'default': genScopeId(({ toggleSelect, item }) =>
-              <g-btn class="mx-1 mb-1" onClick={() => toggleSelect(item)} disabled={item === 'auto'}> {item} </g-btn>)
+              <g-btn class="mx-1 mb-1"
+                     onClick={() => toggleSelect(item)}
+                     disabled={item === 'auto'}> {item}
+              </g-btn>)
           ,
           'selected': genScopeId(({ toggleSelect, item }) =>
-              <g-btn class="mx-1 mb-1" onClick={() => toggleSelect(item)} background-color="blue" text-color="white">
+              <g-btn class="mx-1 mb-1"
+                     onClick={() => toggleSelect(item)}
+                     background-color="blue"
+                     text-color="white">
                 {item}
               </g-btn>)
-        }}>
-        </g-grid-select>
+        }}/>
       </div>
     </div>)
     return genScopeId(() =>

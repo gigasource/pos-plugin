@@ -18,14 +18,13 @@ export const deliveryTimes = [15, 30, 45, 60]
 export const onlineDevice = computed({
     get() {
       const res = posSettings.value.onlineDevice || {}
-      return Object.assign({}, res, { url: webshopUrl.value})
+      return Object.assign({}, res, { url: webshopUrl.value })
     },
     set(val) {
       updateSetting({ onlineDevice: val })
     }
   }
 )
-
 
 
 export const defaultPrepareTime = computed({
@@ -93,7 +92,6 @@ export async function getWebshopUrl() {
 }
 
 
-
 export const webshopName = computed(() => {
   if (onlineDevice.value && onlineDevice.value.store && onlineDevice.value.store.name) {
     return onlineDevice.value.store.name.trim()
@@ -127,6 +125,7 @@ function showErrorSnackbar(error, timeout = 5000) {
 
   snackbarRef.value.showSnackbar(contentFn, '#E57373', timeout)
 }
+
 function showInfoSnackbar(text, timeout = 5000) {
   const contentFn = () => (
     <div style="margin: 0 auto" class="row-flex align-items-center">

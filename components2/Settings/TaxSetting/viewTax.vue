@@ -2,16 +2,15 @@
 import { useI18n } from 'vue-i18n';
 import { genScopeId, isSameId } from '../../utils';
 import { init, listTaxCategories, onSelectTax, selectedTaxCategory } from './view-tax-logics';
-//todo: remove
 export default {
   components: {},
   setup() {
     init()
     const { t } = useI18n()
     const headerRender = genScopeId(() => <tr>
-      <th>Name</th>
+      <th>{t('settings.taxName')}</th>
       <th>{t('common.tax')} </th>
-      <th>Type</th>
+      <th>{t('settings.taxType')}</th>
     </tr>)
 
     const taxItemRender = (tax, idx) => genScopeId(() =>
@@ -22,13 +21,13 @@ export default {
           <td> {tax.type} </td>
         </tr>)
     return genScopeId(() =>
-      <div>
-        <g-simple-table striped>
-          { headerRender()}
-          {listTaxCategories.value.map((tax, i) => taxItemRender(tax, i)()
-          )}
-        </g-simple-table>
-      </div>)
+        <div>
+          <g-simple-table striped>
+            {headerRender()}
+            {listTaxCategories.value.map((tax, i) => taxItemRender(tax, i)()
+            )}
+          </g-simple-table>
+        </div>)
   }
 }
 </script>

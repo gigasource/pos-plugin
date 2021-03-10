@@ -93,7 +93,8 @@ module.exports = {
       choose: 'Choose Position',
       tblTotal: 'Gesamt',
       tblRow: 'Zeilen pro Seite',
-      tblPage: 'Page'
+      tblPage: 'Page',
+      close: 'Schließen'
     },
 
     dialogs: {
@@ -102,6 +103,8 @@ module.exports = {
       other: 'Abbrechen',
       newPrice: 'New Price',
       discountBy: 'Discount by',
+      confirm: 'Bestätigen',
+      save: 'Speichern'
     },
 
     fnBtn: {
@@ -155,6 +158,9 @@ module.exports = {
       discount: 'Rabatt',
       tax: 'MwSt.',
       subtotal: 'Netto',
+      added: 'Hinzugefügt ',
+      removed: 'Entfernt',
+      all: 'Alles'
     },
 
     //<editor-fold desc="reports">
@@ -203,7 +209,36 @@ module.exports = {
       savedList: 'Saved List',
       splitOrder: 'Geteilte bestellung',
       moveItem: 'Artikel verchieben',
-      voucher: 'Gutschein'
+      voucher: 'Gutschein',
+      editScreen: 'Bildschirm bearbeiten',
+      takeAway: 'Mitnehmen',
+      items: 'Artikels',
+      createdTime: 'Erstellte Zeit',
+      createdBy: 'Erstellt von',
+      cashier: 'Kassierer',
+      payment: 'Zahlung',
+    },
+
+    productViewSetting: {
+      product: 'Produkt',
+      fontSize: 'Schriftgröße',
+      minimizeOnlyTextRow: 'Nur die Textzeile minimieren',
+      hideTextRow: 'Extzeile ausblenden',
+      narrowEmptyColumn: 'Leere Spalte verkleinern',
+      hideEmptyColumn: 'Leer Leere Spalte ausblenden',
+      shrinkProductTitle: 'Produkttitel verkleinern',
+      category: 'Kategorie',
+      mode: 'Modus',
+      horizontal: 'Horizontal',
+      vertical: 'Vertikal',
+      singleRowCategory: 'Einzeilige Kategorie',
+      differentWidth: 'Unterschiedliche Breite',
+      differentHeight: 'Unterschiedliche Höhe',
+      height: 'Höhe',
+      width: 'Breite',
+      sidebar: 'Seitenleiste',
+      smallSidebar: 'Kleine Seitenleiste',
+      save: 'Speichern'
     },
 
     orderHistory: {
@@ -228,7 +263,11 @@ module.exports = {
       enterTender: 'Bitte geben Sie das angebotene Bargeld ein',
       cash: 'Bargeld',
       card: 'Karte',
-      multi: 'Mehr'
+      multi: 'Mehr',
+      multiPayment: 'Mehrfachzahlung - Bar & Karte',
+      total: 'Gesamt',
+      cardPayment: 'Kartenzahlung',
+      paymentMethod: 'Zahlungsmethode',
     },
 
     settings: {
@@ -318,14 +357,35 @@ module.exports = {
       networkPrinter: 'Netzwerk Drucker',
       serialPrinter: 'COM',
       usb: 'USB',
+      integrate: 'Integrieren',
+      mergeItems: 'Artikels nach dem Drucken in die Küche zusammenführen \n',
       //payment
       paymentName: 'Name',
-      paymentIcon: 'Symbol',
+      paymentNameExample: 'z.B Visa, Paypal, Gutschein usw',
+      paymesỏtntIcon: 'Symbol',
       //tax:
       noteLetter: 'Invoice Note Letter',
-      createTax: 'Create New Tax',
-      noInternet: 'keine Internetverbindung',
-      noOnlineOrder: 'nicht mit Online Bestellserver verbinden!'
+      createTax: 'Neue Steuern hinzufügen ',
+      taxName: 'Steuername',
+      taxType: 'Steuertyp',
+      noInternet: 'Keine Internetverbindung',
+      noOnlineOrder: 'Nicht mit Online Bestellserver verbinden!',
+      generalSetting: {
+        deliveryOrderMode: 'Lieferauftragsmodus',
+        quickPayAction: 'Schnelle Zahlungstaste erstellen' ,
+        quickPayButton: 'Schnelle Bezahl- / Drucktaste',
+        onlyCheckoutPrintedItems: 'Nur gedruckte Artikel zahlen',
+        usingVirtualPrinter: 'Virtuellen Drucker verwendenr',
+        payButtonPrintsReceipt: 'Zahlungstaste druckt die Quittung',
+        auto: 'Auto',
+        pay: 'Zahlen',
+        receipt: 'Quittung'
+      },
+      keyboard: {
+        activeKeyboard: 'aktive Tastatur',
+        onlyShowInFirstPage: 'Tastatur nur auf der ersten Seite anzeigen',
+        showXButton: '\'x\'-Taste anzeigen'
+      }
     },
 
     //dates
@@ -399,9 +459,10 @@ module.exports = {
         keyboardWidth: 'Keyboard Width',
         keyboardHeight: 'Keyboard Height',
         expansionColumn: 'Expansion Column',
-        keyboardPosition: 'Keyboard Position',
+        keyboardPosition: 'Tastaturposition',
         rows: 'Zeilen',
-        columns: 'Spalten'
+        columns: 'Spalten',
+        mustSelectProduct: 'Produkt auswählen, um die Zutat zu bearbeiten',
       },
 
       product: {
@@ -417,6 +478,7 @@ module.exports = {
       onlineOrders: 'Online Bestellungen',
       pendingOrders: 'offene Bestellung',
       sentToKitchen: 'In Bearbeitung (Küche)',
+      sendToKitchen: 'In die Küche senden',
       dashboard: 'Übersicht',
       orderDetails: 'Bestelldetails',
       completedOrders: 'abgeschlossene Bestellungen',
@@ -436,6 +498,12 @@ module.exports = {
       noPending: 'Noch keine schwebende Bestellung.',
       noKitchen: 'Keine Bestellungen in die Küche schickte.',
       deliveryIn: 'Lieferung in {msg} Minuten.',
+      deliveryMenu: 'Liefermenü',
+      deliveryKeyboard:'Liefertastatur ',
+      externalRows: 'Externe Zeilen',
+      resetOnlineOrders: 'Reset online orders',
+      importDemoData: 'Demo-Daten importieren',
+      templateData: 'Vorlagendaten',
       pickUpIn: 'Abholung in {msg} Minuten.',
       total: 'Gesamt',
       items: 'Artikel',
@@ -487,6 +555,9 @@ module.exports = {
         title: 'Erfassung der Transaktion',
         message: 'Wir sammeln Geld für diese Bestellung. Warten Sie mal...'
       },
+      timeToComplete: 'Fertigstellungszeit (Minuten)',
+      deliveryNote: 'Lieferschein',
+
 
       settings: {
         onlineOrderSettings: 'Online Bestellung Einstellungen',
@@ -544,6 +615,18 @@ module.exports = {
         fri: 'Fre',
         sat: 'Sam',
         sun: 'Son',
+      },
+      callSystem: {
+        modemNotConnected: 'Modem nicht verbunden',
+        missed: 'Verpasst',
+        noPendingCall: 'Keine schwebenden Anrufe',
+        empty: 'leer'
+      },
+      newReservationDialog: {
+        customerName: 'Kundenname',
+        typeCustomerName: 'Kundenname',
+        typeCustomerPhoneNumber: 'Telefonnummer',
+        addNotes: 'Notizen hinzufügen'
       }
     },
 
@@ -603,11 +686,43 @@ module.exports = {
       percent: 'Prozent',
       amount: 'Menge',
       discount: 'Rabatt',
-      custom: 'Selbserstellte',
-      quickDiscount: 'Schneller Rabatt'
+      custom: 'Benutzerdefinierte Rabatte',
+      quickDiscount: 'Schneller Rabatt',
+      removeDiscount: 'Rabatt löschen'
     },
     editablePlan: {
       existedTableNameErrorMsg: 'Nr. "{tableName}" Tisch war bereits vorhanden, bitte wählen Sie andere Tische! z.B: "{suggestionName}"'
+    },
+    customer: {
+      phone: 'Telefonnummer',
+      name: 'Kundenname',
+      address: 'Adresse'
+    },
+    status: {
+      connected: 'Verbunden',
+      notConnected: 'Nicht verbunden',
+    },
+    permission: {
+      enterPasscode: 'Geben Sie Ihren Passcode ein',
+    },
+    modifier: {
+      group: 'Gruppe',
+      category: 'Neue Kategorie',
+      item: 'Artikel',
+      deleteItem: 'Delete this item',
+      deleteGroup: 'Delete this modifier group',
+      deleteCategory: 'Delete this category',
+      duplicate: 'Diesen Modifikator duplizieren',
+      mandatory: 'Nur ein wählen',
+      selectOnlyOne:'',
+      name: 'Name',
+      noOfFreeItems: 'Anzahl der Gratisartikel',
+      price: 'Preis',
+      maxItems: 'Max-Artikels'
+    },
+    product: {
+      unit: 'Einheit',
+      name: 'Name'
     }
   }
 }

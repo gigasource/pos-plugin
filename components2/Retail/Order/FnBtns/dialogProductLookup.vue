@@ -3,7 +3,10 @@ import { getInternalValue, Intersect } from 'pos-vue-framework';
 import { computed, getCurrentInstance, onMounted, ref, watch } from 'vue';
 import _ from 'lodash'
 import { execGenScopeId, genScopeId } from '../../../utils';
-import { addProductToOrder } from '../temp-logic'
+import { products } from "../../../Product/product-logic";
+import {inventories} from "../../../Inventory/inventory-logic-ui";
+import {getCurrentOrder} from "../../../OrderView/pos-logic-be";
+import {addItem} from "../../../OrderView/pos-logic";
 
 export default {
   name: 'dialogProductLookup',
@@ -31,12 +34,9 @@ export default {
     const productNameQueryResults = ref([])
 
     async function queryProductsByName() {
-      const results = await cms.getModel('Product').filter(product =>
-          product.name.toLowerCase().includes(productNameQuery.value.trim().toLowerCase()))
-      productNameQueryResults.value = Object.freeze(results.map(product => ({
-        ...product,
-        originalPrice: product.price
-      })))
+      productNameQueryResults.value = products.value.filter(product => {
+        return product.name.toLowerCase().includes(productNameQuery.value.trim().toLowerCase())
+      })
     }
 
     const dialogContentRef = ref()
@@ -49,7 +49,8 @@ export default {
     })
 
     function addToOrder(product) {
-      addProductToOrder(product)
+      const order = getCurrentOrder()
+      addItem(order, product, 1)
       selected.value = product
       setTimeout(close, 200)
     }
@@ -115,6 +116,7 @@ export default {
       return (i < productList.value.length - 1)
     }
     function renderProductRow(product, i) {
+      const foundInventory = inventories.value.find(inventory => inventory.productId.toString() === product._id.toString())
       return <>
         {
           (i === productList.value.length - 1) &&
@@ -125,7 +127,7 @@ export default {
               {...{ directives: directives.value }}>
             <td>{product.name}</td>
             <td>{product.barcode ? product.barcode : '-'} </td>
-            <td style="text-transform: capitalize">{product.unit ? product.unit : '-'}</td>
+            <td style="text-transform: capitalize">{foundInventory ? foundInventory.unit : '-'}</td>
             <td>
               {(product.attribute
                   ? <div>
@@ -142,7 +144,7 @@ export default {
               onClick={() => addToOrder(product)}>
             <td>{product.name}</td>
             <td>{product.barcode ? product.barcode : '-'}</td>
-            <td style="text-transform: capitalize">{product.unit ? product.unit : '-'}</td>
+            <td style="text-transform: capitalize">{foundInventory ? foundInventory.unit : '-'}</td>
             <td>
               {(product.attribute
                   ? <div>

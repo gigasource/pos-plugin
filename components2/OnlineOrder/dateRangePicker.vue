@@ -136,7 +136,7 @@ export default {
                 </div>
               </div>
               <g-btn-bs height="40" width="100%" background-color="#1976D2" text-color="#fff" onClick={save}>
-                Confirm
+                {t('dialogs.confirm')}
               </g-btn-bs>
               <g-divider style="margin: 8px 0" color="#e0e0e0"/>
               <div class="row-flex flex-wrap w-100 justify-between">

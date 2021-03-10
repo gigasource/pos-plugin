@@ -271,14 +271,14 @@ export default {
                 <div class="dialog-content__title">{t('onlineOrder.makeReservation')}</div>
                 <div class="row-flex">
                   <g-text-field-bs class="bs-tf__pos" v-model={name.value} label="Name"
-                                   placeholder={t('onlineOrder.fillText')} required/>
+                                   placeholder={t('onlineOrder.newReservationDialog.typeCustomerName')} required/>
                   <g-text-field-bs class="bs-tf__pos" v-model={phone.value} label={t('settings.tel')}
-                                   placeholder={t('onlineOrder.fillNumber')} number required/>
+                                   placeholder={t('onlineOrder.newReservationDialog.typeCustomerPhoneNumber')} number required/>
                 </div>
 
                 <div>
                   <div class="label">{t('onlineOrder.note')}</div>
-                  <g-textarea rows="3" outlined v-model={note.value} placeholder={t('onlineOrder.fillText')} no-resize/>
+                  <g-textarea rows="3" outlined v-model={note.value} placeholder={t('onlineOrder.newReservationDialog.addNotes')} no-resize/>
                 </div>
 
                 <div class="dialog-action" style="margin-right: -4px">

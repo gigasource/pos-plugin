@@ -32,8 +32,8 @@ export default {
       <g-btn uppercase={false} background-color="#4CAF50" text-color="#FFFFFF" onClick={onOpenDialogNewPayment}>
         + {t('settings.createPayment')}
       </g-btn>
-      <dialogConfirmDelete type="payment" label={selectedPayment.value ? selectedPayment.value.name : ''} v-model={showDialogConfirmDelete.value} onSubmit={onDeletePayment}></dialogConfirmDelete>
-      <dialogNewPayment ref={dialogRef}></dialogNewPayment>
+      <dialogConfirmDelete type="payment" label={selectedPayment.value ? selectedPayment.value.name : ''} v-model={showDialogConfirmDelete.value} onSubmit={onDeletePayment}/>
+      <dialogNewPayment ref={dialogRef}/>
     </>
   }
 }

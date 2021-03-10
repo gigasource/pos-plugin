@@ -1,13 +1,11 @@
 <script>
-import { appHooks, posSettings } from '../../AppSharedStates';
-import { computed, ref } from 'vue'
+import { appHooks } from '../../AppSharedStates';
 import { genScopeId, isSameId } from '../../utils';
 import { useI18n } from 'vue-i18n';
-import { getScopeAttrs } from '../../../utils/helpers';
-import { selectedPayment, listPayments, onSelectPayment } from './view-payment-logics';
+import { listPayments, onSelectPayment, selectedPayment } from './view-payment-logics';
 
 export default {
-  components: {  },
+  components: {},
   setup() {
     appHooks.emit('settingChange')
     const { t } = useI18n()
@@ -26,14 +24,13 @@ export default {
           </td>
         </tr>)
     return genScopeId(() =>
-        <div>
-          <div {...getScopeAttrs()}>
-            <g-simple-table striped {...getScopeAttrs()}>
-              {headerRender()}
-              {listPayments.value.map(payment => paymentItemRender(payment)())}
+          <div>
+            <g-simple-table striped>
+              {genScopeId(() => <> {headerRender()}
+                {listPayments.value.map(payment => paymentItemRender(payment)())}
+              </>)()}
             </g-simple-table>
-          </div>
-        </div>)
+          </div>)
   }
 }
 </script>

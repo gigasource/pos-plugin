@@ -82,7 +82,7 @@ module.exports = {
       delete: 'Xoá',
       duplicate: 'Tạo bản sao',
       change: 'Thay đổi',
-      sort: 'Lọc',
+      sort: 'Sắp xếp',
       switch: 'Đổi vị trí',
       copy: 'Sao chép',
       color: 'Màu',
@@ -93,7 +93,8 @@ module.exports = {
       choose: 'Chọn vị trí',
       tblTotal: 'Tổng',
       tblRow: 'Số dòng mỗi trang',
-      tblPage: 'Số trang'
+      tblPage: 'Số trang',
+      close: 'Đóng',
     },
 
     dialogs: {
@@ -102,6 +103,8 @@ module.exports = {
       other: 'Khác',
       newPrice: 'Giá mới',
       discountBy: 'Giảm giá',
+      confirm: 'Xác nhận',
+      save: 'Lưu'
     },
 
     fnBtn: {
@@ -150,11 +153,14 @@ module.exports = {
       datetime: 'Ngày/Giờ',
       sales: 'Sales',
       total: 'Tổng',
-      currency: '$',
+      currency: '₫',
       currencyDecimal: '2',
       discount: 'Giảm giá',
       tax: 'Thuế',
       subtotal: 'Tổng phụ',
+      added: 'Đã thêm',
+      removed: 'Đã giảm',
+      all: 'Tất cả'
     },
 
     //reports
@@ -201,8 +207,37 @@ module.exports = {
       each: 'Mỗi',
       savedList: 'Danh sách đã lưu',
       splitOrder: 'Tách đơn',
-      moveItem: 'Chuyển đồ',
-      voucher: 'Phiếu giảm giá'
+      moveItem: 'Chuyển món',
+      voucher: 'Phiếu giảm giá',
+      editScreen: 'Cài đặt màn',
+      takeAway: 'Mang đi',
+      items: 'Món',
+      createdTime: 'Thời gian tạo',
+      createdBy: 'Tạo bởi',
+      cashier: 'Thu ngân',
+      payment: 'Thanh toán',
+    },
+
+    productViewSetting: {
+      product: 'Sản phẩm',
+      fontSize: 'Kích cỡ chữ',
+      minimizeOnlyTextRow: 'Thu nhỏ hàng chữ',
+      hideTextRow: 'Ẩn hàng chữ',
+      narrowEmptyColumn: 'Thu nhỏ cột trống',
+      hideEmptyColumn: 'Ẩn cột trống',
+      shrinkProductTitle: 'Thu nhỏ tên món',
+      category: 'Nhóm sản phẩm',
+      mode: 'Chế độ',
+      horizontal: 'Ngang',
+      vertical: 'Dọc',
+      singleRowCategory: 'Chỉ 1 hàng',
+      differentWidth: 'Chiều rộng tuỳ biến',
+      differentHeight: 'Chiều cao tuỳ biến',
+      height: 'Cao',
+      width: 'Rộng',
+      sidebar: 'Thanh bên',
+      smallSidebar: 'Thu gọn',
+      save: 'Lưu'
     },
 
     orderHistory: {
@@ -229,7 +264,11 @@ module.exports = {
       enterTender: 'Hãy nhập số tiền thu của khách',
       cash: 'Tiền mặt',
       card: 'Thẻ',
-      multi: 'Tiền mặt & thẻ'
+      multi: 'Tiền mặt & thẻ',
+      multiPayment: 'Tiền mặt & thẻ',
+      total: 'Tổng hoá đơn',
+      cardPayment: 'Thẻ',
+      paymentMethod: 'Phương thức thanh toán',
     },
 
     settings: {
@@ -284,7 +323,7 @@ module.exports = {
       companyName: 'Tên công ty',
       address: 'Đường/số nhà',
       address2: 'Địa chỉ 2',
-      zipCode: 'Zip Code',
+      zipCode: 'Mã vùng',
       city: 'Thành phố',
       country: 'Quốc gia',
       tel: 'Điện thoại',
@@ -314,7 +353,8 @@ module.exports = {
       sound: 'Âm thanh',
       escPos: 'ESC POS',
       newSetting: 'New Setting',
-      useFor: 'Dùng để',
+      //printer
+      useFor: 'Dùng cho',
       entireReceiptNo: 'Number of Entire Receipt',
       multipleKitchenPrinter: 'Dùng nhiều máy in cho máy in trong bếp',
       multipleInvoicePrinter: 'Dùng nhiều máy in cho máy in hoá đơn',
@@ -323,14 +363,35 @@ module.exports = {
       networkPrinter: 'Máy in mạng',
       serialPrinter: 'Serial',
       usb: 'USB',
+      integrate: 'Tích hợp',
+      mergeItems: 'Gộp đồ sau khi in cho bếp',
       //payment
-      paymentName: 'Tên',
+      paymentName: 'Tên phương thức',
+      paymentNameExample: 'vd: visa, paypal, voucher',
       paymentIcon: 'Icon',
       //tax:
       noteLetter: 'Invoice Note Letter',
       createTax: 'Thêm thuế mới',
+      taxName: 'Tên thuế',
+      taxType: 'Loại thuế',
       noInternet: 'Mất kết nối internet',
-      noOnlineOrder: 'Không thể kết nối đến máy chủ đặt đồ online!'
+      noOnlineOrder: 'Không thể kết nối đến máy chủ đặt đồ online!',
+      generalSetting: {
+        deliveryOrderMode: 'Chế độ nhận đơn',
+        quickPayAction: 'Cài đặt nút thanh toán nhanh',
+        quickPayButton: 'Nút thanh toán/in nhanh',
+        onlyCheckoutPrintedItems: 'Chỉ thanh toán sản phẩm đã in',
+        usingVirtualPrinter: 'Dùng máy in ảo',
+        payButtonPrintsReceipt: 'Nút thanh toán in hoá đơn',
+        auto: 'Tự động',
+        pay: 'Thanh toán',
+        receipt: 'Hoá đơn'
+      },
+      keyboard: {
+        activeKeyboard: 'Bật phím ảo',
+        onlyShowInFirstPage: 'Chỉ hiện ở trang đầu',
+        showXButton: 'Hiển thị nút \'x\''
+      }
     },
 
     //dates
@@ -405,7 +466,8 @@ module.exports = {
         expansionColumn: 'Cột mở rộng',
         keyboardPosition: 'Vị trí bàn phím',
         rows: 'Hàng',
-        columns: 'Cột'
+        columns: 'Cột',
+        mustSelectProduct: 'Chọn món để chỉnh sửa nguyên liệu',
       },
 
       product: {
@@ -421,11 +483,12 @@ module.exports = {
       onlineOrders: 'Đơn hàng trực tuyến',
       pendingOrders: 'Đơn hàng đang xử lý',
       sentToKitchen: 'Gửi tới bếp',
+      sendToKitchen: 'Gửi vào bếp',
       dashboard: 'Tổng quan',
       orderDetails: 'Chi tiết đơn hàng',
       completedOrders: 'Đơn hàng đã hoàn thành',
       declinedOrders: 'Đơn hàng bị từ chối',
-      no: 'Không.',
+      no: 'Stt',
       customer: 'Khách hàng',
       address: 'Địa chỉ',
       amount: 'Số lượng',
@@ -440,6 +503,12 @@ module.exports = {
       noPending: 'Không có đơn hàng nào chờ xử lý ',
       noKitchen: 'Không có đơn hàng nào trong bếp',
       deliveryIn: 'Giao hàng trong { } phút ',
+      deliveryMenu: 'Thực đơn mang đi',
+      deliveryKeyboard: 'Bàn phím ảo',
+      externalRows: 'Thêm hàng phím',
+      resetOnlineOrders: 'Reset online orders',
+      importDemoData: 'Thêm dữ liệu mẫu',
+      templateData: 'Dữ liệu mẫu',
       pickUpIn: 'Tới nhận hàng trong { } phút',
       total: 'Toàn bộ',
       items: 'Mục',
@@ -491,7 +560,8 @@ module.exports = {
         title: 'Xác nhận thông tin giao dịch',
         message: "Chúng tôi đang xác nhận tiền cho đơn hàng này. Vui lòng chờ đợi..."
       },
-
+      timeToComplete: 'Thời gian hoàn thành (phút)',
+      deliveryNote: 'Ghi chú',
       settings: {
         onlineOrderSettings: 'Cài đặt đặt hàng trực tuyến',
         status: 'Tình trạng',
@@ -548,6 +618,18 @@ module.exports = {
         fri: 'Thứ sáu',
         sat: 'Thứ bảy',
         sun: 'Chủ nhật',
+      },
+      callSystem: {
+        modemNotConnected: 'Chưa kết nối Modem',
+        missed: 'Nhỡ',
+        noPendingCall: 'Không có cuộc gọi',
+        empty: 'Trống'
+      },
+      newReservationDialog: {
+        customerName: 'Tên khách hàng',
+        typeCustomerName: 'Nhập tên khách hàng',
+        typeCustomerPhoneNumber: 'Số điện thoại',
+        addNotes: 'Thêm ghi chú'
       }
     },
 
@@ -614,11 +696,43 @@ module.exports = {
       percent: 'Phần trăm',
       amount: 'Giá trị',
       discount: 'Giảm giá',
-      custom: 'Tuỳ chỉnh',
-      quickDiscount: 'Lịch sử giảm giá'
+      custom: 'Giảm giá tuỳ chỉnh',
+      quickDiscount: 'Lịch sử giảm giá',
+      removeDiscount: 'Xoá giảm giá'
     },
     editablePlan: {
       existedTableNameErrorMsg: 'Bàn "{tableName}" đã tồn tại. Vui lòng chon tên khác! Ví dụ: "{suggestionName}"'
+    },
+    customer: {
+      phone: 'Số điện thoại',
+      address: 'Địa chỉ',
+      name: 'Tên KH'
+    },
+    status: {
+      connected: 'Đã kết nối',
+      notConnected: 'Chưa kết nối'
+    },
+    permission: {
+      enterPasscode: 'Nhập mã đăng nhập',
+    },
+    modifier: {
+      group: 'Nhóm mới',
+      category: 'Mục mới',
+      item: 'Tuỳ chọn mới',
+      deleteItem: 'Xoá tuỳ chọn',
+      deleteGroup: 'Xoá nhóm',
+      deleteCategory: 'Xoá mục',
+      duplicate: 'Tạo bản sao',
+      mandatory: 'Bắt buộc',
+      selectOnlyOne:'Chỉ chọn 1',
+      name: 'Tên',
+      noOfFreeItems: 'Sl miễn phí',
+      price: 'Giá',
+      maxItems: 'Sl tối đa'
+    },
+    product: {
+      unit: 'Đơn vị',
+      name: 'Tên',
     }
   }
 }

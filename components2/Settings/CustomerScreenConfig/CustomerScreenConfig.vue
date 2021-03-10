@@ -83,13 +83,13 @@ export default {
                 <div class="col-3">
                   Effect:
                 </div>
-                <g-select class="col-9 ma-0" text-field-component="GTextFieldBs" items={effects} v-model={item.effect}></g-select>
+                <g-select class="col-9 ma-0" text-field-component="GTextFieldBs" items={effects} v-model={item.effect}/>
               </div>
               <div class="row-flex align-items-center">
                 <div class="col-3">
                   Duration(s):
                 </div>
-                <g-select class="col-9 ma-0" text-field-component="GTextFieldBs" items={durations} v-model={item.duration}></g-select>
+                <g-select class="col-9 ma-0" text-field-component="GTextFieldBs" items={durations} v-model={item.duration}/>
               </div>
             </div>
             <div class="config-table__btn--delete">

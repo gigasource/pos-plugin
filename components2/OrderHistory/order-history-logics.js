@@ -84,10 +84,10 @@ export const OrderHistoryDetailFactory = (props) => {
     return (order.value && order.value.staff) || []
   })
 
-  const createdUser = computed(() => {
+  const cashierUser = computed(() => {
     return (staffs.value && staffs.value.length && _.first(staffs.value).name) || ''
   })
-  const cashierUser = computed(() => {
+  const createdUser = computed(() => {
     return (staffs.value && staffs.value.length && _.last(staffs.value).name) || ''
   })
 
@@ -191,7 +191,7 @@ export async function updateLimit(val) {
 export async function setPaymentFilter(payment) {
   if (!payment) return
   const filter = {
-    title: 'Payment Method',
+    title: t('payment.paymentMethod'),
     text: payment,
     condition: { payment: { $elemMatch: { type: payment } } }
   }
@@ -248,7 +248,7 @@ export function getStaffName(staffs) {
   // TODO: unique the data format
   if (staffs) {
     if (Array.isArray(staffs)) {
-      return staffs.map(s => s.name).join(', ')
+      return _.uniq(staffs.map(s => s.name)).join(', ')
     } else {
       return staffs.name
     }

@@ -93,7 +93,8 @@ module.exports = {
       choose: 'Choose Position',
       tblTotal: 'Total',
       tblRow: 'Rows per page',
-      tblPage: 'Page'
+      tblPage: 'Page',
+      close: 'Close'
     },
 
     dialogs: {
@@ -102,6 +103,8 @@ module.exports = {
       other: 'Other',
       newPrice: 'New Price',
       discountBy: 'Discount by',
+      confirm: 'Confirm',
+      save: 'Save'
     },
 
     fnBtn: {
@@ -155,6 +158,9 @@ module.exports = {
       discount: 'Discount',
       tax: 'Tax',
       subtotal: 'Subtotal',
+      added: 'Added',
+      removed: 'Removed',
+      all: 'All'
     },
 
     //reports
@@ -202,7 +208,36 @@ module.exports = {
       savedList: 'Saved List',
       splitOrder: 'Split order',
       moveItem: 'Move items',
-      voucher: 'Voucher'
+      voucher: 'Voucher',
+      editScreen: 'Edit Screen',
+      takeAway: 'Take Away',
+      items: 'Items',
+      createdTime: 'Created time',
+      createdBy: 'Created by',
+      cashier: 'Cashier',
+      payment: 'Payment',
+    },
+
+    productViewSetting: {
+      product: 'Product',
+      fontSize: 'Font size',
+      minimizeOnlyTextRow: 'Minimize only text row',
+      hideTextRow: 'Hide text row',
+      narrowEmptyColumn: 'Narrow empty column',
+      hideEmptyColumn: 'Hide empty column',
+      shrinkProductTitle: 'Shrink product title',
+      category: 'Category',
+      mode: 'Mode',
+      horizontal: 'Horizontal',
+      vertical: 'Vertical',
+      singleRowCategory: 'Single row category',
+      differentWidth: 'Different width',
+      differentHeight: 'Different height',
+      height: 'Height',
+      width: 'Width',
+      sidebar: 'Sidebar',
+      smallSidebar: 'Small sidebar',
+      save: 'Save'
     },
 
     orderHistory: {
@@ -211,12 +246,13 @@ module.exports = {
       promotionalApplied: 'Promotional Applied',
       barcode: 'Barcode',
       amount: 'Amount',
-      staff: 'User',
+      staff: 'Staff',
       info: 'Info',
       filter: 'Filter',
       deleteOrder: 'Delete Order',
       type: 'Type',
-      tableNo: 'Table No.'
+      tableNo: 'Table No.',
+
     },
 
     payment: {
@@ -229,7 +265,12 @@ module.exports = {
       enterTender: 'Please enter tendered cash',
       cash: 'Cash',
       card: 'Card',
-      multi: 'Multi'
+      multi: 'Multi',
+      multiPayment: 'Multi Payment',
+      total: 'Total',
+      cardPayment: 'Card Payment',
+      paymentMethod: 'Payment method',
+
     },
 
     settings: {
@@ -323,14 +364,36 @@ module.exports = {
       networkPrinter: 'Network Printer',
       serialPrinter: 'Serial',
       usb: 'USB',
+      integrate: 'Integrate',
+      mergeItems: 'Merge items after printing to kitchen',
       //payment
-      paymentName: 'Name',
+      paymentName: 'Payment Name',
+      paymentNameExample: 'ex: visa, paypal, voucher',
       paymentIcon: 'Icon',
       //tax:
       noteLetter: 'Invoice Note Letter',
       createTax: 'Create New Tax',
+      taxName: 'Name',
+      taxType: 'Type',
       noInternet: 'No Internet',
-      noOnlineOrder: 'Unable to connect to online order service!'
+      noOnlineOrder: 'Unable to connect to online order service!',
+      generalSetting: {
+        deliveryOrderMode: 'Delivery order mode',
+        quickPayAction: 'Quick pay button\'s action',
+        quickPayButton: 'Quick pay/print button',
+        onlyCheckoutPrintedItems: 'Only checkout printed items',
+        usingVirtualPrinter: 'Using virtual printer',
+        payButtonPrintsReceipt: 'Pay button prints receipt',
+        onlyCheckoutPrintedItems: '',
+        auto: 'Auto',
+        pay: 'Pay',
+        receipt: 'Receipt'
+      },
+      keyboard: {
+        activeKeyboard: 'Active keyboard',
+        onlyShowInFirstPage: 'Show keyboard only in first page',
+        showXButton: 'Show \'x\' Button'
+      }
     },
 
     //dates
@@ -405,7 +468,8 @@ module.exports = {
         expansionColumn: 'Expansion Column',
         keyboardPosition: 'Keyboard Position',
         rows: 'Rows',
-        columns: 'Columns'
+        columns: 'Columns',
+        mustSelectProduct: 'Select product to edit ingredient',
       },
 
       product: {
@@ -421,6 +485,7 @@ module.exports = {
       onlineOrders: 'Online Orders',
       pendingOrders: 'Pending Orders',
       sentToKitchen: 'Sent to Kitchen',
+      sendToKitchen: 'Send to kitchen',
       dashboard: 'Dashboard',
       orderDetails: 'Order Details',
       completedOrders: 'Completed Orders',
@@ -440,6 +505,12 @@ module.exports = {
       noPending: 'No Pending orders yet',
       noKitchen: 'No orders sent to kitchen',
       deliveryIn: 'Delivery in {msg} minutes',
+      deliveryMenu: 'Delivery menu',
+      deliveryKeyboard: 'Delivery keyboard',
+      externalRows: 'External rows',
+      resetOnlineOrders: 'Reset online orders',
+      importDemoData: 'Import demo data',
+      templateData: 'Template data',
       pickUpIn: 'Pick up in {msg} minutes',
       total: 'Total',
       items: 'item(s)',
@@ -492,6 +563,8 @@ module.exports = {
         title: 'Capturing transaction',
         message: 'We\'re capturing money for this order. Please wait...'
       },
+      timeToComplete: 'Time to complete (minute)',
+      deliveryNote: 'Delivery notes',
 
       settings: {
         onlineOrderSettings: 'Online Order Settings',
@@ -549,8 +622,22 @@ module.exports = {
         fri: 'Fri',
         sat: 'Sat',
         sun: 'Sun',
+      },
+      callSystem: {
+        modemNotConnected: 'Modem not connected',
+        missed: 'Missed',
+        noPendingCall: 'No pending calls',
+        empty: 'Empty'
+      },
+      newReservationDialog: {
+        customerName: 'Customer Name',
+        typeCustomerName: 'Customer name',
+        typeCustomerPhoneNumber: 'Phone number',
+        addNotes: 'Notes'
       }
     },
+
+    orderDelivery: {},
 
     printing: {
       delivery: 'Delivery',
@@ -615,11 +702,42 @@ module.exports = {
       percent: 'Percent',
       amount: 'Amount',
       discount: 'Discount',
-      custom: 'Custom',
+      custom: 'Custom discount',
       quickDiscount: 'Quick discount'
     },
     editablePlan: {
       existedTableNameErrorMsg: 'Table "{tableName}" already existed, please select another name! E.g: "{suggestionName}"'
+    },
+    customer: {
+      phone: 'Phone',
+      address: 'Address',
+      name: 'Name'
+    },
+    status: {
+      connected: 'Connected',
+      notConnected: 'Not connected'
+    },
+    permission: {
+      enterPasscode: 'Enter your passcode',
+    },
+    modifier: {
+      group: 'Group',
+      category: 'Category',
+      item: 'Item',
+      deleteItem: 'Delete this item',
+      deleteGroup: 'Delete this modifier group',
+      deleteCategory: 'Delete this category',
+      duplicate: 'Duplicate this modifier group',
+      mandatory: 'Select one only',
+      selectOnlyOne: '',
+      name: 'Name',
+      noOfFreeItems: 'No. free items',
+      price: 'Price',
+      maxItems: 'Max items'
+    },
+    product: {
+      unit: 'Unit',
+      name: 'Name'
     }
   }
 }

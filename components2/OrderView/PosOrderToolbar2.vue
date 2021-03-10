@@ -82,7 +82,7 @@ export default {
             )
           }}/>
           <g-btn-bs icon="icon-delivery" background-color={order.takeAway ? '#2979FF' : '#fff'}
-                    onClick={toggleTakeAwayOrder}>Take Away
+                    onClick={toggleTakeAwayOrder}>{t('order.takeAway')}
           </g-btn-bs>
           <g-spacer/>
           {order.table && <g-btn-bs background-color="#1271ff" text-color="#fff"

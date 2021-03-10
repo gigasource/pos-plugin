@@ -182,9 +182,9 @@ export default {
           <input-number width="148" model-value={extraColumns.value} onUpdate:modelValue={changeExtraColumns}></input-number>
           <g-btn-bs elevation="2" icon="icon-redo" onClick={resetKeyboard}>{t('ui.reset')} </g-btn-bs>
         </div>
-        <g-checkbox v-model={active.value} label="Active Keyboard"/>
-        <g-checkbox v-model={onlyShowInFirstPage.value} label="Show Keyboard only in first page"/>
-        <g-checkbox v-model={showXButton.value} label="Show 'x' Button"/>
+        <g-checkbox v-model={active.value} label={t('settings.keyboard.activeKeyboard')}/>
+        <g-checkbox v-model={onlyShowInFirstPage.value} label={t('settings.keyboard.onlyShowInFirstPage')}/>
+        <g-checkbox v-model={showXButton.value} label={t('settings.keyboard.showXButton')}/>
         <g-dialog v-model={state.dialog} width="90%" height="90%" eager>
           { genScopeId(() => <div class="dialog">
             <div class="dialog-title">{t('restaurant.menuEdit.keyboardPosition')}</div>

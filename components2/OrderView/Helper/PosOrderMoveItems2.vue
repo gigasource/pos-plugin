@@ -10,7 +10,7 @@ import {
   prepareMoveItemsOrder,
   returnItem
 } from "../pos-logic-be";
-import {activeOrders, avatar, isMobile, username} from "../../AppSharedStates";
+import {activeOrders, avatar, isMobile, username, appHooks} from "../../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import {itemsRenderFactory} from "../pos-ui-shared";
 import {useRouter} from "vue-router";
@@ -54,6 +54,7 @@ export default {
       if (table) {
         await assignTableToOrder2(table);
         await hooks.emit('move-items');
+        appHooks.emit('orderChange')
         internalValue.value = false
       }
     }
@@ -67,7 +68,7 @@ export default {
           <div class="splitter__header row-flex align-items-center">
             {order2.items.length &&
             <div>
-              <span class="mr-2" style="font-weight: 700; font-size: 15px">Items:</span>
+              <span class="mr-2" style="font-weight: 700; font-size: 15px">{t('order.items')}:</span>
               <span style="font-weight: 600; font-size: 18px; color: #ff4452"> {order2.items.length} </span>
             </div>}
             <g-spacer/>
@@ -76,7 +77,7 @@ export default {
                       icon="icon-move-items"
                       background-color="#1271ff"
                       onClick={moveItems}>
-              <span>Move Items</span>
+              <span>{t('order.moveItem')}</span>
             </g-btn-bs>
           </div>
           <div class="splitter__content">

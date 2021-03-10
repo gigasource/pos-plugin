@@ -128,7 +128,7 @@ export async function onUpdateSelectingPrinterGroup() {
 export const printerTypes = [
   { name: 'networkPrinter', value: 'ip' },
   { name: 'usb', value: 'usb' },
-  { name: 'Integrate', value: 'integrate' }
+  { name: 'integrate', value: 'integrate' }
 ]
 
 export const selectingPrinter = ref(null)

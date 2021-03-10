@@ -1,21 +1,28 @@
-import {ref, computed} from "vue";
-import {isIOS} from "../../AppSharedStates";
+import { ref, computed } from 'vue';
+import { isIOS } from '../../AppSharedStates';
 import { calls, missedCalls } from '../../Settings/CallSystem/call-system-calls'
 import {
   deliveryOrderMode, favorites, openDialog, selectedCustomer, showKeyboard,
   name, phone, address, zipcode, street, house, city, selectedAddress, placeId, autocompleteAddresses,
   dialog, dialogMode, selectedCall
-} from "./delivery-shared";
-import _ from "lodash";
-import {v4 as uuidv4} from "uuid";
+} from './delivery-shared';
+import _ from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 import cms from 'cms';
-import {addProduct} from "../pos-logic-be";
+import { addProduct } from '../pos-logic-be';
 import { execGenScopeId } from '../../utils';
+import { useI18n } from 'vue-i18n';
 
 // TODO: split customerUiRender function into ->
 //  1. render selected customer
 //  2. render new for mobile
 //  3. render new customer for table
+
+let t
+
+export function init() {
+  ({ t } = useI18n())
+}
 
 export function deliveryCustomerUiFactory() {
 
@@ -54,6 +61,7 @@ export function deliveryCustomerUiFactory() {
   //fixme: autocomplete use in both PosOrderDelivery & this file
   const autocomplete = ref();
   const token = ref('')
+
   async function searchAddress(text) {
     if (!text || text.length < 4) return
     token.value = uuidv4()
@@ -184,8 +192,7 @@ export function deliveryCustomerUiFactory() {
             placeId: placeId.value
           }
         ]
-      }
-      else if (address.value) {
+      } else if (address.value) {
         customer.addresses = [{
           address: address.value,
           zipcode: zipcode.value,
@@ -205,14 +212,14 @@ export function deliveryCustomerUiFactory() {
   const renderFavorites = () => {
     if (deliveryOrderMode.value === 'tablet' || !showKeyboard.value)
       return (
-          <div class="delivery-info__favorite">
-            {favorites.value.map((f, i) =>
-                <div style={getRandomColor(i)} class="delivery-info__favorite-item"
-                     onClick={() => selectFavoriteProduct(f)}
-                     key={`favorite_${i}`}>
-                  {f.name}
-                </div>)}
-          </div>
+        <div class="delivery-info__favorite">
+          {favorites.value.map((f, i) =>
+            <div style={getRandomColor(i)} class="delivery-info__favorite-item"
+                 onClick={() => selectFavoriteProduct(f)}
+                 key={`favorite_${i}`}>
+              {f.name}
+            </div>)}
+        </div>
       )
   }
   const renderSelectedCustomer = () => {
@@ -220,8 +227,8 @@ export function deliveryCustomerUiFactory() {
       {
         selectedCustomer.value.addresses.map((item, i) =>
           <div
-              class={['delivery-info__customer-address', selectedAddress.value === i && 'delivery-info__customer-address--selected']}
-              onClick={() => selectedAddress.value = i}>
+            class={['delivery-info__customer-address', selectedAddress.value === i && 'delivery-info__customer-address--selected']}
+            onClick={() => selectedAddress.value = i}>
             <div class="row-flex align-items-center">
               <g-radio small v-model={selectedAddress.value} value={i} label={`Address ${i + 1}`}
                        color="#536DFE"/>
@@ -244,15 +251,15 @@ export function deliveryCustomerUiFactory() {
     </>
   }
   const renderNewCustomerForMobile = () => {
-    return  <>
+    return <>
       <div class="row-flex mt-3 w-100">
         <div style="flex: 1; margin-right: 2px">
-          <g-text-field outlined dense v-model={phone.value} label="Phone"
+          <g-text-field outlined dense v-model={phone.value} label={t('customer.phone')}
                         onClick={() => showKeyboard.value = true}
                         virtualEvent={isIOS.value}/>
         </div>
         <div style="flex: 1; margin-left: 2px">
-          <g-text-field outlined dense v-model={name.value} label="Name"
+          <g-text-field outlined dense v-model={name.value} label={t('customer.name')}
                         onClick={() => showKeyboard.value = true}
                         virtualEvent={isIOS.value}/>
         </div>
@@ -295,47 +302,47 @@ export function deliveryCustomerUiFactory() {
   }
   const renderCustomerDeliveryInfo = () => {
     return (
-        <div class="delivery-info__customer">
-          {
-            !isNewCustomer.value
-                ? renderSelectedCustomer()
-                : (deliveryOrderMode.value === 'mobile'
-                  ? renderNewCustomerForMobile()
-                  : renderNewCustomerForNonMobile())
-          }
-        </div>
+      <div class="delivery-info__customer">
+        {
+          !isNewCustomer.value
+            ? renderSelectedCustomer()
+            : (deliveryOrderMode.value === 'mobile'
+            ? renderNewCustomerForMobile()
+            : renderNewCustomerForNonMobile())
+        }
+      </div>
     )
   }
   const renderPendingCalls = () => {
     return (
-        <div class={['delivery-info__call', selectedCall.value && selectedCall.value.type === 'missed' ? 'b-red' : 'b-grey']}>
-          <div class="delivery-info__call--info">
-            <p class="fw-700 fs-small">
-              <g-icon size="16" class="mr-1">icon-call</g-icon>
-              {selectedCall.value.customer.phone}
-            </p>
-            <p class="fs-small text-grey-darken-1">{selectedCall.value.customer.name}</p>
-          </div>
-          <div class={['delivery-info__call-btn', orderType.value === 'pickup' && 'delivery-info__call-btn--selected']}
-              onClick={() => chooseCustomer('pickup')}>
-            <g-icon size="20">icon-take-away</g-icon>
-          </div>
-          <div class={['delivery-info__call-btn', orderType.value === 'delivery' && 'delivery-info__call-btn--selected']}
-              onClick={() => chooseCustomer('delivery')}>
-            <g-icon size="20">icon-delivery-scooter</g-icon>
-          </div>
-          <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall()}>
-            <g-icon color="white">clear</g-icon>
-          </div>
+      <div class={['delivery-info__call', selectedCall.value && selectedCall.value.type === 'missed' ? 'b-red' : 'b-grey']}>
+        <div class="delivery-info__call--info">
+          <p class="fw-700 fs-small">
+            <g-icon size="16" class="mr-1">icon-call</g-icon>
+            {selectedCall.value.customer.phone}
+          </p>
+          <p class="fs-small text-grey-darken-1">{selectedCall.value.customer.name}</p>
         </div>
+        <div class={['delivery-info__call-btn', orderType.value === 'pickup' && 'delivery-info__call-btn--selected']}
+             onClick={() => chooseCustomer('pickup')}>
+          <g-icon size="20">icon-take-away</g-icon>
+        </div>
+        <div class={['delivery-info__call-btn', orderType.value === 'delivery' && 'delivery-info__call-btn--selected']}
+             onClick={() => chooseCustomer('delivery')}>
+          <g-icon size="20">icon-delivery-scooter</g-icon>
+        </div>
+        <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall()}>
+          <g-icon color="white">clear</g-icon>
+        </div>
+      </div>
     )
   }
   const renderNoPendingCalls = () => {
     return (
-        <div class="delivery-info__call--empty">
-          <p class="fw-700">Empty</p>
-          <p class="text-grey-darken-1">No pending calls</p>
-        </div>
+      <div class="delivery-info__call--empty">
+        <p class="fw-700">Empty</p>
+        <p class="text-grey-darken-1">{t('onlineOrder.callSystem.noPendingCall')}</p>
+      </div>
     )
   }
   const menuMissed = ref(false)
@@ -344,44 +351,44 @@ export function deliveryCustomerUiFactory() {
       return
 
     return (
-        <g-menu v-model={menuMissed.value} top left nudge-top="5"
-                v-slots={{
-                  default: () => execGenScopeId(() =>
-                      <div class="menu-missed">
-                        {missedCalls.value.map((call, i) => (
-                            <div class="menu-missed__call" key={`missed_${i}`}>
-                              <div class="menu-missed__call--info">
-                                <p class="fw-700 fs-small">
-                                  <g-icon size="16" class="mr-1">icon-call</g-icon>
-                                  {call.customer.phone}
-                                </p>
-                                <p class="fs-small text-grey-darken-1">{call.customer.name}</p>
-                              </div>
-                              <div class={['delivery-info__call-btn']}
-                                   onClick={() => chooseMissedCustomer(i, 'pickup')}>
-                                <g-icon size="20">icon-take-away</g-icon>
-                              </div>
-                              <div class={['delivery-info__call-btn']}
-                                   onClick={() => chooseMissedCustomer(i, 'delivery')}>
-                                <g-icon size="20">icon-delivery-scooter</g-icon>
-                              </div>
-                              <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall(i)}>
-                                <g-icon color="white">clear</g-icon>
-                              </div>
-                            </div>
-                        ))}
-                      </div>
-                  ),
-                  activator: ({ on }) => execGenScopeId(() =>
-                      <div onClick={on.click} class={['delivery-info__call--missed', menuMissed.value && 'delivery-info__call--missed--selected']}>
-                        <b>Missed</b>
-                        <div class="delivery-info__call--missed-num">
-                          {missedCalls.value.length}
+      <g-menu v-model={menuMissed.value} top left nudge-top="5"
+              v-slots={{
+                default: () => execGenScopeId(() =>
+                  <div class="menu-missed">
+                    {missedCalls.value.map((call, i) => (
+                      <div class="menu-missed__call" key={`missed_${i}`}>
+                        <div class="menu-missed__call--info">
+                          <p class="fw-700 fs-small">
+                            <g-icon size="16" class="mr-1">icon-call</g-icon>
+                            {call.customer.phone}
+                          </p>
+                          <p class="fs-small text-grey-darken-1">{call.customer.name}</p>
+                        </div>
+                        <div class={['delivery-info__call-btn']}
+                             onClick={() => chooseMissedCustomer(i, 'pickup')}>
+                          <g-icon size="20">icon-take-away</g-icon>
+                        </div>
+                        <div class={['delivery-info__call-btn']}
+                             onClick={() => chooseMissedCustomer(i, 'delivery')}>
+                          <g-icon size="20">icon-delivery-scooter</g-icon>
+                        </div>
+                        <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall(i)}>
+                          <g-icon color="white">clear</g-icon>
                         </div>
                       </div>
-                  )
-                }}>
-        </g-menu>
+                    ))}
+                  </div>
+                ),
+                activator: ({ on }) => execGenScopeId(() =>
+                  <div onClick={on.click} class={['delivery-info__call--missed', menuMissed.value && 'delivery-info__call--missed--selected']}>
+                    <b>{t('onlineOrder.callSystem.missed')}</b>
+                    <div class="delivery-info__call--missed-num">
+                      {missedCalls.value.length}
+                    </div>
+                  </div>
+                )
+              }}>
+      </g-menu>
     )
   }
 
@@ -389,15 +396,15 @@ export function deliveryCustomerUiFactory() {
   const customerUiRender = () => (
     <div class="delivery-info">
       <div class="delivery-info--upper">
-        { renderFavorites() }
-        { renderCustomerDeliveryInfo() }
+        {renderFavorites()}
+        {renderCustomerDeliveryInfo()}
       </div>
 
       <div class="delivery-info--lower">
         {
-          (selectedCall.value &&selectedCall.value.customer)
-              ? renderPendingCalls()
-              : [ renderNoPendingCalls(), renderMissedCalls() ]
+          (selectedCall.value && selectedCall.value.customer)
+            ? renderPendingCalls()
+            : [renderNoPendingCalls(), renderMissedCalls()]
         }
       </div>
     </div>
@@ -409,11 +416,11 @@ export function deliveryCustomerUiFactory() {
                        v-slots={{
                          input: () =>
                            <div class="row-flex flex-wrap justify-around">
-                             <pos-textfield-new style="width: 48%" label="Name"
+                             <pos-textfield-new style="width: 48%" label={t('customer.name')}
                                                 v-model={name.value}/>
-                             <pos-textfield-new style="width: 48%" label="Phone"
+                             <pos-textfield-new style="width: 48%" label={t('customer.phone')}
                                                 v-model={phone.value}/>
-                             <g-combobox style="width: 98%" label="Address" v-model={placeId.value} dense
+                             <g-combobox style="width: 98%" label={t('customer.address')} v-model={placeId.value} dense
                                          text-field-component="PosTextfieldNew" clearable
                                          virtualEvent={isIOS.value} skip-search
                                          items={autocompleteAddresses.value} onUpdate:searchText={debounceSearchAddress}
@@ -469,4 +476,4 @@ export function deliveryCustomerUiFactory() {
   }
 }
 
-export const { customerUiRender : renderCustomerSection, renderDialogs : renderCustomerDialogs, orderType } =  deliveryCustomerUiFactory()
+export const { customerUiRender: renderCustomerSection, renderDialogs: renderCustomerDialogs, orderType } = deliveryCustomerUiFactory()

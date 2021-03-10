@@ -37,22 +37,22 @@ export default {
         </div>
     const renderTableNo = () => (order.value.table) &&
         <div class="pl-2 flex-grow-1">
-          <div class="order-title">Table No</div>
+          <div class="order-title">{t('restaurant.table')}</div>
           <div class="order-id">{order.value.table}</div>
         </div>
     const renderCreatedTime = () =>
         <div class="row-flex">
-          <div class="flex-grow-1" style="opacity: 0.5">Created time</div>
+          <div class="flex-grow-1" style="opacity: 0.5">{t('order.createdTime')}</div>
           <div> {formatDate(order.value.date)} </div>
         </div>
     const renderStaff = () => (staffs.value.length) &&
         <>
           <div class="row-flex">
-            <div class="flex-grow-1" style="opacity: 0.5">Created by</div>
+            <div class="flex-grow-1" style="opacity: 0.5">{t('order.createdBy')}</div>
             <span class="ta-right"> {createdUser.value} </span>
           </div>
           <div class="row-flex">
-            <div class="flex-grow-1" style="opacity: 0.5">Cashier</div>
+            <div class="flex-grow-1" style="opacity: 0.5">{t('order.cashier')}</div>
             <span class="ta-right"> {cashierUser.value} </span>
           </div>
         </>
@@ -108,7 +108,7 @@ export default {
 
     const renderPayment = () =>
         <div class="row-flex align-items-center" style="justify-content: space-between; text-transform: capitalize">
-          <span>Payment</span>
+          <span>{t('order.payment')}</span>
           {
             (payment.value.length > 1) ?
                 <div class="row-flex">

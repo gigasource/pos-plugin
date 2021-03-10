@@ -358,7 +358,6 @@ export async function assignTableToOrder2(table) {
 }
 
 export function cancelSplitOrder() {
-  delete order.splitId;
   clearSecondOrder();
   //restore
   order.items.splice(0, order.items.length, ...tempItemsSnapshot);
@@ -516,6 +515,7 @@ hooks.on('togglePayPrintBtn:step2', async (cb) => {
 
 export const disablePay = computed(() => {
   if (!order.table) return false;
+  if (!order.items.length) return true
   if (onlyCheckoutPrintedItems.value) {
     return hasOrderChange.value;
   }
@@ -524,6 +524,7 @@ export const disablePay = computed(() => {
 
 hooks.on('printOrder', async () => {
   order.date = new Date();
+  addUser(order, username.value, order.date)
   clearNullQuantityItems(order);
   mergeSameItems(order);
   await makeActionList();
@@ -624,6 +625,7 @@ hooks.on('pay-split', async (printInvoice) => {
   //todo: discount on split
   //todo: isMobile : show receipt
   order2.date = new Date();
+  addUser(order, username.value, order.date);
   await genMaxId(order2);
   await genBookingNumber(order2);
   if (empty) {

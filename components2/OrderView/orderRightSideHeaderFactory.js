@@ -1,4 +1,5 @@
 import {editModeOL, saveOrderLayoutSetting, showSplitBtn} from "./order-layout-setting-logic";
+import { Transition } from 'vue'
 import {avatar, isMobile, username} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import {
@@ -69,7 +70,7 @@ export function orderRightSideHeader(props, {emit}) {
         <g-icon>icon-split_check_2</g-icon>
       </g-btn-bs>}
 
-      <transition name="fade">
+      <Transition name="fade">
         {!(isMobile.value && showSplitBtn.value && payPrintMode.value === 'pay' && showIcon.value) &&
         genScopeId(() => <>
           <div class="row-flex align-items-center flex-grow-1">
@@ -84,12 +85,12 @@ export function orderRightSideHeader(props, {emit}) {
               default: () => <g-expand-x-transition>
                 {genScopeId(() => (
                   <div class="order-detail__menu">
-                    <g-btn-bs icon="icon-blue-cog" onClick={() => editModeOL.value = true}>Edit Screen</g-btn-bs>
+                    <g-btn-bs icon="icon-blue-cog" onClick={() => editModeOL.value = true}>{t('order.editScreen')}</g-btn-bs>
                     <g-btn-bs icon="icon-voucher" onClick={showVoucherDialog}>{t('order.voucher')}</g-btn-bs>
                     <g-btn-bs icon="icon-move-items" onClick={moveItems}>{t('order.moveItem')}</g-btn-bs>
 
                     <g-btn-bs icon="icon-delivery" background-color={order.takeAway ? '#2979FF' : '#FFF'}
-                              onClick={toggleTakeAwayOrder}>Take Away
+                              onClick={toggleTakeAwayOrder}>{t('order.takeAway')}
                     </g-btn-bs>
                     <g-btn-bs icon="icon-split_check_2" onClick={splitOrder}>{t('order.splitOrder')}</g-btn-bs>
                     {actionList.value.length > 0 && <g-btn-bs disabled={!hasOrderChange.value} icon="icon-print"
@@ -117,7 +118,7 @@ export function orderRightSideHeader(props, {emit}) {
           </div>
         </>)()
         }
-      </transition>
+      </Transition>
       <g-spacer/>
       {renderPayBtn()}
 

@@ -141,12 +141,12 @@ export default {
           <g-table striped fixed-header style="flex: 1">
             <thead>
             <tr style="font-size: 12px;">
-              <th class="ta-left pl-2" style={thStyle}>Name</th>
-              <th class="ta-right pr-2" style={[qtyStyle, thStyle]}>Unit</th>
+              <th class="ta-left pl-2" style={thStyle}>{t('product.name')}</th>
+              <th class="ta-right pr-2" style={[qtyStyle, thStyle]}>{t('product.unit')}</th>
               {(type.value === 'all' || type.value === 'add') &&
-              <th class="ta-right pr-2" style={[qtyStyle, thStyle]}>Added</th>}
+              <th class="ta-right pr-2" style={[qtyStyle, thStyle]}>{t('common.added')}</th>}
               {(type.value === 'all' || type.value === 'remove') &&
-              <th class="ta-right pr-2" style={[qtyStyle, thStyle]}>Removed</th>}
+              <th class="ta-right pr-2" style={[qtyStyle, thStyle]}>{t('common.removed')}</th>}
             </tr>
             </thead>
             <tbody>

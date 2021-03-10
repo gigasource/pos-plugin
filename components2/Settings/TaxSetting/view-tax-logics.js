@@ -12,7 +12,7 @@ export const selectedTaxCategory = ref(null)
 
 export const taxCategoryHooks = new Hooks()
 
-taxCategoryHooks.on('updateListTaxCategories', async() => {
+taxCategoryHooks.on('updateListTaxCategories', async () => {
   listTaxCategories.value = await getListTaxCategory()
 })
 
@@ -101,13 +101,14 @@ export const TaxCategoryDialogLogicsFactory = (props, { emit }) => {
   function open(_isEditing) {
     isEditing.value = _isEditing
     if (isEditing.value && selectedTaxCategory.value) {
-      ({value: taxValue.value, name: taxName.value, type: taxType.value} = selectedTaxCategory.value)
+      ({ value: taxValue.value, name: taxName.value, type: taxType.value } = selectedTaxCategory.value)
       taxValue.value = taxValue.value.toString()
     } else {
       [taxValue.value, taxName.value, taxType.value] = ['', '', ''];
     }
     internalValue.value = true;
   }
+
   return {
     taxValue,
     taxName,

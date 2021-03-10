@@ -91,9 +91,13 @@ export const FnBtns = {
     }
   }
 }
-export const FnBtnNames = computed(() => Object.keys(FnBtns))
+export const FnBtnNames = computed(() => {
+  return Object.keys(FnBtns).filter((name) => {
+    return !fnBtnSetting.value.find(btn => btn.fn === name)
+  })
+})
 export const fnBtnSetting = computed(() => {
-    return (posSettings.value && posSettings.value.rightFunctionButtons) || []
+  return (posSettings.value && posSettings.value.rightFunctionButtons) || []
 })
 
 async function updatePosSetting(val) {
@@ -104,9 +108,9 @@ async function updatePosSetting(val) {
 //<editor-fold desc="dialog logic">
 const limitValue = {
   MIN_ROW: 1,
-  MAX_ROW: 12,
+  MAX_ROW: 7,
   MIN_COL: 1,
-  MAX_COL: 2
+  MAX_COL: 3
 }
 export function removeBtnFn(name) {
   const fnBtnIndex = fnBtnSetting.value.findIndex(fnBtn => fnBtn.fn === name)

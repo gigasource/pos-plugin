@@ -1,5 +1,5 @@
 <script>
-import { KeepAlive, Component, h} from 'vue'
+import { h, KeepAlive } from 'vue'
 import viewGeneral from './viewGeneral';
 import viewCompany from './viewCompany';
 import viewPayment from './PaymentSetting/viewPayment';
@@ -16,25 +16,26 @@ import CustomerScreenConfig from './CustomerScreenConfig/CustomerScreenConfig';
 import OnlineOrderSetting from './OnlineOrderSetting/OnlineOrderSetting';
 import PosOrderDeliveryConfig from './DeliverySetting/PosOrderDeliveryConfig'
 import CustomerLedDisplay from './CustomerScreenConfig/CustomerLedDisplay';
-import { VIEWS, currentSettingView } from './settings-shared';
+import { currentSettingView, VIEWS } from './settings-shared';
 
 export default {
-  components: { CustomerLedDisplay, PosOrderDeliveryConfig, OnlineOrderSetting, CustomerScreenConfig, CallSystem, PosSettingsScreenToolbar, viewGeneral, viewUser, viewPayment, viewTax, viewCompany, viewUserToolbar, viewTaxToolbar, viewPaymentToolbar, PosSettingsScreenSidebar},
+  components: { CustomerLedDisplay, PosOrderDeliveryConfig, OnlineOrderSetting, CustomerScreenConfig, CallSystem, PosSettingsScreenToolbar, viewGeneral, viewUser, viewPayment, viewTax, viewCompany, viewUserToolbar, viewTaxToolbar, viewPaymentToolbar, PosSettingsScreenSidebar },
   setup() {
-    const GeneralSettingView = <viewGeneral style="flex: 1"/>
-    const UserSettingView = <viewUser style="flex: 1"/>
-    const CompanyInfoSettingView =<viewCompany style="flex: 1"/>
-    const PaymentSettingView = <viewPayment style="flex: 1"/>
-    const TaxSettingView = <viewTax style="flex: 1"/>
-    const CallSystemSettingView = <CallSystem style="flex: 1"/>
-    const CustomerScreenSettingView = <CustomerScreenConfig style="flex: 1"/>
-    const OnlineOrderSettingView = <OnlineOrderSetting style="flex: 1"/>
-    const DeliverySettingView = <PosOrderDeliveryConfig style="flex: 1"/>
-    const UserToolbar = <viewUserToolbar></viewUserToolbar>
-    const PaymentToolbar = <viewPaymentToolbar></viewPaymentToolbar>
-    const TaxToolbar = <viewTaxToolbar></viewTaxToolbar>
-    const CustomerLedDisplayView = <customer-led-display/>
+    const GeneralSettingView = <viewGeneral style="flex: 1" key="generalSettingView"/>
+    const UserSettingView = <viewUser style="flex: 1" key="userSetttingView"/>
+    const CompanyInfoSettingView = <viewCompany style="flex: 1" key="companyInfoSettingView"/>
+    const PaymentSettingView = <viewPayment style="flex: 1" key="paymentSettingView"/>
+    const TaxSettingView = <viewTax style="flex: 1" key="taxSettingView"/>
+    const CallSystemSettingView = <CallSystem style="flex: 1" key="callSystemSettingView"/>
+    const CustomerScreenSettingView = <CustomerScreenConfig style="flex: 1" key="customerScreenSettingView"/>
+    const OnlineOrderSettingView = <OnlineOrderSetting style="flex: 1" key="onlineOrderSettingView"/>
+    const DeliverySettingView = <PosOrderDeliveryConfig style="flex: 1" key="deliverySettingView"/>
+    const UserToolbar = <viewUserToolbar/>
+    const PaymentToolbar = <viewPaymentToolbar/>
+    const TaxToolbar = <viewTaxToolbar/>
+    const CustomerLedDisplayView = <customer-led-display key="customerLedDisplayView"/>
     let views = {}
+
     views[VIEWS.GENERAL_SETTING_VIEW] = GeneralSettingView
     views[VIEWS.USER_SETTING_VIEW] = UserSettingView
     views[VIEWS.COMPANY_INFO_SETTING_VIEW] = CompanyInfoSettingView
@@ -52,18 +53,17 @@ export default {
       TaxSettingView: TaxToolbar
     }
     return genScopeId(() =>
-      <div class="setting">
-        <div class="setting-main">
-          <PosSettingsScreenSidebar>
-          </PosSettingsScreenSidebar>
-          <KeepAlive>
-            {h(views[currentSettingView.value])}
-          </KeepAlive>
-        </div>
-        <PosSettingsScreenToolbar>
-          {h(toolbars[currentSettingView.value])}
-        </PosSettingsScreenToolbar>
-      </div>)
+        <div class="setting">
+          <div class="setting-main">
+            <PosSettingsScreenSidebar/>
+            <KeepAlive>
+              {h(views[currentSettingView.value])}
+            </KeepAlive>
+          </div>
+          <PosSettingsScreenToolbar>
+            {h(toolbars[currentSettingView.value])}
+          </PosSettingsScreenToolbar>
+        </div>)
   }
 }
 </script>

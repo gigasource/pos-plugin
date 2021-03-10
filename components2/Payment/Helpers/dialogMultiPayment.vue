@@ -110,9 +110,9 @@ export default {
         <g-card class={['dialog-multi-payment', rotate && 'rotate']}>
           {execGenScopeId(() => <>
             <div class="dialog-multi-payment__header">
-              <span class="dialog-multi-payment__header-title">Multi Payment</span>
+              <span class="dialog-multi-payment__header-title">{t('payment.multiPayment')}</span>
               <g-spacer/>
-              <span class="mr-1">Total:</span>
+              <span class="mr-1">{t('payment.total')}:</span>
               <span class="dialog-multi-payment__header-number">
                 {t('common.currency', locale.value)} {props.total}
               </span>
@@ -124,7 +124,7 @@ export default {
                               style="border: 1px solid #bdbdbd"
                               onClick={() => click(`${item.type}-textfield`)}>
                       {item.icon && <g-icon size="20">{item.icon}</g-icon>}
-                      <span class="ml-2" style="text-transform: capitalize">{item.type}</span>
+                      <span class="ml-2" style="text-transform: capitalize">{t(`payment.${item.type}`)}</span>
                     </g-btn-bs>
                     {item.type === 'cash' ?
                         <pos-textfield-new clearable ref={cashTextfieldRef}
@@ -155,7 +155,7 @@ export default {
             <g-btn-bs background-color="#2979ff" text-color="#fff" class="w-100 mt-2" disabled={disableConfirmMulti.value}
                       style="min-height: 25px"
                       onClick={submit}>
-              Confirm
+              {t('dialogs.confirm')}
             </g-btn-bs>
           </>)}
         </g-card>
