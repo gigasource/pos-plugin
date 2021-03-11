@@ -10,9 +10,9 @@ import {
   dialogMode,
   favorites,
   house,
-  name,
+  customerName,
   openDialog,
-  phone,
+  customerPhoneNr,
   placeId,
   selectedAddress,
   selectedCall,
@@ -99,24 +99,20 @@ export function deliveryCustomerUiFactory() {
     }
   }
 
-  function chooseCustomer(type) {
-    orderType.value = type
+  function prepareOrderForCallingCustomer(_orderType) {
+    orderType.value = _orderType
     selectedCustomer.value = calls.value[0].customer
-    name.value = selectedCustomer.value.name === 'New customer' ? '' : selectedCustomer.value.name
-    phone.value = selectedCustomer.value.phone
   }
 
-  function chooseMissedCustomer(index, type) {
-    orderType.value = type
+  function prepareOrderForMissedCustomer(missedCallIndex, _orderType) {
+    orderType.value = _orderType
     const call = {
-      ...missedCalls.value[index],
+      ...missedCalls.value[missedCallIndex],
       type: 'missed'
     }
     calls.value.unshift(call)
-    missedCalls.value.splice(index, 1)
+    missedCalls.value.splice(missedCallIndex, 1)
     selectedCustomer.value = call.customer
-    name.value = selectedCustomer.value.name === 'New customer' ? '' : selectedCustomer.value.name
-    phone.value = selectedCustomer.value.phone
   }
 
   async function selectAutocompleteAddress(place_id) {
@@ -147,8 +143,8 @@ export function deliveryCustomerUiFactory() {
   function addNewCustomer() {
     if (dialogMode.value === 'add') {
       Object.assign(selectedCustomer.value, {
-        name: name.value,
-        phone: phone.value,
+        name: customerName.value,
+        phone: customerPhoneNr.value,
         addresses: [
           ...!!selectedCustomer.value.addresses ? _.cloneDeep(selectedCustomer.value.addresses) : [],
           {
@@ -164,7 +160,7 @@ export function deliveryCustomerUiFactory() {
       selectedAddress.value = selectedCustomer.value.addresses.length - 1
     }
     if (dialogMode.value === 'edit') {
-      selectedCustomer.value['name'] = name.value
+      selectedCustomer.value['name'] = customerName.value
       selectedCustomer.value.addresses.splice(selectedAddress.value, 1, {
         address: address.value,
         zipcode: zipcode.value,
@@ -191,10 +187,10 @@ export function deliveryCustomerUiFactory() {
   // this only used when add new customer
   function submitCustomer() {
     //todo: fix this function logic
-    if (name.value && phone.value) {
+    if (customerName.value && customerPhoneNr.value) {
       let customer = {}
-      customer.name = name.value
-      customer.phone = phone.value
+      customer.name = customerName.value
+      customer.phone = customerPhoneNr.value
       if (selectedCustomer.value.addresses) {
         customer.addresses = [
           ...selectedCustomer.value.addresses,
@@ -270,12 +266,12 @@ export function deliveryCustomerUiFactory() {
     return <>
       <div class="row-flex mt-3 w-100">
         <div style="flex: 1; margin-right: 2px">
-          <g-text-field outlined dense v-model={phone.value} label={t('customer.phone')}
+          <g-text-field outlined dense v-model={customerPhoneNr.value} label={t('customer.phone')}
                         onClick={() => showKeyboard.value = true}
                         virtualEvent={isIOS.value}/>
         </div>
         <div style="flex: 1; margin-left: 2px">
-          <g-text-field outlined dense v-model={name.value} label={t('customer.name')}
+          <g-text-field outlined dense v-model={customerName.value} label={t('customer.name')}
                         onClick={() => showKeyboard.value = true}
                         virtualEvent={isIOS.value}/>
         </div>
@@ -304,7 +300,7 @@ export function deliveryCustomerUiFactory() {
   }
   const renderNewCustomerForNonMobile = () => {
     return <>
-      <g-text-field-bs class="bs-tf__pos" label="Name" v-model={name.value}
+      <g-text-field-bs class="bs-tf__pos" label="Name" v-model={customerName.value}
                        onClick={() => openDialog('add')} v-slots={{
         'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
       }}>
@@ -340,11 +336,11 @@ export function deliveryCustomerUiFactory() {
             <p class="fs-small text-grey-darken-1">{selectedCall.value.customer.name}</p>
           </div>
           <div class={['delivery-info__call-btn', orderType.value === 'pickup' && 'delivery-info__call-btn--selected']}
-               onClick={() => chooseCustomer('pickup')}>
+               onClick={() => prepareOrderForCallingCustomer('pickup')}>
             <g-icon size="20">icon-take-away</g-icon>
           </div>
           <div class={['delivery-info__call-btn', orderType.value === 'delivery' && 'delivery-info__call-btn--selected']}
-               onClick={() => chooseCustomer('delivery')}>
+               onClick={() => prepareOrderForCallingCustomer('delivery')}>
             <g-icon size="20">icon-delivery-scooter</g-icon>
           </div>
           <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall()}>
@@ -384,13 +380,13 @@ export function deliveryCustomerUiFactory() {
                           </div>
                           <div class={['delivery-info__call-btn']} onClick={() => {
                             menuMissed.value = false;
-                            chooseMissedCustomer(i, 'pickup');
+                            prepareOrderForMissedCustomer(i, 'pickup');
                           }}>
                             <g-icon size="20">icon-take-away</g-icon>
                           </div>
                           <div class={['delivery-info__call-btn']} onClick={() => {
                             menuMissed.value = false;
-                            chooseMissedCustomer(i, 'delivery');
+                            prepareOrderForMissedCustomer(i, 'delivery');
                           }}>
                             <g-icon size="20">icon-delivery-scooter</g-icon>
                           </div>
@@ -442,8 +438,8 @@ export function deliveryCustomerUiFactory() {
         v-slots={{
           input: () =>
               <div class="row-flex flex-wrap justify-around">
-                <pos-textfield-new style="width: 48%" label={t('customer.name')} v-model={name.value}/>
-                <pos-textfield-new style="width: 48%" label={t('customer.phone')} v-model={phone.value}/>
+                <pos-textfield-new style="width: 48%" label={t('customer.name')} v-model={customerName.value}/>
+                <pos-textfield-new style="width: 48%" label={t('customer.phone')} v-model={customerPhoneNr.value}/>
                 <g-combobox
                     style="width: 98%" label={t('customer.address')} v-model={placeId.value} dense
                     text-field-component="PosTextfieldNew" clearable
