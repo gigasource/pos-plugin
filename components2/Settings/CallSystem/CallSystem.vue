@@ -1,7 +1,7 @@
 <script>
 import { computed } from 'vue'
-import { CALL_SYSTEM_MODES } from '../../../components/constants';
 import {
+  CALL_SYSTEM_MODES,
   callSystemStatus,
   changeNotSavedWarningMessage,
   currentCallSystemMode,
