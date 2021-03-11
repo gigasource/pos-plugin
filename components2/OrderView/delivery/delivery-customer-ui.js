@@ -25,9 +25,8 @@ export function init() {
 }
 
 export function deliveryCustomerUiFactory() {
-
+  const colors = ['#FBE4EC', '#84FFFF', '#80D8FF', '#FFF59D', '#B2FF59', '#E1BEE7', '#FFAB91', '#B39DDB', '#BCAAA4', '#1DE9B6']
   function getRandomColor(i) {
-    const colors = ['#FBE4EC', '#84FFFF', '#80D8FF', '#FFF59D', '#B2FF59', '#E1BEE7', '#FFAB91', '#B39DDB', '#BCAAA4', '#1DE9B6']
     return 'background-color: ' + colors[i]
   }
 
@@ -75,10 +74,9 @@ export function deliveryCustomerUiFactory() {
 
   const orderType = ref();
 
-  function deleteCall(index) {
-    //index => missed call || first call
-    if (index) {
-      missedCalls.value.splice(index, 1)
+  function deleteCall(missedCallIndex) {
+    if (missedCallIndex != null) {
+      missedCalls.value.splice(missedCallIndex, 1)
     } else {
       calls.value.splice(0, 1)
     }

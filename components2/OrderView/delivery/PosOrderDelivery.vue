@@ -683,7 +683,6 @@ export default {
         border-radius: 4px;
         background: #FFFFFF;
         border: 0.4px solid #9E9E9E;
-        margin-right: 8px;
         line-height: 1.2;
         font-size: 14px;
       }
