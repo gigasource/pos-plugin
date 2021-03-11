@@ -31,6 +31,7 @@ module.exports = {
     {loader: {type: 'route'}, filePath: 'components2/EndOfDay/PosEndOfDayReport.vue', name: 'PosEndOfDayReport', path: '/pos-eod-report'},
     {loader: {type: 'route'}, filePath: 'components2/MonthReport/posMonthReportView.vue', name: 'posMonthReportView', path: '/pos-month-report'},
     {loader: {type: 'route'}, filePath: 'components2/ReportViews/StaffReportView.vue', name: 'StaffReport', path: '/pos-staff-report'},
+    {loader: {type: 'route'}, filePath: 'components2/Tutorial/Tutorial.vue', name: 'StaffReport', path: '/pos-tutorial'},
     //
     {loader: {type: 'init '}, path: 'composition/plugin-init.js'},
     {loader: {type: 'vue-singleton'}, path: 'components/Store/Snackbar.vue',},
