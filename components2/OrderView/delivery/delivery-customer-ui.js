@@ -76,12 +76,12 @@ export function deliveryCustomerUiFactory() {
   let debounceSearchAddress = _.debounce(searchAddress, 300);
   //fixme: autocomplete use in both PosOrderDelivery & this file
   const autocomplete = ref();
-  const token = ref('')
+  let googlePlaceSessionToken = ''
 
   async function searchAddress(text) {
     if (!text || text.length < 4) return
-    token.value = uuidv4()
-    cms.socket.emit('searchPlace', text, token.value, places => {
+    googlePlaceSessionToken = uuidv4()
+    cms.socket.emit('searchPlace', text, googlePlaceSessionToken, places => {
       autocompleteAddresses.value = places.map(p => ({
         text: p.description,
         value: p.place_id,
@@ -122,7 +122,7 @@ export function deliveryCustomerUiFactory() {
   async function selectAutocompleteAddress(place_id) {
     placeId.value = place_id
     if (autocompleteAddresses.value.find(item => item.value === place_id)) {
-      cms.socket.emit('getPlaceDetail', place_id, token.value, data => {
+      cms.socket.emit('getPlaceDetail', place_id, googlePlaceSessionToken, data => {
         if (!_.isEmpty(data)) {
           for (const component of data.address_components) {
             if (component.types.includes('street_number')) {
