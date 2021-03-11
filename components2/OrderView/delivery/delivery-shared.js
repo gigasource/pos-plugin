@@ -73,9 +73,7 @@ function resetOrderData() {
 
 export function clearDeliveryOrder() {
   resetOrderData()
-  selectedCustomer.value = {}
-  customerName.value = ''
-  customerPhoneNr.value = ''
+  clearCustomer()
   address.value = ''
   house.value = ''
   street.value = ''

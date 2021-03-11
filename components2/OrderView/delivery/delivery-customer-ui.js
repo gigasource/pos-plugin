@@ -5,14 +5,14 @@ import {
   address,
   autocompleteAddresses,
   city,
+  customerName,
+  customerPhoneNr,
   deliveryOrderMode,
   dialog,
   dialogMode,
   favorites,
   house,
-  customerName,
   openDialog,
-  customerPhoneNr,
   placeId,
   selectedAddress,
   selectedCall,
@@ -118,24 +118,25 @@ export function deliveryCustomerUiFactory() {
   async function selectAutocompleteAddress(place_id) {
     placeId.value = place_id
     if (autocompleteAddresses.value.find(item => item.value === place_id)) {
-      cms.socket.emit('getPlaceDetail', place_id, googlePlaceSessionToken, data => {
-        if (!_.isEmpty(data)) {
-          for (const component of data.address_components) {
-            if (component.types.includes('street_number')) {
-              house.value = component.long_name
-            }
-            if (component.types.includes('route')) {
-              street.value = component.long_name
-            }
-            if (component.types.includes('postal_code')) {
-              zipcode.value = component.long_name
-            }
-            if (component.types.includes('locality') || component.types.includes('administrative_area_level_1')) {
-              city.value = component.long_name
-            }
-          }
-          address.value = data.name
+      cms.socket.emit('getPlaceDetail', place_id, googlePlaceSessionToken, placeDetail => {
+        if (_.isEmpty(placeDetail)) {
+          return
         }
+        for (const component of placeDetail.address_components) {
+          if (component.types.includes('street_number')) {
+            house.value = component.long_name
+          }
+          if (component.types.includes('route')) {
+            street.value = component.long_name
+          }
+          if (component.types.includes('postal_code')) {
+            zipcode.value = component.long_name
+          }
+          if (component.types.includes('locality') || component.types.includes('administrative_area_level_1')) {
+            city.value = component.long_name
+          }
+        }
+        address.value = placeDetail.name
       })
     }
   }
@@ -300,16 +301,18 @@ export function deliveryCustomerUiFactory() {
   }
   const renderNewCustomerForNonMobile = () => {
     return <>
-      <g-text-field-bs class="bs-tf__pos" label="Name" v-model={customerName.value}
-                       onClick={() => openDialog('add')} v-slots={{
-        'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
-      }}>
-      </g-text-field-bs>
-      <g-text-field-bs class="bs-tf__pos" label="Address" v-model={address.value}
-                       onClick={() => openDialog('add')} v-slots={{
-        'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
-      }}>
-      </g-text-field-bs>
+      <g-text-field-bs
+          class="bs-tf__pos" label="Name" v-model={customerName.value}
+          onClick={() => openDialog('add')}
+          v-slots={{
+            'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
+          }}/>
+      <g-text-field-bs
+          class="bs-tf__pos" label="Address" v-model={address.value}
+          onClick={() => openDialog('add')}
+          v-slots={{
+            'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
+          }}/>
     </>
   }
   const renderCustomerDeliveryInfo = () => {
@@ -357,15 +360,14 @@ export function deliveryCustomerUiFactory() {
         </div>
     )
   }
-  const menuMissed = ref(false)
+  const missedCallMenuCtxVisible = ref(false)
   const renderMissedCalls = () => {
-    if (!missedCalls.value || missedCalls.value.length < 1) {
+    if (_.isEmpty(missedCalls.value))
       return
-    }
 
     return (
         <g-menu
-            v-model={menuMissed.value} top left nudge-top="5"
+            v-model={missedCallMenuCtxVisible.value} top left nudge-top="5"
             v-slots={{
               default: () => execGenScopeId(() =>
                   <div class="menu-missed">
@@ -379,19 +381,19 @@ export function deliveryCustomerUiFactory() {
                             <p class="fs-small text-grey-darken-1">{call.customer.name}</p>
                           </div>
                           <div class={['delivery-info__call-btn']} onClick={() => {
-                            menuMissed.value = false;
+                            missedCallMenuCtxVisible.value = false;
                             prepareOrderForMissedCustomer(i, 'pickup');
                           }}>
                             <g-icon size="20">icon-take-away</g-icon>
                           </div>
                           <div class={['delivery-info__call-btn']} onClick={() => {
-                            menuMissed.value = false;
+                            missedCallMenuCtxVisible.value = false;
                             prepareOrderForMissedCustomer(i, 'delivery');
                           }}>
                             <g-icon size="20">icon-delivery-scooter</g-icon>
                           </div>
                           <div class="delivery-info__call-btn--cancel" onClick={() => {
-                            menuMissed.value = false;
+                            missedCallMenuCtxVisible.value = false;
                             deleteCall(i);
                           }}>
                             <g-icon color="white">clear</g-icon>
@@ -401,7 +403,7 @@ export function deliveryCustomerUiFactory() {
                   </div>
               ),
               activator: ({ on }) => execGenScopeId(() =>
-                  <div onClick={on.click} class={['delivery-info__call--missed', 'ml-2', menuMissed.value && 'delivery-info__call--missed--selected']}>
+                  <div onClick={on.click} class={['delivery-info__call--missed', 'ml-2', missedCallMenuCtxVisible.value && 'delivery-info__call--missed--selected']}>
                     <b>{t('onlineOrder.callSystem.missed')}</b>
                     <div class="delivery-info__call--missed-num">
                       {missedCalls.value.length}
