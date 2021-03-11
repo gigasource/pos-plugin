@@ -27,7 +27,7 @@ export default {
     const saving = ref(false)
 
     return genScopeId(() => (
-        <g-dialog v-model={internalValue} eager width="584">
+        <g-dialog v-model={internalValue.value} eager width="584" persistent>
           {execGenScopeId(() => (
               <div class="dialog">
                 <div class="dialog-title">GDPdU/GoBD Data Exportieren</div>
