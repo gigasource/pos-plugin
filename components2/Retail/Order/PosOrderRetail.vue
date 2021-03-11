@@ -137,24 +137,12 @@ export default {
               <g-btn-bs style="margin: 0; background-color: #FFF; flex: 1" onClick={goBack}>
                 <g-icon>icon-back</g-icon>
               </g-btn-bs>
-              <g-menu v-model={showMoreSettingCtxMenu.value} close-on-content-click top nudge-top={5} v-slots={{
-                default: () => (
-                    <g-expand-x-transition>{execGenScopeId(() =>
-                        <div style="background-color: #FFF;" class="col-flex">
-                          <g-btn-bs icon="icon-blue-cog" onClick={() => {
-                            loadRetailLayoutSetting()
-                            inEditScreenMode.value = !inEditScreenMode.value
-                          }}>Edit Screen
-                          </g-btn-bs>
-                        </div>
-                    )}</g-expand-x-transition>
-                ),
-                activator: ({ on }) => (
-                    <g-btn-bs onClick={on.click} style="text-align: center; margin-right: 0; background-color: #FFF">
-                      <g-icon>more_horiz</g-icon>
-                    </g-btn-bs>
-                )
-              }}/>
+              <g-btn-bs style="text-align: center; margin-right: 0; background-color: #FFF" onClick={() => {
+                loadRetailLayoutSetting()
+                inEditScreenMode.value = !inEditScreenMode.value
+              }}>
+                <g-icon>icon-blue-cog</g-icon>
+              </g-btn-bs>
             </div>
           </div>
       )
