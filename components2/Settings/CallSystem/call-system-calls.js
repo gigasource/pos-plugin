@@ -24,12 +24,60 @@ export const mockMissedCalls = [
         }
       ]
     }, date: dayjs() },
-  { customer: { name: 'Miss Customer 2', phone: '0123456678', addresses: [] }, date: dayjs() },
-  { customer: { name: 'Miss Customer 3', phone: '0123456678', addresses: [] }, date: dayjs() },
-  { customer: { name: 'Miss Customer 4', phone: '0123456678', addresses: [] }, date: dayjs() },
-  { customer: { name: 'Miss Customer 5', phone: '0123456678', addresses: [] }, date: dayjs() },
-  { customer: { name: 'Miss Customer 6', phone: '0123456678', addresses: [] }, date: dayjs() },
-  { customer: { name: 'Miss Customer 7', phone: '0123456678', addresses: [] }, date: dayjs() },
+  { customer: { name: 'Miss Customer 2', phone: '0123456678', addresses: [
+        {
+          address: 'missCust.1.addrs.address',
+          house: 'missCust.1.addrs.house',
+          street: 'missCust.1.addrs.street',
+          zipcode: 'missCust.1.addrs.zipcode',
+          city: 'missCust.1.addrs.city'
+        }
+      ] }, date: dayjs() },
+  { customer: { name: 'Miss Customer 3', phone: '0123456678', addresses: [
+        {
+          address: 'missCust.1.addrs.address',
+          house: 'missCust.1.addrs.house',
+          street: 'missCust.1.addrs.street',
+          zipcode: 'missCust.1.addrs.zipcode',
+          city: 'missCust.1.addrs.city'
+        }
+      ] }, date: dayjs() },
+  { customer: { name: 'Miss Customer 4', phone: '0123456678', addresses: [
+        {
+          address: 'missCust.1.addrs.address',
+          house: 'missCust.1.addrs.house',
+          street: 'missCust.1.addrs.street',
+          zipcode: 'missCust.1.addrs.zipcode',
+          city: 'missCust.1.addrs.city'
+        }
+      ] }, date: dayjs() },
+  { customer: { name: 'Miss Customer 5', phone: '0123456678', addresses: [
+        {
+          address: 'missCust.1.addrs.address',
+          house: 'missCust.1.addrs.house',
+          street: 'missCust.1.addrs.street',
+          zipcode: 'missCust.1.addrs.zipcode',
+          city: 'missCust.1.addrs.city'
+        }
+      ] }, date: dayjs() },
+  { customer: { name: 'Miss Customer 6', phone: '0123456678', addresses: [
+        {
+          address: 'missCust.1.addrs.address',
+          house: 'missCust.1.addrs.house',
+          street: 'missCust.1.addrs.street',
+          zipcode: 'missCust.1.addrs.zipcode',
+          city: 'missCust.1.addrs.city'
+        }
+      ] }, date: dayjs() },
+  { customer: { name: 'Miss Customer 7', phone: '0123456678', addresses: [
+        {
+          address: 'missCust.1.addrs.address',
+          house: 'missCust.1.addrs.house',
+          street: 'missCust.1.addrs.street',
+          zipcode: 'missCust.1.addrs.zipcode',
+          city: 'missCust.1.addrs.city'
+        }
+      ] }, date: dayjs() },
 ]
 missedCalls.value = mockMissedCalls
 export function deleteCall(index, { callId }) {
