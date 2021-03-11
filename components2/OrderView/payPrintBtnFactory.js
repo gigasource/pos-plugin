@@ -54,7 +54,7 @@ export function payPrintBtnFactory() {
     }
     const bigBtnAttrs = {
       width: '104',
-      style: 'font-size: 14px; padding: 4px 0; padding: 0',
+      style: 'font-size: 14px; padding: 4px 0;',
       'background-color': "#1271FF",
       disabled: !payBtnClickable.value,
       onClick: withModifiers(_togglePayPrintBtn, ['stop'])
