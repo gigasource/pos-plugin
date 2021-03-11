@@ -120,7 +120,6 @@ export function removeBtnFn(name) {
   }
 }
 export async function addBtnFn() {
-  //todo: add rules to g-select to prevent select duplicate item
   await updatePosSetting([...fnBtnSetting.value, {
     rows: [selectedBtn.value.row, selectedBtn.value.row + selectedBtn.value.height],
     cols: [selectedBtn.value.col, selectedBtn.value.col + selectedBtn.value.width],
