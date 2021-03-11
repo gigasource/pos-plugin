@@ -27,7 +27,6 @@ module.exports = {
     {loader: {type: 'route'}, filePath: 'components2/OtherViews/OrderHistory.vue', name: 'OrderHistory', path: '/pos-order-history'},
     {loader: {type: 'route'}, filePath: 'components2/Retail/Order/PosOrderRetail.vue', name: 'Retail', path: '/retail--order' },
     {loader: {type: 'route'}, filePath: 'components2/Retail/Order/PosOrderRetail.vue', name: 'RetailRefund', path: '/retail--order-refund' },
-    {loader: {type: 'route'}, filePath: 'components2/Retail/Article/PosArticle.vue', name: 'Article', path: '/retail--article' },
     {loader: {type: 'route'}, filePath: 'components2/EndOfDay/PosEndOfDayReport.vue', name: 'PosEndOfDayReport', path: '/pos-eod-report'},
     {loader: {type: 'route'}, filePath: 'components2/MonthReport/posMonthReportView.vue', name: 'posMonthReportView', path: '/pos-month-report'},
     {loader: {type: 'route'}, filePath: 'components2/ReportViews/StaffReportView.vue', name: 'StaffReport', path: '/pos-staff-report'},
