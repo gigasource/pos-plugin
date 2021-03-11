@@ -161,8 +161,6 @@ export default {
 
 <style scoped lang="scss">
 .pos-payment-keyboard {
-  background-image: url('../../../assets/pos-payment-method-screen-bg.png');
-  background-repeat: repeat;
   padding: 8px !important;
   display: flex;
 
