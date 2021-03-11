@@ -15,7 +15,8 @@
 
 <script>
   import customParseFormat from 'dayjs/plugin/customParseFormat'
-  import { getProvided, mobileCheck } from '../logic/commonUtils';
+  import { getProvided } from '../logic/commonUtils';
+  import { mobileCheck } from '../../utils/mobileCheck';
   import _ from 'lodash';
 
   dayjs.extend(customParseFormat)
