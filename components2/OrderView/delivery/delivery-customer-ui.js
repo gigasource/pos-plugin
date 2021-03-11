@@ -73,7 +73,7 @@ export function deliveryCustomerUiFactory() {
     }
   }
 
-  let debounceSearchAddress = _.debounce(searchAddress, 300);
+  const debounceSearchAddress = _.debounce(searchAddress, 300);
   //fixme: autocomplete use in both PosOrderDelivery & this file
   const autocomplete = ref();
   let googlePlaceSessionToken = ''
