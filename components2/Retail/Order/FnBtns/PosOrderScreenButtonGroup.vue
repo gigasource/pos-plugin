@@ -73,6 +73,7 @@ export default {
                   style={{
                     fontSize: '10px',
                     border: '1px solid #979797',
+                    backgroundColor: fnBtn.backgroundColor,
                     gridRow: fnBtn.rows[0] + '/' + fnBtn.rows[1],
                     gridColumn: fnBtn.cols[0] + '/' + fnBtn.cols[1],
                   }}> <g-icon small>delete</g-icon> {componentKey}

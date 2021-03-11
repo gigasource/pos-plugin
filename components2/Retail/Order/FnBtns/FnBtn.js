@@ -3,6 +3,7 @@ import { appHooks, posSettings } from '../../../AppSharedStates';
 import DialogProductLookup from './dialogProductLookup'
 import DialogRefundSearchResult from '../Refund/dialogRetailRefundSearch'
 import {genScopeId} from "../../../utils";
+import { categoryColor, debouncedUpdateCategory } from '../../../EditMenuCard/CategoryEditor/category-editor-category';
 
 const btnStyle = {
   width: '100%',
@@ -73,7 +74,7 @@ export const FnBtns = {
     text: 'Save list',
     setup() {
       return () => <div class='row-flex'>
-        <div style={[btnStyle, "background-color: #FFA726; color: #FFF"]} class="elevation-0">Save</div>
+        <div style={btnStyle} class="elevation-0">Save</div>
       </div>
     }
   },
@@ -123,7 +124,7 @@ export async function addBtnFn() {
   await updatePosSetting([...fnBtnSetting.value, {
     rows: [selectedBtn.value.row, selectedBtn.value.row + selectedBtn.value.height],
     cols: [selectedBtn.value.col, selectedBtn.value.col + selectedBtn.value.width],
-    "backgroundColor": "#FFFFFF", //todo: add bg color
+    backgroundColor: selectedBtn.value.backgroundColor,
     text: FnBtns[selectedBtn.value.fn].text,
     fn: selectedBtn.value.fn
   }])
@@ -136,7 +137,8 @@ export const selectedBtn = ref({
   col: 1,
   height: 1,
   width: 1,
-  fn: ''
+  fn: '',
+  backgroundColor: '#FFFFFF'
 })
 export function showSetBtnFnDialog(row, col) {
   selectedBtn.value = {
@@ -144,7 +146,8 @@ export function showSetBtnFnDialog(row, col) {
     col,
     height: 1,
     width: 1,
-    fn: ''
+    fn: '',
+    backgroundColor: '#FFFFFF',
   }
   showDialogBtnFn.value = true
 }
@@ -188,6 +191,14 @@ export function renderDialogSetBtn() {
                   <g-icon onClick={() => selectedBtn.value.width += (selectedBtn.value.col + selectedBtn.value.width < limitValue.MAX_COL ? 1 : 0)}>add_circle</g-icon>
                 </span>
               </div>
+            </div>
+
+            <div style="margin: 5px">
+              <div>Color</div>
+              <color-selector
+                  v-model={selectedBtn.value.backgroundColor}
+                  colors={['#FFFFFF', '#CE93D8', '#B2EBF2', '#C8E6C9', '#DCE775', '#FFF59D', '#FFCC80', '#FFAB91']}
+                  itemSize={25}/>
             </div>
 
             <div class="row-flex justify-end mt-5">
