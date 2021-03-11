@@ -39,13 +39,13 @@ export function init() {
   ({ t } = useI18n())
 }
 
+const colors = ['#FBE4EC', '#84FFFF', '#80D8FF', '#FFF59D', '#B2FF59', '#E1BEE7', '#FFAB91', '#B39DDB', '#BCAAA4', '#1DE9B6']
+
+function getRandomColor(i) {
+  return 'background-color: ' + colors[i]
+}
+
 export function deliveryCustomerUiFactory() {
-  const colors = ['#FBE4EC', '#84FFFF', '#80D8FF', '#FFF59D', '#B2FF59', '#E1BEE7', '#FFAB91', '#B39DDB', '#BCAAA4', '#1DE9B6']
-
-  function getRandomColor(i) {
-    return 'background-color: ' + colors[i]
-  }
-
   function selectFavoriteProduct(product) {
     addProduct({
       ...product,
