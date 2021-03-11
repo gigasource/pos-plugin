@@ -105,7 +105,7 @@ export default {
       }
     }
 
-    return () => <g-dialog v-model={internalValue.value} width="50%">
+    return () => <g-dialog v-model={internalValue.value} width="70vh">
       {execGenScopeId(() =>
         <g-card class={['dialog-multi-payment', rotate && 'rotate']}>
           {execGenScopeId(() => <>
@@ -234,8 +234,8 @@ export default {
 
 .rotate {
   width: 400px;
-  transform: rotate(-90deg) translateX(-100%);
-  transform-origin: left top;
+  transform: rotate(-90deg);
+  transform-origin: center;
 }
 
 @media screen and (max-height: 599px) {
