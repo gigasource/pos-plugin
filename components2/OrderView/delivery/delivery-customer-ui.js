@@ -1,10 +1,25 @@
-import { ref, computed } from 'vue';
+import { computed, ref } from 'vue';
 import { isIOS } from '../../AppSharedStates';
 import { calls, missedCalls } from '../../Settings/CallSystem/call-system-calls'
 import {
-  deliveryOrderMode, favorites, openDialog, selectedCustomer, showKeyboard,
-  name, phone, address, zipcode, street, house, city, selectedAddress, placeId, autocompleteAddresses,
-  dialog, dialogMode, selectedCall
+  address,
+  autocompleteAddresses,
+  city,
+  deliveryOrderMode,
+  dialog,
+  dialogMode,
+  favorites,
+  house,
+  name,
+  openDialog,
+  phone,
+  placeId,
+  selectedAddress,
+  selectedCall,
+  selectedCustomer,
+  showKeyboard,
+  street,
+  zipcode
 } from './delivery-shared';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
@@ -26,6 +41,7 @@ export function init() {
 
 export function deliveryCustomerUiFactory() {
   const colors = ['#FBE4EC', '#84FFFF', '#80D8FF', '#FFF59D', '#B2FF59', '#E1BEE7', '#FFAB91', '#B39DDB', '#BCAAA4', '#1DE9B6']
+
   function getRandomColor(i) {
     return 'background-color: ' + colors[i]
   }
@@ -51,8 +67,9 @@ export function deliveryCustomerUiFactory() {
       selectedAddress.value -= 1
 
       // in case the 1st address has been removed, then move to new first address line
-      if (selectedAddress.value < 0)
+      if (selectedAddress.value < 0) {
         selectedAddress.value = 0
+      }
     }
   }
 
@@ -208,42 +225,43 @@ export function deliveryCustomerUiFactory() {
 
   // renders functions
   const renderFavorites = () => {
-    if (deliveryOrderMode.value === 'tablet' || !showKeyboard.value)
+    if (deliveryOrderMode.value === 'tablet' || !showKeyboard.value) {
       return (
-        <div class="delivery-info__favorite">
-          {favorites.value.map((f, i) =>
-            <div style={getRandomColor(i)} class="delivery-info__favorite-item"
-                 onClick={() => selectFavoriteProduct(f)}
-                 key={`favorite_${i}`}>
-              {f.name}
-            </div>)}
-        </div>
+          <div class="delivery-info__favorite">
+            {favorites.value.map((f, i) =>
+                <div style={getRandomColor(i)} class="delivery-info__favorite-item"
+                     onClick={() => selectFavoriteProduct(f)}
+                     key={`favorite_${i}`}>
+                  {f.name}
+                </div>)}
+          </div>
       )
+    }
   }
   const renderSelectedCustomer = () => {
     return <>
       {
         selectedCustomer.value.addresses.map((item, i) =>
-          <div
-            class={['delivery-info__customer-address', selectedAddress.value === i && 'delivery-info__customer-address--selected']}
-            onClick={() => selectedAddress.value = i}>
-            <div class="row-flex align-items-center">
-              <g-radio small v-model={selectedAddress.value} value={i} label={`Address ${i + 1}`}
-                       color="#536DFE"/>
-              <g-spacer/>
-              <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#F9A825"
-                        onClick={() => openDialog('edit', item.address, item.zipcode, item.placeId, i)}>
-                <g-icon size="15">icon-reservation_modify</g-icon>
-              </g-btn-bs>
-              <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#FF4452"
-                        onClick={() => removeAddress(i)}>
-                <g-icon size="15">icon-delete</g-icon>
-              </g-btn-bs>
-            </div>
-            <p>{item.address}</p>
-            <p class="text-grey fs-small">{item.zipcode}</p>
-            <p class="text-grey fs-small">{item.city}</p>
-          </div>)
+            <div
+                class={['delivery-info__customer-address', selectedAddress.value === i && 'delivery-info__customer-address--selected']}
+                onClick={() => selectedAddress.value = i}>
+              <div class="row-flex align-items-center">
+                <g-radio small v-model={selectedAddress.value} value={i} label={`Address ${i + 1}`}
+                         color="#536DFE"/>
+                <g-spacer/>
+                <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#F9A825"
+                          onClick={() => openDialog('edit', item.address, item.zipcode, item.placeId, i)}>
+                  <g-icon size="15">icon-reservation_modify</g-icon>
+                </g-btn-bs>
+                <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#FF4452"
+                          onClick={() => removeAddress(i)}>
+                  <g-icon size="15">icon-delete</g-icon>
+                </g-btn-bs>
+              </div>
+              <p>{item.address}</p>
+              <p class="text-grey fs-small">{item.zipcode}</p>
+              <p class="text-grey fs-small">{item.city}</p>
+            </div>)
       }
       <g-icon size="40" color="#1271FF" onClick={() => openDialog('add')}>add_circle</g-icon>
     </>
@@ -300,150 +318,143 @@ export function deliveryCustomerUiFactory() {
   }
   const renderCustomerDeliveryInfo = () => {
     return (
-      <div class="delivery-info__customer">
-        {
-          !isNewCustomer.value
-            ? renderSelectedCustomer()
-            : (deliveryOrderMode.value === 'mobile'
-            ? renderNewCustomerForMobile()
-            : renderNewCustomerForNonMobile())
-        }
-      </div>
+        <div class="delivery-info__customer">
+          {
+            !isNewCustomer.value
+                ? renderSelectedCustomer()
+                : (deliveryOrderMode.value === 'mobile'
+                ? renderNewCustomerForMobile()
+                : renderNewCustomerForNonMobile())
+          }
+        </div>
     )
   }
   const renderPendingCalls = () => {
     return (
-      <div class={['delivery-info__call', selectedCall.value && selectedCall.value.type === 'missed' ? 'b-red' : 'b-grey']}>
-        <div class="delivery-info__call--info">
-          <p class="fw-700 fs-small">
-            <g-icon size="16" class="mr-1">icon-call</g-icon>
-            {selectedCall.value.customer.phone}
-          </p>
-          <p class="fs-small text-grey-darken-1">{selectedCall.value.customer.name}</p>
+        <div class={['delivery-info__call', selectedCall.value && selectedCall.value.type === 'missed' ? 'b-red' : 'b-grey']}>
+          <div class="delivery-info__call--info">
+            <p class="fw-700 fs-small">
+              <g-icon size="16" class="mr-1">icon-call</g-icon>
+              {selectedCall.value.customer.phone}
+            </p>
+            <p class="fs-small text-grey-darken-1">{selectedCall.value.customer.name}</p>
+          </div>
+          <div class={['delivery-info__call-btn', orderType.value === 'pickup' && 'delivery-info__call-btn--selected']}
+               onClick={() => chooseCustomer('pickup')}>
+            <g-icon size="20">icon-take-away</g-icon>
+          </div>
+          <div class={['delivery-info__call-btn', orderType.value === 'delivery' && 'delivery-info__call-btn--selected']}
+               onClick={() => chooseCustomer('delivery')}>
+            <g-icon size="20">icon-delivery-scooter</g-icon>
+          </div>
+          <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall()}>
+            <g-icon color="white">clear</g-icon>
+          </div>
         </div>
-        <div class={['delivery-info__call-btn', orderType.value === 'pickup' && 'delivery-info__call-btn--selected']}
-             onClick={() => chooseCustomer('pickup')}>
-          <g-icon size="20">icon-take-away</g-icon>
-        </div>
-        <div class={['delivery-info__call-btn', orderType.value === 'delivery' && 'delivery-info__call-btn--selected']}
-             onClick={() => chooseCustomer('delivery')}>
-          <g-icon size="20">icon-delivery-scooter</g-icon>
-        </div>
-        <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall()}>
-          <g-icon color="white">clear</g-icon>
-        </div>
-      </div>
     )
   }
   const renderNoPendingCalls = () => {
     return (
-      <div class="delivery-info__call--empty">
-        <p class="fw-700">Empty</p>
-        <p class="text-grey-darken-1">{t('onlineOrder.callSystem.noPendingCall')}</p>
-      </div>
+        <div class="delivery-info__call--empty">
+          <p class="fw-700">Empty</p>
+          <p class="text-grey-darken-1">{t('onlineOrder.callSystem.noPendingCall')}</p>
+        </div>
     )
   }
   const menuMissed = ref(false)
   const renderMissedCalls = () => {
-    if (!missedCalls.value || missedCalls.value.length < 1)
+    if (!missedCalls.value || missedCalls.value.length < 1) {
       return
+    }
 
     return (
-      <g-menu v-model={menuMissed.value} top left nudge-top="5"
-              v-slots={{
-                default: () => execGenScopeId(() =>
+        <g-menu
+            v-model={menuMissed.value} top left nudge-top="5"
+            v-slots={{
+              default: () => execGenScopeId(() =>
                   <div class="menu-missed">
                     {missedCalls.value.map((call, i) => (
-                      <div class="menu-missed__call" key={`missed_${i}`}>
-                        <div class="menu-missed__call--info">
-                          <p class="fw-700 fs-small">
-                            <g-icon size="16" class="mr-1">icon-call</g-icon>
-                            {call.customer.phone}
-                          </p>
-                          <p class="fs-small text-grey-darken-1">{call.customer.name}</p>
+                        <div class="menu-missed__call" key={`missed_${i}`}>
+                          <div class="menu-missed__call--info">
+                            <p class="fw-700 fs-small">
+                              <g-icon size="16" class="mr-1">icon-call</g-icon>
+                              {call.customer.phone}
+                            </p>
+                            <p class="fs-small text-grey-darken-1">{call.customer.name}</p>
+                          </div>
+                          <div class={['delivery-info__call-btn']} onClick={() => chooseMissedCustomer(i, 'pickup')}>
+                            <g-icon size="20">icon-take-away</g-icon>
+                          </div>
+                          <div class={['delivery-info__call-btn']} onClick={() => chooseMissedCustomer(i, 'delivery')}>
+                            <g-icon size="20">icon-delivery-scooter</g-icon>
+                          </div>
+                          <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall(i)}>
+                            <g-icon color="white">clear</g-icon>
+                          </div>
                         </div>
-                        <div class={['delivery-info__call-btn']}
-                             onClick={() => chooseMissedCustomer(i, 'pickup')}>
-                          <g-icon size="20">icon-take-away</g-icon>
-                        </div>
-                        <div class={['delivery-info__call-btn']}
-                             onClick={() => chooseMissedCustomer(i, 'delivery')}>
-                          <g-icon size="20">icon-delivery-scooter</g-icon>
-                        </div>
-                        <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall(i)}>
-                          <g-icon color="white">clear</g-icon>
-                        </div>
-                      </div>
                     ))}
                   </div>
-                ),
-                activator: ({ on }) => execGenScopeId(() =>
-                  <div onClick={on.click} class={['delivery-info__call--missed', menuMissed.value && 'delivery-info__call--missed--selected']}>
+              ),
+              activator: ({ on }) => execGenScopeId(() =>
+                  <div onClick={on.click} class={['delivery-info__call--missed', 'ml-2', menuMissed.value && 'delivery-info__call--missed--selected']}>
                     <b>{t('onlineOrder.callSystem.missed')}</b>
                     <div class="delivery-info__call--missed-num">
                       {missedCalls.value.length}
                     </div>
                   </div>
-                )
-              }}>
-      </g-menu>
+              )
+            }}>
+        </g-menu>
     )
   }
 
   //
   const customerUiRender = () => (
-    <div class="delivery-info">
-      <div class="delivery-info--upper">
-        {renderFavorites()}
-        {renderCustomerDeliveryInfo()}
-      </div>
+      <div class="delivery-info">
+        <div class="delivery-info--upper">
+          {renderFavorites()}
+          {renderCustomerDeliveryInfo()}
+        </div>
 
-      <div class="delivery-info--lower">
-        {
-          (selectedCall.value && selectedCall.value.customer)
-            ? renderPendingCalls()
-            : [renderNoPendingCalls(), renderMissedCalls()]
-        }
+        <div class="delivery-info--lower">
+          {
+            (selectedCall.value && selectedCall.value.customer)
+                ? renderPendingCalls()
+                : [renderNoPendingCalls(), renderMissedCalls()]
+          }
+        </div>
       </div>
-    </div>
   )
 
   const renderDialogs = () => (<>
-    <dialog-form-input v-model={dialog.value.input} onSubmit={addNewCustomer}
-                       eager={false}
-                       v-slots={{
-                         input: () =>
-                           <div class="row-flex flex-wrap justify-around">
-                             <pos-textfield-new style="width: 48%" label={t('customer.name')}
-                                                v-model={name.value}/>
-                             <pos-textfield-new style="width: 48%" label={t('customer.phone')}
-                                                v-model={phone.value}/>
-                             <g-combobox style="width: 98%" label={t('customer.address')} v-model={placeId.value} dense
-                                         text-field-component="PosTextfieldNew" clearable
-                                         virtualEvent={isIOS.value} skip-search
-                                         items={autocompleteAddresses.value} onUpdate:searchText={debounceSearchAddress}
-                                         keep-menu-on-blur
-                                         menu-class="menu-autocomplete-address"
-                                         onUpdate:modelValue={selectAutocompleteAddress}/>
-                             <pos-textfield-new style="width: 23%" label="Street"
-                                                placeholder="Street name (Autofill)"
-                                                v-model={street.value}/>
-                             <pos-textfield-new style="width: 23%" label="House no."
-                                                placeholder="House number (Autofill)"
-                                                v-model={house.value}/>
-                             <pos-textfield-new style="width: 23%" label="Zipcode"
-                                                placeholder="Zipcode (Autofill)"
-                                                v-model={zipcode.value}/>
-                             <pos-textfield-new style="width: 23%" label="City"
-                                                placeholder="City (Autofill)"
-                                                v-model={city.value}/>
-                           </div>
-                       }}
+    <dialog-form-input
+        v-model={dialog.value.input} onSubmit={addNewCustomer}
+        eager={false}
+        v-slots={{
+          input: () =>
+              <div class="row-flex flex-wrap justify-around">
+                <pos-textfield-new style="width: 48%" label={t('customer.name')} v-model={name.value}/>
+                <pos-textfield-new style="width: 48%" label={t('customer.phone')} v-model={phone.value}/>
+                <g-combobox
+                    style="width: 98%" label={t('customer.address')} v-model={placeId.value} dense
+                    text-field-component="PosTextfieldNew" clearable
+                    virtualEvent={isIOS.value} skip-search
+                    items={autocompleteAddresses.value} onUpdate:searchText={debounceSearchAddress}
+                    keep-menu-on-blur
+                    menu-class="menu-autocomplete-address"
+                    onUpdate:modelValue={selectAutocompleteAddress}/>
+                <pos-textfield-new style="width: 23%" label="Street" placeholder="Street name (Autofill)" v-model={street.value}/>
+                <pos-textfield-new style="width: 23%" label="House no." placeholder="House number (Autofill)" v-model={house.value}/>
+                <pos-textfield-new style="width: 23%" label="Zipcode" placeholder="Zipcode (Autofill)" v-model={zipcode.value}/>
+                <pos-textfield-new style="width: 23%" label="City" placeholder="City (Autofill)" v-model={city.value}/>
+              </div>
+        }}
     />
 
-    <dialog-text-filter v-model={dialog.value.note}
-                        label="Delivery note"
-                        onSubmit={e => note.value = e}/>
+    <dialog-text-filter
+        v-model={dialog.value.note}
+        label="Delivery note"
+        onSubmit={e => note.value = e}/>
 
     {showKeyboard.value && <div class="keyboard">
       <div class="keyboard-overlay" onClick={hideKeyboard}></div>
