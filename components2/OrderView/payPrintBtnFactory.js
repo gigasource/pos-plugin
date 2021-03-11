@@ -14,6 +14,7 @@ import {
 } from "./pos-logic-be";
 import {orderViewDialog} from "./pos-ui-shared";
 import {addSinglePayment, clearPayment, getRestTotal} from "./pos-logic";
+import { execGenScopeId } from '../utils';
 
 export function payPrintBtnFactory() {
   let {t: $t, locale} = useI18n();
@@ -45,15 +46,15 @@ export function payPrintBtnFactory() {
   const renderPayBtn = () => {
     const btnAttrs = {
       width: 75,
-      style: 'font-size: 14px; border: none',
+      style: 'font-size: 14px; border: none; padding: 0',
       'text-color': "#FFF",
       'background-color': "#1271FF",
       disabled: !payBtnClickable.value,
-      onClick: withModifiers(_togglePayPrintBtn, ['stop'])
+      onClick: withModifiers(_togglePayPrintBtn, ['stop']),
     }
     const bigBtnAttrs = {
       width: '104',
-      style: 'font-size: 14px; padding: 4px 0',
+      style: 'font-size: 14px; padding: 4px 0; padding: 0',
       'background-color': "#1271FF",
       disabled: !payBtnClickable.value,
       onClick: withModifiers(_togglePayPrintBtn, ['stop'])
@@ -63,30 +64,34 @@ export function payPrintBtnFactory() {
       if (smallSidebar.value) {
         if (payPrintMode.value === 'print') {
           return <g-btn-bs {...btnAttrs}>
-            <Transition name="front">
-              {!showIcon.value && <div class="animation-wrapper">
-                <span>{$t('common.currency', locale)} {$filters.formatCurrency(order.vSum)}</span>
-              </div>}
-            </Transition>
-            <Transition name="back">
-              {showIcon.value && <div class="animation-wrapper" style="background-color: #0EA76F">
-                <g-icon>icon-print</g-icon>
-              </div>}
-            </Transition>
+            {execGenScopeId(() => <>
+              <Transition name="front">
+                {!showIcon.value && <div class="animation-wrapper">
+                  <span>{$t('common.currency', locale)} {$filters.formatCurrency(order.vSum)}</span>
+                </div>}
+              </Transition>
+              <Transition name="back">
+                {showIcon.value && <div class="animation-wrapper" style="background-color: #0EA76F">
+                  <g-icon>icon-print</g-icon>
+                </div>}
+              </Transition>
+            </>)}
           </g-btn-bs>
         }
         return (
           <g-btn-bs {...btnAttrs}>
-            <Transition name="front">
-              {!showIcon.value && <div class="animation-wrapper">
-                <span>{$t('common.currency', locale)} {$filters.formatCurrency(order.vSum)}</span>
-              </div>}
-            </Transition>
-            <Transition name="back">
-              {showIcon.value && <div class="animation-wrapper">
-                <g-icon>icon-wallet</g-icon>
-              </div>}
-            </Transition>
+            { execGenScopeId(() => <>
+              <Transition name="front">
+                {!showIcon.value && <div class="animation-wrapper">
+                  <span>{$t('common.currency', locale)} {$filters.formatCurrency(order.vSum)}</span>
+                </div>}
+              </Transition>
+              <Transition name="back">
+                {showIcon.value && <div class="animation-wrapper bg-pink">
+                  <g-icon>icon-wallet</g-icon>
+                </div>}
+              </Transition>
+            </>) }
           </g-btn-bs>
         )
       }
