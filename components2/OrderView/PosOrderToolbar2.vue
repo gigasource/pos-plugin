@@ -76,9 +76,9 @@ export default {
               ),
               default: () => execGenScopeId(() =>
                   <div class="col-flex bg-white">
-                    <g-btn-bs icon="icon-move-items" onClick={withModifiers(moveItems, ['stop'])}
+                    <g-btn-bs icon="icon-move-items" style="justify-content: flex-start"  onClick={withModifiers(moveItems, ['stop'])}
                               disabled={disableMoveItemsBtn}>{t('order.moveItem')}</g-btn-bs>
-                    <g-btn-bs icon="icon-voucher" onClick={showVoucherDialog}>{t('order.voucher')}</g-btn-bs>
+                    <g-btn-bs icon="icon-voucher" style="justify-content: flex-start" onClick={showVoucherDialog}>{t('order.voucher')}</g-btn-bs>
                   </div>
               )
             }}/>
