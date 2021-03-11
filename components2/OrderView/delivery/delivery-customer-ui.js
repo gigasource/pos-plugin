@@ -382,13 +382,22 @@ export function deliveryCustomerUiFactory() {
                             </p>
                             <p class="fs-small text-grey-darken-1">{call.customer.name}</p>
                           </div>
-                          <div class={['delivery-info__call-btn']} onClick={() => chooseMissedCustomer(i, 'pickup')}>
+                          <div class={['delivery-info__call-btn']} onClick={() => {
+                            menuMissed.value = false;
+                            chooseMissedCustomer(i, 'pickup');
+                          }}>
                             <g-icon size="20">icon-take-away</g-icon>
                           </div>
-                          <div class={['delivery-info__call-btn']} onClick={() => chooseMissedCustomer(i, 'delivery')}>
+                          <div class={['delivery-info__call-btn']} onClick={() => {
+                            menuMissed.value = false;
+                            chooseMissedCustomer(i, 'delivery');
+                          }}>
                             <g-icon size="20">icon-delivery-scooter</g-icon>
                           </div>
-                          <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall(i)}>
+                          <div class="delivery-info__call-btn--cancel" onClick={() => {
+                            menuMissed.value = false;
+                            deleteCall(i);
+                          }}>
                             <g-icon color="white">clear</g-icon>
                           </div>
                         </div>
