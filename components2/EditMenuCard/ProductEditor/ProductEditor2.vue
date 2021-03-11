@@ -34,7 +34,7 @@ import dialogProductInfo from "../dialog/dialogProductInfo";
 import dialogTextFilter from "../../pos-shared-components/dialogFilter/dialogTextFilter";
 import { modifierHooks } from '../../Modifiers/dialogEditPopupModifier/modifier-ui-logics';
 import {modifierGroups} from "../../Modifiers/dialogEditPopupModifier/modifier-ui-logics";
-import ColorSelector from '../../../components/common/ColorSelector';
+import ColorSelector from '../../common/ColorSelector';
 
 const colors = ['#FFFFFF','#CE93D8','#B2EBF2','#C8E6C9','#DCE775','#FFF59D','#FFCC80','#FFAB91']
 
