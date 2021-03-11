@@ -264,7 +264,7 @@ module.exports = {
       cash: 'Bargeld',
       card: 'Karte',
       multi: 'Mehr',
-      multiPayment: 'Mehrfachzahlung - Bar & Karte',
+      multiPayment: 'Bargeld/Karte',
       total: 'Gesamt',
       cardPayment: 'Kartenzahlung',
       paymentMethod: 'Zahlungsmethode',
