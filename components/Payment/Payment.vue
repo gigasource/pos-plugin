@@ -1,0 +1,70 @@
+<script>
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import PosPaymentScreenKeyboard from './Helpers/PosPaymentScreenKeyboard';
+import PosPaymentScreenPaymentMethods from './Helpers/PosPaymentScreenPaymentMethods';
+import PosRestaurantPaymentOrderDetail from './Helpers/PosRestaurantPaymentOrderDetail';
+import PosRestaurantPaymentToolbar from './Helpers/PosRestaurantPaymentToolbar';
+import PaymentLogicsFactory from './payment-logics';
+import { genScopeId } from '../utils';
+import { makeDiscount } from '../OrderView/pos-logic';
+import dialogChangeValue from './Helpers/dialogChangeValue';
+
+export default {
+  name: 'Payment',
+  components: [PosPaymentScreenKeyboard, PosPaymentScreenPaymentMethods, PosRestaurantPaymentOrderDetail, PosRestaurantPaymentToolbar, dialogChangeValue],
+  setup() {
+    const { t } = useI18n()
+    const showDiscountMessage = ref(false)
+    const discountDialog = ref(null)
+    const { moreDiscount, currentOrder } = PaymentLogicsFactory()
+    const showDiscountDialog = ref(false)
+    const discountCurrentOrder = function (discount) {
+      console.log(discount)
+      makeDiscount(currentOrder, discount)
+    }
+    const onOpenDiscountDialog = function () {
+      showDiscountDialog.value = true
+    }
+    return genScopeId(() => <>
+      <div class="payment">
+        <div class="payment-main">
+          <pos-payment-screen-payment-methods/>
+          <pos-payment-screen-keyboard/>
+        </div>
+        <pos-restaurant-payment-order-detail/>
+        <pos-restaurant-payment-toolbar onPromotion={onOpenDiscountDialog}/>
+      </div>
+      <g-snackbar v-model={showDiscountMessage.value} color="#FFC107" timeout="2000" top>
+        <div style="color: #FF4552; display: flex; align-items: center">
+          <g-icon color="#FF4552" style="margin-right: 8px">
+            warning
+          </g-icon>
+          <span> {t('payment.alertDiscount')} </span>
+        </div>
+      </g-snackbar>
+      <dialog-change-value v-model={showDiscountDialog.value} onSubmit={discountCurrentOrder}/>
+    </>)
+  }
+}
+</script>
+
+<style scoped lang="scss">
+.payment {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 70% 30%;
+  grid-template-rows: calc(100% - 64px) 64px;
+
+  .g-toolbar {
+    grid-column: span 2;
+  }
+
+  &-main {
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 40% 60%;
+    background-image: url('../../assets/pos-payment-method-screen-bg.png');
+  }
+}
+</style>
