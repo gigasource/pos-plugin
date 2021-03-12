@@ -159,6 +159,6 @@ export const storeLocale = computed(() => {
       && posSettings.value.onlineDevice.store.locale) || locale.value || 'en')
 })
 
-// init call system in the very first moment
 initCallSystem()
 initBell(posSettings)
+
