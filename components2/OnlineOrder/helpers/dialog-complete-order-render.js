@@ -3,9 +3,9 @@ import { useI18n } from 'vue-i18n'
 import { completeOrder, declineOrder } from '../online-order-main-logic-be'
 import { getExtraInfo, getItemPrice, getShippingFee } from '../online-order-main-logic'
 import { $filters } from '../../AppSharedStates'
-import orderUtil from '../../../components/logic/orderUtil';
-import { execGenScopeId } from '../../utils';
-import {findCustomerWithId} from "../../Customer/customer-logic";
+import orderUtil from '../../logic/orderUtil'
+import { execGenScopeId } from '../../utils'
+import {findCustomerWithId} from "../../Customer/customer-logic"
 
 export const dialogOrder = ref(null)
 

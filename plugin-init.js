@@ -1,9 +1,9 @@
-import { user } from './components2/AppSharedStates';
+import { user } from './components/AppSharedStates';
 import {
   setupOnlineOrderSocketPairEventHandle,
   deviceNeedToPair
-} from './components2/OnlineOrder/online-order-pairing';
-import { initVirtualPrinterData } from './components2/VirtualPrinter/virtual-printer-logics';
+} from './components/OnlineOrder/online-order-pairing';
+import { initVirtualPrinterData } from './components/VirtualPrinter/virtual-printer-logics';
 
 const publicRoutes = ['/admin' , '/plugins', '/pos-setup']
 

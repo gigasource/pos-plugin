@@ -1,5 +1,5 @@
 import { listPayments } from '../Settings/PaymentSetting/view-payment-logics';
-import orderUtil from '../../components/logic/orderUtil';
+import orderUtil from '../logic/orderUtil'
 import _ from 'lodash';
 import { formatDatetime } from '../utils';
 import { computed, reactive, ref } from 'vue'
