@@ -6,7 +6,7 @@ import { computed, ref } from 'vue'
 import Snackbar from '../../../components/Store/Snackbar';
 import { genScopeId } from '../../utils';
 import { prepareMockData } from './delivery-mock-data'
-import posOrderDeliveryKeyboard from '../../OrderView/Helper/posOrderDeliveryKeyboard2';
+import posOrderDeliveryKeyboard from '../../OrderView/Helper/posOrderDeliveryKeyboard';
 import { useI18n } from 'vue-i18n';
 
 export default {

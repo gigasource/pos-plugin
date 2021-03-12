@@ -14,7 +14,7 @@ import {
 import {itemsRenderFactory} from "../pos-ui-shared";
 import {useRouter} from "vue-router";
 import {genScopeId, internalValueFactory} from "../../utils";
-import PosOrderReceipt2 from "./PosOrderReceipt2";
+import PosOrderReceipt from "./PosOrderReceipt";
 import dialogMultiPayment from "../../Payment/Helpers/dialogMultiPayment";
 import {addMultiPayment, addSinglePayment, getRestTotal, hooks} from "../pos-logic";
 import delay from "delay";
@@ -22,7 +22,7 @@ import delay from "delay";
 //todo: make run with new logic
 export default {
   name: 'PosOrderSplitOrder2',
-  components: {dialogMultiPayment, PosOrderReceipt2},
+  components: {dialogMultiPayment, PosOrderReceipt},
   props: {
     modelValue: Boolean,
   },
@@ -226,7 +226,7 @@ export default {
                                 total={order2.vSum}
                                 onSubmit={saveMultiPayment}/>
 
-          <pos-order-receipt2 v-model={showReceiptDialog.value}
+          <pos-order-receipt v-model={showReceiptDialog.value}
                               split
                               splitOrders={splitOrders.value}
                               onUpdatePayment={updateSplitPayment}

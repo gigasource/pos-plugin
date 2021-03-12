@@ -10,13 +10,13 @@ import {orderLayoutCategoriesFactory} from "./order-layout-categories";
 import {orderLayoutProductFactory} from "./order-layout-products";
 import cms from 'cms';
 import {genScopeId} from "../utils";
-import PosOrderKeyboard2 from "./Helper/PosOrderKeyboard2";
+import PosOrderKeyboard from "./Helper/PosOrderKeyboard";
 import dialogChoosePopupModifier from "../Modifiers/dialogChoosePopupModifier/dialogChoosePopupModifier";
 import dialogTextFilter from "../pos-shared-components/dialogFilter/dialogTextFilter";
 
 export default {
-  name: 'PosOrderLayout2',
-  components: {dialogChoosePopupModifier, dialogTextFilter, dialogProductSearchResult, PosOrderKeyboard2},
+  name: 'PosOrderLayout',
+  components: {dialogChoosePopupModifier, dialogTextFilter, dialogProductSearchResult, PosOrderKeyboard},
   props: {
     editable: {
       type: Boolean,

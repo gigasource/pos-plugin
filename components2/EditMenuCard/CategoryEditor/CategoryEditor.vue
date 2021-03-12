@@ -22,7 +22,7 @@ import InputNumber from "../InputNumber";
 import PosKeyboardFull from "../../pos-shared-components/PosKeyboardFull";
 
 export default {
-  name: 'CategoryEditor2',
+  name: 'CategoryEditor',
   components: { PosKeyboardFull, InputNumber, ColorSelector },
   setup() {
     const { t } = useI18n()

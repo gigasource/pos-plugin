@@ -149,14 +149,14 @@ describe("test Pos Payment Screen Keyboard", () => {
             </span>
           </g-btn-stub>
         </div>
-        <dialog-multi-payment2-stub modelvalue="false"
+        <dialog-multi-payment-stub modelvalue="false"
                                     total="1.3"
                                     storelocale="en"
                                     cardvalue
                                     cashvalue
                                     ismobile="false"
         >
-        </dialog-multi-payment2-stub>
+        </dialog-multi-payment-stub>
         <dialog-form-input-stub width="40%"
                                 keyboard-type="numeric"
                                 keyboard-width="100%"
@@ -255,14 +255,14 @@ describe("test Pos Payment Screen Keyboard", () => {
             </span>
           </g-btn-stub>
         </div>
-        <dialog-multi-payment2-stub modelvalue="false"
+        <dialog-multi-payment-stub modelvalue="false"
                                     total="1.3"
                                     storelocale="en"
                                     cardvalue
                                     cashvalue
                                     ismobile="false"
         >
-        </dialog-multi-payment2-stub>
+        </dialog-multi-payment-stub>
         <dialog-form-input-stub width="40%"
                                 keyboard-type="numeric"
                                 keyboard-width="100%"

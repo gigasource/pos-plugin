@@ -24,7 +24,7 @@ import {mockOrder} from "./mock-order";
 import Order2 from "../Order2";
 import {orderLayout} from "../pos-ui-shared";
 import {demoData} from "./demoData";
-import PosOrderLayout2 from "../PosOrderLayout2";
+import PosOrderLayout from "../PosOrderLayout";
 import {isMobile} from "../../AppSharedStates";
 import PosOrderReceipt2 from "../Helper/PosOrderReceipt2";
 import {addSinglePayment, genSplitId, getRestTotal, simulateBackendPrint} from "../pos-logic";
@@ -71,7 +71,7 @@ describe("order-view test", function () {
     let order = getCurrentOrder();
     addProduct(order, mockProduct);
     orderLayout.value = demoData.OrderLayout[0];
-    makeWrapper(PosOrderLayout2, {shallow: true});
+    makeWrapper(PosOrderLayout, {shallow: true});
     await nextTick();
     await delay(50);
     expect(wrapper.html()).toMatchSnapshot()

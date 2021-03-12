@@ -24,8 +24,8 @@ import { loadCustomers } from './customer-be-logics';
 import { useI18n } from 'vue-i18n';
 
 export default {
+  name: "PosCustomer",
   setup() {
-
     //fixme: current problem: address text field
     const { t } = useI18n()
     onMounted(async () => {

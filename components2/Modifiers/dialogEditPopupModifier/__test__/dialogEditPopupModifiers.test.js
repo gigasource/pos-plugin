@@ -1,5 +1,5 @@
 import cms from "cms";
-import dialogEditPopupModifiers2 from "../dialogEditPopupModifiers2";
+import dialogEditPopupModifiers from "../dialogEditPopupModifiers";
 import { nextTick } from "vue";
 import { stringify } from "schemahandler/utils";
 import _ from "lodash";
@@ -38,7 +38,7 @@ beforeAll(async () => {
 });
 describe("test dialog edit popup modifier UI", () => {
   it("should render", async () => {
-    makeWrapper(dialogEditPopupModifiers2, { shallow: true });
+    makeWrapper(dialogEditPopupModifiers, { shallow: true });
     await delay(300); // wait fetch modifiers
     await onCreateItem("groups", "group");
     await nextTick()

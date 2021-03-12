@@ -27,12 +27,11 @@ import { wrapper, makeWrapper } from "../../test-utils";
 import { mockProduct } from "../../OrderView/__test__/mock_product";
 const delay = require("delay");
 import _ from 'lodash'
-import ProductEditor2 from '../ProductEditor/ProductEditor2';
+import ProductEditor from '../ProductEditor/ProductEditor';
 import {nextTick} from 'vue'
 import {
   orderLayout, selectCategoryLayout, selectProductLayout,
 } from '../../OrderView/pos-ui-shared';
-import StubFactory from '../../StubFactory';
 import { createEmptyLayout, createEmptyProductLayout } from '../utils';
 import { allowSelectPrinter2, dineInTaxes, printers, takeAwayTaxes } from '../ProductEditor/ProductEditorLogic';
 const ignoreComponents = ['Portal', 'PortalTarget', 'MountingPortal', 'portal', 'portal-target']
@@ -63,8 +62,8 @@ describe('product-editor', () => {
 
   async function expectSnapshot() {
     // wipe-out components (to make dependencies component un-resolvable) to make sure snapshot render prop for stub class
-    ProductEditor2.components = {}
-    makeWrapper(ProductEditor2, {
+    ProductEditor.components = {}
+    makeWrapper(ProductEditor, {
       shallow: false,
       global: {
         stubs: {

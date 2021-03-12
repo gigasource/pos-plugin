@@ -6,6 +6,7 @@ import { $filters } from '../AppSharedStates';
 import { getPaymentTotal } from '../OrderView/pos-logic';
 
 export default {
+  name: "CustomerOrder",
   setup() {
     const companyName = computed(() => {
       return (posSettings.value && posSettings.value.companyInfo && posSettings.value.companyInfo.name) || ''

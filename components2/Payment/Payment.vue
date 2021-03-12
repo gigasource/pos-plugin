@@ -1,18 +1,18 @@
 <script>
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import PosPaymentScreenKeyboard2 from './Helpers/PosPaymentScreenKeyboard2';
-import PosPaymentScreenPaymentMethods2 from './Helpers/PosPaymentScreenPaymentMethods2';
-import PosRestaurantPaymentOrderDetail2 from './Helpers/PosRestaurantPaymentOrderDetail2';
-import PosRestaurantPaymentToolbar2 from './Helpers/PosRestaurantPaymentToolbar2';
+import PosPaymentScreenKeyboard from './Helpers/PosPaymentScreenKeyboard';
+import PosPaymentScreenPaymentMethods from './Helpers/PosPaymentScreenPaymentMethods';
+import PosRestaurantPaymentOrderDetail from './Helpers/PosRestaurantPaymentOrderDetail';
+import PosRestaurantPaymentToolbar from './Helpers/PosRestaurantPaymentToolbar';
 import PaymentLogicsFactory from './payment-logics';
 import { genScopeId } from '../utils';
 import { makeDiscount } from '../OrderView/pos-logic';
-import dialogChangeValue2 from './Helpers/dialogChangeValue';
+import dialogChangeValue from './Helpers/dialogChangeValue';
 
 export default {
   name: 'Payment',
-  components: [PosPaymentScreenKeyboard2, PosPaymentScreenPaymentMethods2, PosRestaurantPaymentOrderDetail2, PosRestaurantPaymentToolbar2, dialogChangeValue2],
+  components: [PosPaymentScreenKeyboard, PosPaymentScreenPaymentMethods, PosRestaurantPaymentOrderDetail, PosRestaurantPaymentToolbar, dialogChangeValue],
   setup() {
     const { t } = useI18n()
     const showDiscountMessage = ref(false)
@@ -29,11 +29,11 @@ export default {
     return genScopeId(() => <>
       <div class="payment">
         <div class="payment-main">
-          <pos-payment-screen-payment-methods2/>
-          <pos-payment-screen-keyboard2/>
+          <pos-payment-screen-payment-methods/>
+          <pos-payment-screen-keyboard/>
         </div>
-        <pos-restaurant-payment-order-detail2/>
-        <pos-restaurant-payment-toolbar2 onPromotion={onOpenDiscountDialog}/>
+        <pos-restaurant-payment-order-detail/>
+        <pos-restaurant-payment-toolbar onPromotion={onOpenDiscountDialog}/>
       </div>
       <g-snackbar v-model={showDiscountMessage.value} color="#FFC107" timeout="2000" top>
         <div style="color: #FF4552; display: flex; align-items: center">

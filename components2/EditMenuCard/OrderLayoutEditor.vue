@@ -9,7 +9,7 @@ import { useI18n } from 'vue-i18n'
 import { genScopeId } from '../utils';
 
 export default {
-  name: 'OrderLayoutEditor2',
+  name: 'OrderLayoutEditor',
   components: {PosTextfieldNew, dialogFormInput},
   props: {},
   setup() {

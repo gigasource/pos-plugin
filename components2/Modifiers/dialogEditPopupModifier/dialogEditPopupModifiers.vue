@@ -21,6 +21,7 @@ import cms from 'cms';
 import { useI18n } from 'vue-i18n';
 
 export default {
+  name: 'DialogEditPopupModifiers',
   props: {
     modelValue: Boolean
   },

@@ -24,7 +24,7 @@ import {
   makeWrapper,
 } from "../../test-utils";
 const delay = require("delay");
-import CategoryEditor2 from '../CategoryEditor/CategoryEditor2';
+import CategoryEditor from '../CategoryEditor/CategoryEditor';
 import {nextTick} from 'vue'
 import { orderLayout, selectCategoryLayout } from '../../OrderView/pos-ui-shared';
 import { createEmptyCategoryLayout, createEmptyLayout } from '../utils';
@@ -44,9 +44,9 @@ describe('category-editor', () => {
     selectCategoryLayout({ top: 0, left: 0 })
 
     // wipe-out components (to make dependencies component un-resolvable) to make sure snapshot render prop for stub class
-    CategoryEditor2.components = {}
+    CategoryEditor.components = {}
 
-    makeWrapper(CategoryEditor2, {
+    makeWrapper(CategoryEditor, {
       shallow: false,
       global: {
         stubs: {

@@ -10,7 +10,7 @@ import _ from 'lodash';
 import dialogMultiPayment from "../../Payment/Helpers/dialogMultiPayment";
 
 export default {
-  name: 'PosOrderReceipt2',
+  name: 'PosOrderReceipt',
   components: {
     dialogMultiPayment
   },

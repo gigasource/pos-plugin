@@ -9,7 +9,7 @@ import PosTextfieldNew from '../../pos-shared-components/POSInput/PosTextfieldNe
 import { genScopeId, VModel_number } from '../../utils';
 
 export default {
-  name: 'PosPaymentScreenKeyboard2',
+  name: 'PosPaymentScreenKeyboard',
   components: [PosKeyboardFull, GTable, GSpacer, GIcon, PosTextfieldNew, GDivider],
   setup: function (props, { emit }) {
 

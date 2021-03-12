@@ -6,6 +6,7 @@ import {addProduct, getCurrentOrder} from "../pos-logic-be";
 import {addModifier} from "../pos-logic";
 
 export default {
+  name: 'PosOrderKeyboard',
   props: ['keyboardConfig', 'mode'],
   emits: ['edit:keyboard'],
   setup(props, {emit}) {

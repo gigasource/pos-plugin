@@ -29,7 +29,7 @@ import {useI18n} from 'vue-i18n'
 import {useRouter} from 'vue-router'
 import {computed, onActivated, reactive, watch, onDeactivated} from 'vue';
 import {genScopeId} from '../../utils';
-import dialogEditPopupModifiers2 from "../../Modifiers/dialogEditPopupModifier/dialogEditPopupModifiers2";
+import dialogEditPopupModifiers from "../../Modifiers/dialogEditPopupModifier/dialogEditPopupModifiers";
 import dialogProductInfo from "../dialog/dialogProductInfo";
 import dialogTextFilter from "../../pos-shared-components/dialogFilter/dialogTextFilter";
 import { modifierHooks } from '../../Modifiers/dialogEditPopupModifier/modifier-ui-logics';
@@ -39,9 +39,9 @@ import ColorSelector from '../../common/ColorSelector';
 const colors = ['#FFFFFF','#CE93D8','#B2EBF2','#C8E6C9','#DCE775','#FFF59D','#FFCC80','#FFAB91']
 
 export default {
-  name: 'ProductEditor2.vue',
+  name: 'ProductEditor',
   props: {},
-  components: {dialogEditPopupModifiers2, dialogProductInfo, dialogTextFilter, ColorSelector}, // TODO: update component
+  components: {dialogEditPopupModifiers, dialogProductInfo, dialogTextFilter, ColorSelector}, // TODO: update component
   setup() {
     const {t} = useI18n()
     const router = useRouter()
@@ -301,7 +301,7 @@ export default {
             onSubmit={e => updateProductLayout({text: e, type: 'Text'}, e)}/>
     )
 
-    const renderPopupModifierDialog = () => <dialog-edit-popup-modifiers2
+    const renderPopupModifierDialog = () => <dialog-edit-popup-modifiers
         v-model={dialog.popupModifiers}
         product={selectedProduct.value}/>
 

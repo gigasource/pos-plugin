@@ -3,7 +3,7 @@ import {
   makeWrapper,
 } from "../../test-utils";
 const delay = require("delay");
-import OrderLayoutEditor2 from '../OrderLayoutEditor2';
+import OrderLayoutEditor from '../OrderLayoutEditor';
 import {nextTick} from 'vue'
 import {genScopeId} from '../../utils';
 import { orderLayout } from '../../OrderView/pos-ui-shared';
@@ -21,10 +21,10 @@ describe('order-layout-editor', () => {
 
     const Root = {
       name: 'Root',
-      components: {OrderLayoutEditor2},
+      components: {OrderLayoutEditor},
       setup() {
         return genScopeId(() => <div>
-          <order-layout-editor2></order-layout-editor2>
+          <order-layout-editor></order-layout-editor>
         </div>)
       }
     }
@@ -51,10 +51,10 @@ describe('order-layout-editor', () => {
 
     const Root = {
       name: 'Root',
-      components: {OrderLayoutEditor2},
+      components: {OrderLayoutEditor},
       setup() {
         return genScopeId(() => <div>
-          <order-layout-editor2></order-layout-editor2>
+          <order-layout-editor></order-layout-editor>
         </div>)
       }
     }

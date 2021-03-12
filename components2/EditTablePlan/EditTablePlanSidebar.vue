@@ -1,6 +1,6 @@
 <script>
 import { GBtn, GSwitch, GTextFieldBs } from '../../../../backoffice/pos-vue-framework';
-import PosDashboardSidebar2 from '../Dashboard/DashboardSidebar/PosDashboardSidebar2';
+import PosDashboardSidebar from '../Dashboard/DashboardSidebar/PosDashboardSidebar';
 import { useI18n } from 'vue-i18n'
 import { ref, watch } from 'vue'
 import {
@@ -33,7 +33,7 @@ import { useRouter } from 'vue-router'
 
 export default {
   name: 'EditTablePlanSidebar',
-  components: [PosDashboardSidebar2, GBtn, GTextFieldBs, GSwitch],
+  components: [PosDashboardSidebar, GBtn, GTextFieldBs, GSwitch],
   setup() {
     const { t } = useI18n()
     const router = useRouter()
@@ -164,7 +164,7 @@ export default {
     }, { deep: true })
 
     return () =>
-        <PosDashboardSidebar2 v-model={sidebarSelectingPath.value} onToggle={toggle} items={sidebarData.value} v-slots={slots}/>
+        <PosDashboardSidebar v-model={sidebarSelectingPath.value} onToggle={toggle} items={sidebarData.value} v-slots={slots}/>
   }
 }
 </script>

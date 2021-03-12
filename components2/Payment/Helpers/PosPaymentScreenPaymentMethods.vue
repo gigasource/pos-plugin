@@ -10,7 +10,7 @@ import PosTextfieldNew from '../../pos-shared-components/POSInput/PosTextfieldNe
 
 //todo: ref-tip-textfield
 export default {
-  name: 'PosPaymentScreenPaymentMethods2',
+  name: 'PosPaymentScreenPaymentMethods',
   components: { GBtn, GIcon, GBadge, dialogMultiPayment, PosTextfieldNew },
   setup() {
     const {

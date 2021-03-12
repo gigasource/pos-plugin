@@ -7,7 +7,7 @@ import { useI18n } from 'vue-i18n';
 import { itemsRenderFactory } from '../../OrderView/pos-ui-shared';
 
 export default {
-  name: 'PosRestaurantPaymentOrderDetail2',
+  name: 'PosRestaurantPaymentOrderDetail',
   components: [GAvatar, GSpacer, GChip],
   setup() {
     const { t } = useI18n()

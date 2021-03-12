@@ -15,7 +15,7 @@ import {activeOrders} from "../AppSharedStates";
 import { useI18n } from 'vue-i18n';
 
 export default {
-  name: "posOrder2",
+  name: "PosOrder",
   directives: {
     Touch
   },

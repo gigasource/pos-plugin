@@ -35,7 +35,7 @@ import {
 
 import cms from 'cms'
 import { genScopeId } from '../../utils';
-import PosOrderDeliveryKeyboard from '../Helper/posOrderDeliveryKeyboard2'
+import PosOrderDeliveryKeyboard from '../Helper/posOrderDeliveryKeyboard'
 import { createOrder, addItem, changeItemQuantity, addCustomer } from '../pos-logic'
 import { advanceUpdateCustomer } from '../../Customer/customer-be-logics';
 import { acceptOrder } from '../../OnlineOrder/online-order-main-logic-be';

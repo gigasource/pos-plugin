@@ -9,7 +9,7 @@ import { genScopeId } from '../utils';
 import _ from 'lodash'
 
 export default {
-  name: 'KeyboardEditor2.vue',
+  name: 'KeyboardEditor',
   components: {InputNumber},
   props: {},
   setup() {

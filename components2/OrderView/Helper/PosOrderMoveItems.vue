@@ -20,6 +20,7 @@ import {hooks} from "../pos-logic";
 
 //finish
 export default {
+  name: "PosOrderMoveItems",
   props: {
     modelValue: Boolean,
   },

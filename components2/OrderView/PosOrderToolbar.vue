@@ -8,7 +8,7 @@ import { orderViewDialog } from './pos-ui-shared';
 import { execGenScopeId, genScopeId } from '../utils';
 
 export default {
-  name: 'PosOrderToolbar2',
+  name: 'PosOrderToolbar',
   setup(props, { emit }) {
     const order = getCurrentOrder();
     const showMenu = ref(false);

@@ -10,7 +10,7 @@ import { genScopeId, execGenScopeId } from '../../utils';
 import { hooks } from '../../OrderView/pos-logic';
 
 export default {
-  name: 'PosRestaurantPaymentToolbar2',
+  name: 'PosRestaurantPaymentToolbar',
   components: { GToolbar, GBtnBs, GSpacer, GProgressCircular },
   setup(props, { emit }) {
     const { paidValue } = PaymentLogicsFactory()

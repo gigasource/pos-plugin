@@ -6,7 +6,7 @@ import {ref, watch} from 'vue';
 import {getCurrentOrder} from "../pos-logic-be";
 
 export default {
-  name: 'PosOrderVoucherDialog2',
+  name: 'PosOrderVoucherDialog',
   props: {
     modelValue: Boolean
   },

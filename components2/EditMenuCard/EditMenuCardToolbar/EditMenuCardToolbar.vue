@@ -7,7 +7,7 @@
   import { genScopeId } from '../../utils';
 
   export default {
-    name: 'EditMenuCardToolbar2',
+    name: 'EditMenuCardToolbar',
     components: { },
     props: {},
     setup() {

@@ -18,7 +18,7 @@ import {loadCategories} from "../../Product/product-logic-be";
 import {loadProducts} from "../../Product/product-logic-be";
 
 export default {
-  name: 'IngredientEditor2',
+  name: 'IngredientEditor',
   directives: {
     Touch
   },
