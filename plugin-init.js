@@ -13,7 +13,7 @@ export default function () {
       next()
     } else if (deviceNeedToPair.value) {
       next('/pos-setup')
-    } else if (!user.value) {
+    } else if (!user.value && to.path !== '/pos-login') {
       next('/pos-login')
     } else {
       next()
