@@ -1,10 +1,7 @@
 <script>
-import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-// import { user } from './AppSharedStates';
 import cms from 'cms'
+import { onMounted } from 'vue'
 import { appHooks, notifyState } from './AppSharedStates'
-import {  setupPairDevice, getPairStatus, getWebshopName } from './online-order-pairing'
 
 // This file is for emitting screen-loaded
 export default {
@@ -12,29 +9,12 @@ export default {
   domain: 'EmptyStore',
   props: {},
   setup() {
-    // TODO: navigate to login page if the user is not logged-in
-    // Issue: not work as the Store loaded same time with component, only work in next route navigation.
-    const router = useRouter()
-    // router.beforeEach((to, from, next) => {
-    //   console.log('beforeEach', to, from, next, user.value)
-    //   if (to.path === '/admin' || to.path === '/plugins' || to.path === '/pos-login' || to.path === '/pos-setup') {
-    //     next()
-    //   } else if (!user.value) {
-    //     next('/pos-login')
-    //   } else {
-    //     next()
-    //   }
-    // })
     appHooks.emit('settingChange')
     onMounted(() => {
-      setTimeout(async () => {
-        await setupPairDevice()
-        await getPairStatus()
-        await getWebshopName()
-      }, 500)
       cms.socket.emit('screen-loaded')
     })
 
+    // TODO: Move to back-office
     function renderSystemSnackbar() {
       return <g-snackbar
           top right
