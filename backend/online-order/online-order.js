@@ -947,18 +947,19 @@ module.exports = async cms => {
 
       try {
         onlineOrderSocket.emit('getOnlineDeviceServices', deviceId, async ({services: {delivery, pickup, noteToCustomers}, error}) => {
-          if (error) return callback({error})
+          if (error) {
+            callback({error})
+            return
+          }
+
           await cms.getModel('PosSetting').findOneAndUpdate({}, {
-            $set: {
-              'onlineDevice.services': {delivery, pickup, noteToCustomers: noteToCustomers || ''}
-            }
+            $set: { 'onlineDevice.services': {delivery, pickup, noteToCustomers: noteToCustomers || ''} }
           })
-          const services = {delivery, pickup, noteToCustomers}
-          callback({services})
+
+          callback({services: {delivery, pickup, noteToCustomers} })
         })
       } catch (error) {
-        const posSetting = cms.getModel('PosSetting').findOne()
-        callback(posSetting.onlineDevice.services, error)
+        callback({error})
       }
     })
 
