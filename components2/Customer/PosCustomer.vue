@@ -1,16 +1,23 @@
 <script>
 import { execGenScopeId, genScopeId } from '../utils';
 import _ from 'lodash';
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router';
+import { isIOS } from '../AppSharedStates';
 import {
-  onDialogSubmit,
+  selectingCustomer,
   onOpenDialog,
   onRemoveSelectingCustomer,
-  onSelectCustomer,
-  renderCustomerInfo,
-  selectingCustomer,
   showCustomerDialog,
+  onDialogSubmit,
+  onSelectCustomer,
+  customerDialogData,
+  onRemoveAddress,
+  autocompleteAddresses,
+  debounceSearchAddress,
+  onAddAddress,
+  selectAutocompleteAddress,
+  resetAddress
 } from './customer-ui-logics-shared';
 import { customers } from './customer-logic';
 import { loadCustomers } from './customer-be-logics';
@@ -47,10 +54,10 @@ export default {
             {genScopeId(() =>
                 <>
                   <tr>
-                    <th class="sticky"> {t('onlineOrder.refundDialog.name')} </th>
-                    <th class="sticky"> {t('onlineOrder.refundDialog.phone')} </th>
-                    <th class="sticky"> {t('onlineOrder.refundDialog.address')} </th>
-                    <th className="sticky"> {t('onlineOrder.refundDialog.spending')} </th>
+                    <th class="sticky"> {t('customer.name')} </th>
+                    <th class="sticky"> {t('customer.phone')} </th>
+                    <th class="sticky"> {t('customer.address')} </th>
+                    <th class="sticky"> {t('customer.spending')} </th>
                   </tr>
                   {sortedCustomer.value.map((customer, i) =>
                       <tr key={i} onClick={() => onSelectCustomer(customer)} class={[selectingCustomer.value && selectingCustomer.value._id === customer._id && 'bordered']}>
@@ -104,6 +111,53 @@ export default {
           </>)}
         </g-toolbar>
 
+
+    function renderCustomerInfo() {
+      return <div class="dialog-left">
+        <div class="row-flex">
+          <g-text-field required={true} virtualEvent={isIOS.value} outlined style="flex: 1" label={t('customer.name')} v-model={customerDialogData.name}/>
+          <g-text-field required={true} virtualEvent={isIOS.value} outlined style="flex: 1" label={t('customer.phone')}
+                        v-model={customerDialogData.phone}/>
+        </div>
+
+        {
+          customerDialogData.addresses.map((address, i) =>
+              <div class="row-flex flex-wrap justify-around mt-4 r">
+                <div class="btn-delete" onClick={() => onRemoveAddress(address)}>
+                  <g-icon>
+                    icon-cancel3
+                  </g-icon>
+                </div>
+                <div class="row-flex">
+                  <g-combobox label={`Address ${i + 1}`}
+                              key={`${customerDialogData.phone}_address_${i}`}
+                              v-model={autocompleteAddresses.value[i].model}
+                              clearable
+                              skip-search
+                              keep-menu-on-blur
+                              searchText={address.address}
+                              class="col-8" menu-class="menu-autocomplete-address"
+                              items={autocompleteAddresses.value[i].places}
+                              onUpdate:searchText={text => debounceSearchAddress(text, i)}
+                              onUpdate:modelValue={val => selectAutocompleteAddress(val, i)}
+                              virtualEvent={isIOS.value} outlined
+                              onClear={() => resetAddress(i)}
+                  />
+                  <g-text-field label={`House ${i + 1}`} key={`${customerDialogData.phone}_house_${i}`} v-model={address.house} virtualEvent={isIOS.value} outlined/>
+                </div>
+                <div class="row-flex">
+                  <g-text-field label={`Street ${i + 1}`} key={`${customerDialogData.phone}_street_${i}`} v-model={address.street} virtualEvent={isIOS.value} outlined/>
+                  <g-text-field label={`Zipcode ${i + 1}`} key={`${customerDialogData.phone}_zipcode_${i}`} v-model={address.zipcode} virtualEvent={isIOS.value} outlined/>
+                  <g-text-field label={`City ${i + 1}`} key={`${customerDialogData.phone}_city_${i}`} v-model={address.city} virtualEvent={isIOS.value} outlined/>
+                </div>
+              </div>
+          )
+        }
+        <g-icon color="#1271FF" size="40" style="margin: 8px calc(50% - 20px)" onClick={onAddAddress}>
+          add_circle
+        </g-icon>
+      </div>
+    }
 
     return genScopeId(() =>
         <div class="customer">

@@ -15,14 +15,6 @@
       disabled: Boolean,
       readonly: Boolean
     },
-    data() {
-      return {
-        listeners: {
-          onClick: (e) => this.$emit('click', e),
-          onFocus: (e) => this.$emit('focus', e),
-        }
-      }
-    },
     computed: {
       isMobile() {
         return isMobile.value
@@ -56,13 +48,13 @@
           return (
               <g-text-field ref="textfield" {...{
                 ...{outlined: true, ...props, ...this.isIOS && {virtualEvent: this.isIOS}, readOnly: this.readonly}, // props
-                ...{'onUpdate:modelValue': (val) => this.internalValue = val, ...this.listeners} //listeners
+                ...{'onUpdate:modelValue': (val) => this.internalValue = val}
               }} />
           )
         }
         return <g-text-field-bs ref="textfield" class="bs-tf__pos" {...{
           ...{large: true, ...props, ...this.isIOS && {virtualEvent: this.isIOS}, readonly: this.readonly}, //props
-          ...{'onUpdate:modelValue': (val) => this.internalValue = val, ...this.listeners} //listeners
+          ...{'onUpdate:modelValue': (val) => this.internalValue = val}
         }} />
       }
 

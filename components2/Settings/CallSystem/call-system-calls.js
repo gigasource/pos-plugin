@@ -139,4 +139,4 @@ async function getCustomerInfo(phone) {
   return customer
 }
 
-// calls.value.push({customer: { name: 'duonbg', phone: '0932585101', addresses: []}, date: new Date(), callId: 'testId'} )
+calls.value.push({customer: { name: 'duonbg', phone: '0932585101', addresses: []}, date: new Date(), callId: 'testId'} )

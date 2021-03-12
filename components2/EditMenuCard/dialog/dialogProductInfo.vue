@@ -2,6 +2,7 @@
 import { ref, computed, nextTick, watch } from 'vue'
 import PosTextfieldNew from '../../pos-shared-components/POSInput/PosTextfieldNew'
 import {internalValueFactory} from "../../utils";
+import { useI18n } from 'vue-i18n';
 export default {
   name: "dialogProductInfo",
   components: { PosTextfieldNew },
@@ -17,6 +18,7 @@ export default {
     const id = ref('')
     const name = ref('')
     const price = ref('')
+    const { t } = useI18n()
     const refComp = {
       id: ref(null),
       name: ref(null),
@@ -71,8 +73,8 @@ export default {
       <dialog-form-input v-model={internalValue.value} onSubmit={updateProduct} valid={isValid.value} v-slots={{
         input: () => <div class="row-flex justify-between flex-wrap">
           <pos-textfield-new style="width: 48%;" ref={refComp['id']} label="ID" v-model={id.value}/>
-          <pos-textfield-new style="width: 48%;" ref={refComp['name']} label="Name" required v-model={name.value} validate-on-blur rules={[rules.required]}/>
-          <pos-textfield-new style="width: 48%;" ref={refComp['price']} label="Price" required v-model={price.value} rules={[rules.number]}/>
+          <pos-textfield-new style="width: 48%;" ref={refComp['name']} label={t('product.name')} required v-model={name.value} validate-on-blur rules={[rules.required]}/>
+          <pos-textfield-new style="width: 48%;" ref={refComp['price']} label={t('product.price')} required v-model={price.value} rules={[rules.number]}/>
         </div>
       }}/>
     )

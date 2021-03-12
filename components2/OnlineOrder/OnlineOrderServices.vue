@@ -77,7 +77,7 @@ export default {
             <g-btn-bs background-color="#536DFE" style="margin: 0; width: 96px;" text-color="white" onClick={withModifiers(save, ['stop'])}>
               {t('onlineOrder.save')} </g-btn-bs>
           </div>
-          <dialog-blogtext-input v-model={dialog.value.text} label="Note" defaultValue={note.value} onSubmit={changeNote}></dialog-blogtext-input>
+          <dialog-blogtext-input v-model={dialog.value.text} label={t('service.note')} placeholder={t('service.addNote')} defaultValue={note.value} onSubmit={changeNote}></dialog-blogtext-input>
         </div>
     )
   }

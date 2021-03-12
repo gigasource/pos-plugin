@@ -160,7 +160,8 @@ module.exports = {
       subtotal: 'Tổng phụ',
       added: 'Đã thêm',
       removed: 'Đã giảm',
-      all: 'Tất cả'
+      all: 'Tất cả',
+      empty: 'Trống',
     },
 
     //reports
@@ -446,6 +447,8 @@ module.exports = {
       table: 'Bàn',
       wall: 'Tường',
       room: 'Phòng',
+      roomName: 'Phòng',
+      tableName: 'Bàn',
       addRoom: 'Thêm phòng',
       takeAway: 'Mang đi',
       createVoucher: 'Tạo phiếu giảm giá',
@@ -648,7 +651,8 @@ module.exports = {
     },
 
     service: {
-
+      note: 'Ghi chú cho khách hàng',
+      addNote: 'Thêm ghi chú'
     },
 
     inventory: {
@@ -689,7 +693,8 @@ module.exports = {
         name: 'Tên',
         category: 'Nhóm hàng',
         stock: 'Tồn kho'
-      }
+      },
+      lowStock: 'Hàng hoá với số lượng bé'
     },
 
     discount: {
@@ -706,7 +711,8 @@ module.exports = {
     customer: {
       phone: 'Số điện thoại',
       address: 'Địa chỉ',
-      name: 'Tên KH'
+      name: 'Tên KH',
+      spending: 'Spending',
     },
     status: {
       connected: 'Đã kết nối',
@@ -733,6 +739,7 @@ module.exports = {
     product: {
       unit: 'Đơn vị',
       name: 'Tên',
+      price: 'Giá',
     }
   }
 }

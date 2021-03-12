@@ -48,10 +48,11 @@ export default {
 // methods
     function searchPlace(text) {
       if (!text || text.length < 4) {
-        placesSearchResult.value = []
+        // placesSearchResult.value = []
         return
       }
       cms.socket.emit('searchPlace', text, token, places => {
+        console.log(places)
         placesSearchResult.value = places.map(p => {
           return ({
             text: p.description,

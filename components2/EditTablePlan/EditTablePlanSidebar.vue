@@ -56,7 +56,7 @@ export default {
           </g-btn>
         </div>
     const roomToolbarRenderFn = () => isSelectingRoomOnly.value && <div class="card-info">
-      <g-text-field-bs modelValue={selectingRoomStates.value.room.name} label="Room name *:" onUpdate:modelValue={onUpdateSelectingRoomName} v-slots=
+      <g-text-field-bs modelValue={selectingRoomStates.value.room.name} label={t('restaurant.roomName')} onUpdate:modelValue={onUpdateSelectingRoomName} v-slots=
           {{
             'append-inner': () =>
                 <g-icon style="cursor: pointer"

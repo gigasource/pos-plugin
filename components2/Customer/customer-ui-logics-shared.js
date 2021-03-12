@@ -65,20 +65,28 @@ async function searchAddress(text, index) {
   })
 }
 
-async function selectAutocompleteAddress(place_id, index) {
+export async function selectAutocompleteAddress(place_id, index) {
   if (autocompleteAddresses.value[index].places.find(item => item.value === place_id)) {
     cms.socket.emit('getPlaceDetail', place_id, token, data => {
       if (!_.isEmpty(data)) {
         for (const component of data.address_components) {
-          customerDialogData.addresses[index].house = component.types.includes('street_number') ? component.long_name : ''
-          customerDialogData.addresses[index].street = component.types.includes('route') ? component.long_name : ''
-          customerDialogData.addresses[index].zipcode = component.types.includes('postal_code') ? component.long_name : ''
-          customerDialogData.addresses[index].city = component.types.includes('locality') ? component.long_name : ''
+          if (component.types.includes('street_number')) customerDialogData.addresses[index].house = component.long_name
+          if (component.types.includes('route')) customerDialogData.addresses[index].street =  component.long_name
+          if (component.types.includes('postal_code')) customerDialogData.addresses[index].zipcode = component.long_name
+          if (_.intersection(component.types, ['locality', 'administrative_area_level_1']).length) customerDialogData.addresses[index].city = component.long_name
         }
         customerDialogData.addresses[index].address = data.name
       }
     })
   }
+}
+
+export async function resetAddress(index) {
+  customerDialogData.addresses[index].address = ''
+  customerDialogData.addresses[index].house = ''
+  customerDialogData.addresses[index].street = ''
+  customerDialogData.addresses[index].zipcode = ''
+  customerDialogData.addresses[index].city = ''
 }
 
 export const debounceSearchAddress = _.debounce(searchAddress, 300)
@@ -181,48 +189,3 @@ export function clearCustomerDialogData() {
   customerDialogData.addresses = []
 }
 
-export function renderCustomerInfo() {
-  return <div className="dialog-left">
-    <div className="row-flex">
-      <g-text-field required={true} virtualEvent={isIOS.value} outlined style="flex: 1" label="Name" v-model={customerDialogData.name}/>
-      <g-text-field required={true} virtualEvent={isIOS.value} outlined style="flex: 1" label="Phone"
-                    v-model={customerDialogData.phone}/>
-    </div>
-
-    {
-      customerDialogData.addresses.map((address, i) =>
-        <div class="row-flex flex-wrap justify-around mt-4 r">
-          <div class="btn-delete" onClick={() => onRemoveAddress(address)}>
-            <g-icon>
-              icon-cancel3
-            </g-icon>
-          </div>
-          <div class="row-flex">
-            <g-combobox label={`Address ${i + 1}`}
-                        key={`address_${i}`}
-              // text-field-component="GTextFieldBs"
-                        v-model={autocompleteAddresses.value[i].model}
-                        clearable
-                        skip-search
-                        keep-menu-on-blur
-                        class="col-8" menu-class="menu-autocomplete-address"
-                        items={autocompleteAddresses.value[i].places}
-                        onUpdate:searchText={text => debounceSearchAddress(text, i)}
-                        onUpdate:modelValue={val => selectAutocompleteAddress(val, i)}
-                        virtualEvent={isIOS.value} outlined
-            />
-            <g-text-field label={`House ${i + 1}`} key={`house_${i}`} v-model={address.house} virtualEvent={isIOS.value} outlined/>
-          </div>
-          <div class="row-flex">
-            <g-text-field label={`Street ${i + 1}`} key={`street_${i}`} v-model={address.street} virtualEvent={isIOS.value} outlined/>
-            <g-text-field label={`Zipcode ${i + 1}`} key={`zipcode_${i}`} v-model={address.zipcode} virtualEvent={isIOS.value} outlined/>
-            <g-text-field label={`City ${i + 1}`} key={`city_${i}`} v-model={address.city} virtualEvent={isIOS.value} outlined/>
-          </div>
-        </div>
-      )
-    }
-    <g-icon color="#1271FF" size="40" style="margin: 8px calc(50% - 20px)" onClick={onAddAddress}>
-      add_circle
-    </g-icon>
-  </div>
-}

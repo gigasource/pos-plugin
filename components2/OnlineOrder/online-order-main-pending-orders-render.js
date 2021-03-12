@@ -22,7 +22,7 @@ import {
 
 import { acceptOrder, declineOrder, onDeclinedOrder } from './online-order-main-logic-be'
 //<editor-fold desc="delivery">
-import {selectedCustomer as deliverySelectedCustomer, phone, selectedCall} from "../OrderView/delivery/delivery-shared";
+import {selectedCustomer as deliverySelectedCustomer, customerPhoneNr, selectedCall} from "../OrderView/delivery/delivery-shared";
 import { orderType } from "../OrderView/delivery/delivery-customer-ui";
 //</editor-fold>
 
@@ -46,7 +46,7 @@ export function navigateToDeliveryScreen(call, type, missedCallIndex) {
 		deleteMissedCall(missedCallIndex)
 	}
 	selectedCustomer.value = deliverySelectedCustomer.value = customer
-	phone.value = customer.phone
+	customerPhoneNr.value = customer.phone
 	orderType.value = type
 	selectedCall.value = call
 	router.push({ path: '/pos-order-delivery' })

@@ -16,6 +16,7 @@ import {
   tableNameExistedErrorMsg,
   updateTableName
 } from './EditableRoom/EditTablePlanLogics';
+import { useI18n } from 'vue-i18n';
 
 const EditablePlanFactory = () => {
   const hooks = new Hooks()
@@ -24,6 +25,7 @@ const EditablePlanFactory = () => {
     components: [EditTablePlanSidebar, EditableRoom, dialogTextFilter, GSnackbar],
     setup() {
       initI18n()
+      const { t } = useI18n()
       fetchRooms().then(() => {
         roomsStates.value.length > 0 && onSelectRoom(roomsStates.value[0])
       })
@@ -31,9 +33,9 @@ const EditablePlanFactory = () => {
       const roomRenderFn = () => <EditableRoom/>
       const dialogsRenderFn = () => <>
         {isSelectingARoom.value &&
-        <dialog-text-filter label="Room name" default-value={selectingRoomStates.value.room.name} v-model={dialog.showRoomNameKbd} onSubmit={onUpdateSelectingRoomName}/>}
+        <dialog-text-filter label={t('restaurant.roomName')} default-value={selectingRoomStates.value.room.name} v-model={dialog.showRoomNameKbd} onSubmit={onUpdateSelectingRoomName}/>}
         {isSelectingARoomObject.value &&
-        <dialog-text-filter label="Table name" default-value={selectingObject.value.name} v-model={dialog.showTableNameKbd} onSubmit={updateTableName}/>}
+        <dialog-text-filter label={t('restaurant.tableName')} default-value={selectingObject.value.name} v-model={dialog.showTableNameKbd} onSubmit={updateTableName}/>}
         <g-snackbar v-model={showExistedTableNameError.value} time-out="3000">{tableNameExistedErrorMsg.value}</g-snackbar>
       </>
       return genScopeId(() => <div class="row-flex">

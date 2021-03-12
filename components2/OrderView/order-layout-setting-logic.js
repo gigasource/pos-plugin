@@ -1,4 +1,4 @@
-import {onActivated, reactive, ref} from "vue";
+import { onActivated, reactive, ref, toRaw } from 'vue';
 
 export const fontSize = ref('14px');
 export const category = reactive({
@@ -16,17 +16,25 @@ export const editModeOL = ref(false);
 export const hideTextRow = ref(false);
 export const hideBlankColumn = ref(false);
 
-const olSetting = reactive({
+const olSetting = {
   fontSize, category, minimumTextRow, collapseBlankColumn,
   collapseText, showOverlay, showSplitBtn, smallSidebar, scrollableLayout,
   hideTextRow, hideBlankColumn
-})
+}
 
 export function saveOrderLayoutSetting() {
   const setting = {
-    fontSize, category, minimumTextRow, collapseBlankColumn,
-    collapseText, showOverlay, showSplitBtn, smallSidebar, scrollableLayout,
-    hideTextRow, hideBlankColumn
+    fontSize: fontSize.value,
+    category: toRaw(category),
+    minimumTextRow: minimumTextRow.value,
+    collapseBlankColumn: collapseBlankColumn.value,
+    collapseText: collapseText.value,
+    showOverlay: showOverlay.value,
+    showSplitBtn: showSplitBtn.value,
+    smallSidebar: smallSidebar.value,
+    scrollableLayout: scrollableLayout.value,
+    hideTextRow: hideTextRow.value,
+    hideBlankColumn: hideBlankColumn.value
   }
   localStorage.setItem('OrderScreenSetting', JSON.stringify(setting))
   editModeOL.value = false;
@@ -42,7 +50,7 @@ export function loadOrderLayoutSetting() {
         Object.assign(category, setting[key]);
         continue
       }
-      olSetting[key] = setting[key];
+      olSetting[key].value = setting[key];
     }
   }
 }
@@ -69,7 +77,7 @@ export function changeCategory() {
 export function changeCategorySize(change) {
   const size = +category.size.slice(0, category.size.length - 2)
   if (size + change > 0) {
-    Object.assign(category, {size: `${size + change}px`})
+    Object.assign(category, { size: `${size + change}px` })
   }
 }
 

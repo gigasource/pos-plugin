@@ -4,7 +4,7 @@
       <g-icon @click="internalValue = false" svg size="20" class="icon">icon-close</g-icon>
       <div class="screen">
         <p class="fw-700">{{label}}</p>
-        <g-textarea :model-value="screenValue" @update:modelValue="e => updateValue(e)" no-resize outlined rows="5" :placeholder="`${label}...`" ref="textarea"/>
+        <g-textarea :model-value="screenValue" @update:modelValue="e => updateValue(e)" no-resize outlined rows="5" :placeholder="`${placeholder || label}...`" ref="textarea"/>
         <div class="buttons">
           <g-btn :uppercase="false" text @click="internalValue = false" outlined width="120" class="mr-2">
             {{$t('ui.cancel')}}
@@ -28,6 +28,7 @@
     name: 'dialogBlogtextInput',
     props: {
       label: null,
+      placeholder: null,
       modelValue: null,
       defaultValue: {
         type: String,

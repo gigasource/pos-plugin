@@ -19,7 +19,7 @@ import { DASHBOARD_VIEWS, dashboardHooks } from '../Dashboard/DashboardSharedSta
 export default {
   components: { DialogLoginSupport, SupportBtn, StoreIdBtn, VersionBtn, PosLoginBtnLanguage, ConnectionStatusBtn, PosLoginKeyboard, PosLoginTextfield, },
   setup() {
-    const { locale: i18nLocale } = useI18n()
+    const { locale: i18nLocale, t } = useI18n()
 
     const router = useRouter()
     const loginPassword = ref('')
@@ -79,7 +79,7 @@ export default {
             <div style="display: flex; flex-direction: column; justify-content: center;">
               <div class="login-input">
                 <div class="login-input__title">
-                  Enter your passcode to login
+                  {t('login.loginMess')}
                 </div>
                 <div class="login-input__textfield">
                   <PosLoginTextfield v-model={loginPassword.value} incorrectPasscode={incorrectPasscode.value}/>
