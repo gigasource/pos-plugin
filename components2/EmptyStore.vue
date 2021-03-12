@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 // import { user } from './AppSharedStates';
 import cms from 'cms'
 import { appHooks, notifyState } from './AppSharedStates'
-import { useDeviceManagementSystem } from './online-order-pairing'
+import {  setupPairDevice, getPairStatus, getWebshopName } from './online-order-pairing'
 
 // This file is for emitting screen-loaded
 export default {
@@ -25,15 +25,7 @@ export default {
     //     next()
     //   }
     // })
-
-    const {
-      setupPairDevice,
-      getPairStatus,
-      getWebshopName
-    } = useDeviceManagementSystem(router)
-
     appHooks.emit('settingChange')
-
     onMounted(() => {
       setTimeout(async () => {
         await setupPairDevice()
