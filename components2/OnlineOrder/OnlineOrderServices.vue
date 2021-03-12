@@ -43,10 +43,13 @@ export default {
         if (error) {
           showNotify(error)
         }
-        const { delivery: _d, pickup: _p, noteToCustomers: _n } = services
-        delivery.value = _d
-        pickup.value = _p
-        note.value = _n || ''
+
+        if (services) {
+          const { delivery: _d, pickup: _p, noteToCustomers: _n } = services
+          delivery.value = _d
+          pickup.value = _p
+          note.value = _n || ''
+        }
       })
     }
     function changeNote(val) {

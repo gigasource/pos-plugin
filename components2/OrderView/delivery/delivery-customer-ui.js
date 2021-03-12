@@ -279,8 +279,8 @@ export function deliveryCustomerUiFactory() {
       </div>
       {
         orderType.value === 'delivery' &&
-        <div className="row-flex" style="width: 100%">
-          <div className="col-9">
+        <div class="row-flex" style="width: 100%">
+          <div class="col-9">
             <g-combobox style="width: 100%" label="Address" v-model={placeId.value} outlined dense
                         clearable
                         virtualEvent={isIOS.value} skip-search
@@ -290,7 +290,7 @@ export function deliveryCustomerUiFactory() {
                         menu-class="menu-autocomplete-address"
                         onUpdate:modelValue={selectAutocompleteAddress}/>
           </div>
-          <div className="flex-grow-1 ml-1">
+          <div class="flex-grow-1 ml-1">
             <g-text-field disabled outlined dense v-model={house.value} label="Nr"
                           onClick={() => showKeyboard.value = true}
                           virtualEvent={isIOS.value}/>

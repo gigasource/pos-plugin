@@ -934,23 +934,33 @@ module.exports = async cms => {
     })
 
     socket.on('getOnlineDeviceServices', async (callback) => {
-      const deviceId = await getDeviceId()
-      if (!onlineOrderSocket || !deviceId) return callback(null);
+      if (!onlineOrderSocket) {
+        callback({ error: 'Connection to online order is lost!' })
+        return
+      }
 
+      const deviceId = await getDeviceId()
+      if (!deviceId) {
+        callback({ error: 'Bad request: Device id was not provided!' })
+        return
+      }
+
+      // TODO: Do we need try/catch??/
       try {
         onlineOrderSocket.emit('getOnlineDeviceServices', deviceId, async ({services: {delivery, pickup, noteToCustomers}, error}) => {
-          if (error) return callback({error})
+          if (error) {
+            callback({error})
+            return
+          }
+
           await cms.getModel('PosSetting').findOneAndUpdate({}, {
-            $set: {
-              'onlineDevice.services': {delivery, pickup, noteToCustomers: noteToCustomers || ''}
-            }
+            $set: { 'onlineDevice.services': {delivery, pickup, noteToCustomers: noteToCustomers || ''} }
           })
-          const services = {delivery, pickup, noteToCustomers}
-          callback({services})
+
+          callback({services: {delivery, pickup, noteToCustomers} })
         })
       } catch (error) {
-        const posSetting = cms.getModel('PosSetting').findOne()
-        callback(posSetting.onlineDevice.services, error)
+        callback({error})
       }
     })
 
