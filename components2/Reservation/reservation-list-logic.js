@@ -6,7 +6,7 @@ import {
   selectedReservation,
   showReservationDialog,
   reservationDialogEditMode,
-  updatePendingReservationsLength,
+  updateTodayPendingReservations,
   getReservations,
   updateReservation,
 } from './reservation-shared';
@@ -108,7 +108,7 @@ export async function genReservations(_date, _status) {
   _date = _date || date.value
   _status = _status || status.value
   reservations.value = await getReservations(_date, _status)
-  await updatePendingReservationsLength()
+  await updateTodayPendingReservations()
 }
 // complete
 export async function completeReservation(reservation) {
@@ -116,7 +116,7 @@ export async function completeReservation(reservation) {
     return
   reservation.status = 'completed'
   await updateReservation(reservation._id, { status: 'completed' })
-  await updatePendingReservationsLength()
+  await updateTodayPendingReservations()
 }
 // modify
 export const showNoticeDialog = ref(false)
@@ -144,5 +144,5 @@ export async function confirmRemove() {
   reservations.value.splice(index, 1)
   if (reservations.value.length === 1) // TODO: Why we do it?
     await genWeek(date.value)
-  await updatePendingReservationsLength()
+  await updateTodayPendingReservations()
 }

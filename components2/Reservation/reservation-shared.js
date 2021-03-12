@@ -2,12 +2,22 @@ import {ref, computed} from 'vue'
 import dayjs from 'dayjs'
 import cms from 'cms';
 import { posSettings } from '../AppSharedStates';
-/**
- * Get reservations for specified date & status
- * @param date specified date or new Date() object if not provided
- * @param status 'all' | 'pending' | 'completed' | 'declined'
- * @return {Promise<*>}
- */
+
+export const reservationSetting = computed(() => {
+  return (posSettings.value && posSettings.value.reservation) || {}
+})
+
+let _reservationBell = null
+export const reservationBell = computed(() => {
+  if (!reservationSetting.value.soundNotification)
+    return null;
+
+  if (_reservationBell == null)
+    _reservationBell = new Audio('/plugins/pos-plugin/assets/sounds/reservation-bell.mp3')
+
+  return _reservationBell
+})
+
 export async function getReservations(date = new Date(), status = 'all') {
   const currentDate = dayjs(date).startOf('day')
   return await cms.getModel('Reservation').find({
@@ -16,13 +26,8 @@ export async function getReservations(date = new Date(), status = 'all') {
   })
 }
 
-
 export const todayPendingReservation = ref(0)
-/**
- * Update today pending reservations
- * @return {Promise<Number>} the number of pending reservations
- */
-export async function updatePendingReservationsLength() {
+export async function updateTodayPendingReservations() {
   const today = dayjs().startOf('day')
   const reservations = await cms.getModel('Reservation').find({
     status: 'pending',
@@ -31,26 +36,14 @@ export async function updatePendingReservationsLength() {
   todayPendingReservation.value = reservations.length
 }
 
-/**
- * Update specified reservation
- * @param _id
- * @param change
- * @return {Promise<void>}
- */
 export async function updateReservation(_id, change) {
   await cms.getModel('Reservation').findOneAndUpdate({ _id }, change)
   cms.socket.emit('rescheduleReservation', _id, change)
 }
 
-export const reservationSetting = computed(() => {
-  return posSettings.value && posSettings.value.reservation || {}
-})
-
-// store selected reservation, which will be used to remove, modify, update, etc
 export const selectedReservation = ref({})
 
-// object contain information whether reservation dialog will be shown or not, in edit mode or add
 export const showReservationDialog = ref(false)
 export const reservationDialogEditMode = ref(false)
 
-updatePendingReservationsLength()
+updateTodayPendingReservations()
