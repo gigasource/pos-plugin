@@ -934,8 +934,16 @@ module.exports = async cms => {
     })
 
     socket.on('getOnlineDeviceServices', async (callback) => {
+      if (!onlineOrderSocket) {
+        callback({ error: 'Connection to online order is lost!' })
+        return
+      }
+
       const deviceId = await getDeviceId()
-      if (!onlineOrderSocket || !deviceId) return callback(null);
+      if (!deviceId) {
+        callback({ error: 'Bad request: Device id was not provided!' })
+        return
+      }
 
       try {
         onlineOrderSocket.emit('getOnlineDeviceServices', deviceId, async ({services: {delivery, pickup, noteToCustomers}, error}) => {
