@@ -116,7 +116,7 @@ export default {
                         <div class="btn" key={`btn_${i}`}
                              style={getItemStyle(item)}
                              onClick={withModifiers(() => addProduct(item), ['stop'])}>
-                          {item.name}
+                          {(item.id ? `${item.id}.` : '') + item.name}
                         </div>)
                     )}
                   </g-scroll-window-item>

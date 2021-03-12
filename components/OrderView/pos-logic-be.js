@@ -104,7 +104,7 @@ hooks.on('pre:prepareOrder', order => {
 function mapProduct(p) {
   return {
     groupPrinter: _.get(p, 'groupPrinter.name', ''),
-    ..._.pick(p, ['id', 'name', 'price']),
+    ..._.pick(p, ['id', 'name', 'price', '_id']),
     product: p._id,
     taxes: [p.tax, p.tax2],
     ingredients: p.ingredients ? p.ingredients : []

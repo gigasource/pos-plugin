@@ -408,7 +408,8 @@ module.exports = async cms => {
         if (name === 'startOnBoot') {
           await updateStartOnBoot(enabled)
         }
-        return await cms.getModel('Feature').updateOne({name}, {$set: {enabled}}, {upsert: true})
+        const result = await cms.getModel('Feature').updateOne({name}, {$set: {enabled}}, {upsert: true})
+        return result
       }))
 
       console.debug(getBaseSentryTags('updateAppFeature'), '3. Restaurant backend: received feature update from server, emitting to frontend', JSON.stringify(data));

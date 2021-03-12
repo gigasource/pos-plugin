@@ -20,7 +20,6 @@ import {
   genMaxId
 } from "../OrderView/pos-logic-be";
 import {loadCategories, loadProducts} from "../Product/product-logic-be";
-import { categoryColor, debouncedUpdateCategory } from '../EditMenuCard/CategoryEditor/category-editor-category';
 
 watch(() => currentAppType.value, async () => {
   await loadCategories()

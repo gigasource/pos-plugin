@@ -30,6 +30,7 @@ import {renderCustomerInfo, customerDialogData, clearCustomerDialogData, onCreat
 import PosKeyboardFull from "../../pos-shared-components/PosKeyboardFull";
 import { barcodeHook, setHandleKeyupBarcode, removeHandleKeyupBarcode } from "../../Product/barcode-listener";
 import {loadInventories} from "../../Inventory/inventory-logic-be";
+import { useI18n } from 'vue-i18n'
 
 export default {
   name: 'PosOrderRetail',
@@ -43,6 +44,7 @@ export default {
     PosRetailCart,
   },
   setup() {
+    const { t } = useI18n()
     const router = useRouter()
     const isRefundMode = ref(false)
     const inEditScreenMode = ref(false)
@@ -230,7 +232,7 @@ export default {
                                       ref={autoCompleteRef}/>
                     </g-tab-item>
                     <g-tab-item item={tabsTitle[1]}>
-                      {renderCustomerInfo()}
+                      {renderCustomerInfo(t)}
                     </g-tab-item>
                   </g-tabs>
                   <div class="dialog-keyboard">

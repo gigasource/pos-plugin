@@ -1,5 +1,5 @@
 <script>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import {
   CALL_SYSTEM_MODES,
   callSystemStatus,
@@ -16,10 +16,12 @@ import {
 } from './call-system-logics';
 import { genScopeId } from '../../utils';
 import { useI18n } from 'vue-i18n';
+import {javaData} from "../../AppSharedStates";
 
 export default {
   setup() {
     loadData()
+    const showLogDialog = ref(false)
 
     const { t } = useI18n()
     const callSystemModesRender = genScopeId(() => <div class="row-flex align-items-center justify-start">
@@ -72,10 +74,17 @@ export default {
           </div>
 
           <div class="row-flex">
+            <g-btn-bs style="margin-right:0" width="80" background-color="#2979FF" onClick={() => showLogDialog.value = !showLogDialog.value}>{'Log'}</g-btn-bs>
             <g-spacer/>
             <g-btn-bs style="margin-right:0" width="80" background-color="#2979FF" onClick={switchMode}>{t('dialogs.save')}</g-btn-bs>
           </div>
 
+          {
+            showLogDialog.value &&
+            <div style="white-space:pre-wrap">
+              {javaData.value}
+            </div>
+          }
           <dialog-text-filter v-model={dialog.value.ip} label="Call System IP" defaultValue={ipAddresses.value[currentCallSystemMode.value]} onSubmit={changeIp}></dialog-text-filter>
         </div>)
   }
