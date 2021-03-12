@@ -1,5 +1,5 @@
 <script>
-import { onActivated, onDeactivated, ref, withModifiers } from 'vue'
+import { onActivated, onDeactivated, onMounted, ref, withModifiers } from 'vue'
 import { useRouter } from 'vue-router'
 import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
 import DialogChangeStock from './helpers/dialogChangeStock';
@@ -170,12 +170,22 @@ export default {
       }, '')
     }
 
+    onActivated(() => {
+      searchText.value = ''
+    })
+
+
+    const searchText = ref('')
+
+    function onClickKeyboardIcon() {
+      showKeyboard.value = true
+    }
     return genScopeId(() => <>
       <div class="inventory-stock" onClick={() => {if (showKeyboard.value) showKeyboard.value = false}}>
         <div class="inventory-stock__header">
-          <g-autocomplete text-field-component="GTextFieldBs" onUpdate:modelValue={selectItem} clearable keep-menu-on-blur items={inventories.value} return-object menu-class="menu-inventory-stock" v-slots={{
+          <g-autocomplete text-field-component="GTextFieldBs" searchText={searchText.value} onUpdate:searchText={v => searchText.value = v} onUpdate:modelValue={selectItem} clearable keep-menu-on-blur items={inventories.value} return-object menu-class="menu-inventory-stock" v-slots={{
             'append-inner': () =>
-                <g-icon onClick={withModifiers(() => showKeyboard.value = true, ['stop'])}>icon-keyboard</g-icon>
+                <g-icon class="ignore-click-outside" onClick={withModifiers(onClickKeyboardIcon, ['stop'])}>icon-keyboard</g-icon>
           }}></g-autocomplete>
           <div class="inventory-stock__header-btn" onClick={() => openDialog()}>
             <g-icon color="white">add</g-icon>

@@ -1,5 +1,5 @@
 <template>
-  <div class="row-flex justify-center" ref="keyboardRef">
+  <div :class="['row-flex', 'justify-center', ignoreClickOutside ? 'ignore-click-outside' : '']">
     <g-keyboard-auto :items="internalKeyboard"
                      :template="internalTemplate"
                      :style="computedStyles"
@@ -342,25 +342,6 @@ export default {
       immediate: true
     }
   },
-  setup(props) {
-    const keyboardRef = ref(null)
-    onMounted(() => {
-      if (props.ignoreClickOutside) {
-        if (!window.clickOutsideIgnoreElements) window.clickOutsideIgnoreElements = []
-        window.clickOutsideIgnoreElements.push(keyboardRef)
-      }
-    })
-    onBeforeUnmount(() => {
-      if (props.ignoreClickOutside) {
-        const idx = window.clickOutsideIgnoreElements.indexOf(keyboardRef)
-        if (idx !== -1) window.clickOutsideIgnoreElements.splice(idx, 1)
-      }
-    })
-
-    return {
-      keyboardRef
-    }
-  }
 }
 </script>
 
