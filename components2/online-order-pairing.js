@@ -56,19 +56,11 @@ export function useDeviceManagementSystem(router) {
       webshopName.value = storeName || 'Web shop name not available'
     })
   }
-  function getOnlineDeviceServices(callback) {
-    cms.socket.emit('getOnlineDeviceServices', callback)
-  }
-  function updateOnlineDeviceServices(services, callback) {
-    cms.socket.emit('updateOnlineDeviceServices', services, callback)
-  }
 
   return {
     setupPairDevice,
     getPairStatus,
     getWebshopName,
-    getOnlineDeviceServices,
-    updateOnlineDeviceServices,
   }
 }
 
