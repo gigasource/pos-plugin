@@ -14,6 +14,7 @@ import {
 import {
 	findCustomerWithId
 } from "../Customer/customer-logic";
+import { webShopConnected } from './online-order-pairing';
 
 export const completeOrderDialogShow = ref(false)
 
@@ -34,6 +35,8 @@ export function renderKitchenOrdersFactory() {
 						'badge': () => <div class="px-2">{sortedKitchenOrders.value.length}</div>
 					}}></g-badge>
 				}
+				<g-spacer/>
+				<div>{ webShopConnected.value ? 'online': 'offline' }</div>
 			</div>
 		)
 	}

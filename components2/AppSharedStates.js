@@ -151,6 +151,7 @@ appHooks.on('updateEnabledFeatures', async () => {
   const _enabledFeatures = await cms.getModel('Feature').find({enabled: true})
   enabledFeatures.value = _enabledFeatures.map(feature => feature.name)
 })
+cms.socket.on('updateAppFeature', () => appHooks.emit('updateEnabledFeatures'))
 
 export const storeLocale = computed(() => {
   return ((posSettings.value
