@@ -945,6 +945,7 @@ module.exports = async cms => {
         return
       }
 
+      // TODO: Do we need try/catch??/
       try {
         onlineOrderSocket.emit('getOnlineDeviceServices', deviceId, async ({services: {delivery, pickup, noteToCustomers}, error}) => {
           if (error) {
