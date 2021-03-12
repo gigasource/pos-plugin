@@ -114,10 +114,14 @@ export function selectPrinterGroup(val) {
   state.printerGroupFilter = val
 }
 
-let clearVirtualReportTimerId = -1;
 export async function initVirtualPrinterData() {
   await loadReportCount()
   await loadPrinterGroups()
+  setupVirtualReportCleaner()
+}
+
+let clearVirtualReportTimerId = -1;
+export function setupVirtualReportCleaner() {
   clearVirtualReportTimerId = setInterval(async () => {
     await cms.getModel(VIRTUAL_REPORT_COLLECTION).remove({
       created: {
@@ -126,7 +130,6 @@ export async function initVirtualPrinterData() {
     })
   }, MILLISECONS_PER_DAY)
 }
-
-export function clearVirtualReportTimer() {
+export function stopVirtualReportCleaner() {
   clearInterval(clearVirtualReportTimerId)
 }
