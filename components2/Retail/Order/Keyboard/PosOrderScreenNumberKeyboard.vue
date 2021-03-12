@@ -1,8 +1,9 @@
 <script>
   import { nextTick, ref } from 'vue';
   import { genScopeId } from '../../../utils';
-  import { addProductToOrder } from '../temp-logic';
   import DialogProductSearchResult from './dialogProductSearchResult';
+  import {products} from "../../../Product/product-logic";
+  import { getCurrentOrder, addProduct } from "../../../OrderView/pos-logic-be"
 
   export default {
     name: 'PosOrderScreenNumberKeyboard',
@@ -96,7 +97,7 @@
           quantity = parseInt(queryStrArr[2]);
           productIdQuery.value = queryStrArr[0]
         }
-        const results = cms.getList('Product').filter(item => item.id === productIdQuery.value)
+        const results = products.value.filter(item => item.id === productIdQuery.value)
         if (results) {
           productIdQueryResults.value = results.map(product => ({
             ...product,
@@ -107,18 +108,18 @@
       }
 
       async function openDialogProductSearchResults() {
+        const order = getCurrentOrder()
         if (productIdQuery.value.trim()) {
           await queryProductsById()
           if (productIdQueryResults.value.length === 1) {
-            const onlyResult = productIdQueryResults.value[0];
-            if (onlyResult.attributes.keys().length === onlyResult.attributes.length) {
-              addProductToOrder(onlyResult)
-              return
-            }
+            const product = productIdQueryResults.value[0];
+            addProduct(order, product, product.quantity ? product.quantity : 1)
+          } else {
             await nextTick(() => {
               showDialogProductSearchResult.value = true
             })
           }
+          productIdQuery.value = ''
         }
       }
 

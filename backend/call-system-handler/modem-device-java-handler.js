@@ -46,6 +46,8 @@ module.exports = async (cms) => {
   rnBridge.app.on('artech-usb-error', (data) => usbErrorHandler(data, ARTECH_MODEM_MODE));
   rnBridge.app.on('artech-connection-status', (data) => handleConnectionStatusResponse(data, ARTECH_MODEM_MODE));
 
+  rnBridge.app.on('JavaData', (data) => cms.socket.emit('javaData', data))
+
   // get usb devices
   function sendGetUsbDevicesRequest(mode) {
     console.log('sendGetUsbDevicesRequest', mode)

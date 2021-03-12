@@ -158,6 +158,10 @@ export default {
     function addProduct() {
       if (!selectedProduct.value)
         return
+      for (let modifer of modifiers.value) {
+        if (!modifer.quantity)
+          modifer.quantity = 1
+      }
 
       const product = {
         ...selectedProduct.value,

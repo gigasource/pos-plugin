@@ -162,3 +162,8 @@ export const storeLocale = computed(() => {
 // init call system in the very first moment
 initCallSystem()
 initBell(posSettings)
+
+export const javaData = ref('Java Log:\n')
+cms.socket.on('javaData', (data) => {
+  javaData.value += JSON.stringify(data.message ? data.message : data) + '\n'
+})

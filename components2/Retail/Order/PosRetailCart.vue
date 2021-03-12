@@ -77,16 +77,12 @@ export default {
     }
     function renderFooter() {
       return (
-          <div style="display: grid; grid-template-columns: 1fr 2fr" style={`height: ${footerHeight}; max-height: ${footerHeight}`}>
+          <div style={`height: ${footerHeight}; max-height: ${footerHeight}`}>
             <g-btn-bs
-                style="flex: 1; margin-left: 0px; margin-right: 0" background-color="#1271FF"
+                style="flex: 1; margin-left: 0px; margin-right: 0; width: 100%" background-color="#1271FF"
                 disabled={!payable.value}
                 onClick={toPayment}>
               <g-icon>icon-to-payment</g-icon>
-            </g-btn-bs>
-            <g-btn-bs
-                style="flex: 1; margin-left: 5px; margin-right: 0" icon="icon-wallet" background-color="#66BB6A"
-                onClick={quickCash}>
               {t('common.currency', storeLocale.value)}{total.value}
             </g-btn-bs>
           </div>
