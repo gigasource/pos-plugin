@@ -3,6 +3,7 @@ import { execGenScopeId, genScopeId } from '../utils';
 import _ from 'lodash';
 import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router';
+import { isIOS } from '../AppSharedStates';
 import {
   selectingCustomer,
   onOpenDialog,
