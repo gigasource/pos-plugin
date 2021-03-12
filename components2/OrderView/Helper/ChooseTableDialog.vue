@@ -10,6 +10,7 @@ import { fetchRooms, rooms } from '../../TablePlan/RoomState';
 
 
 export default {
+  name: 'ChooseTableDialog',
   props: {
     modelValue: Boolean,
     table: String,

@@ -15,7 +15,7 @@ import {useI18n} from "vue-i18n";
 import {itemsRenderFactory} from "../pos-ui-shared";
 import {useRouter} from "vue-router";
 import {ref, watch} from 'vue';
-import ChooseTableDialog2 from "./ChooseTableDialog2";
+import ChooseTableDialog from "./ChooseTableDialog";
 import {hooks} from "../pos-logic";
 
 //finish
@@ -23,7 +23,7 @@ export default {
   props: {
     modelValue: Boolean,
   },
-  components: [ChooseTableDialog2],
+  components: [ChooseTableDialog],
   emits: ['update:modelValue'],
   setup(props, {emit}) {
     const internalValue = internalValueFactory(props, {emit});
@@ -121,7 +121,7 @@ export default {
 
     return () =>
         <div>
-          <choose-table-dialog2 table={currentTable.value} active-orders={activeOrders.value}
+          <choose-table-dialog table={currentTable.value} active-orders={activeOrders.value}
                                 v-model={showChooseTableDialog.value}
                                 onSubmit={submitTable}/>
           <g-dialog v-model={internalValue.value} transition={false} content-class="move-items-dialog">
