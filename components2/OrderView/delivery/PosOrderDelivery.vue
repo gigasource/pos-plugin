@@ -14,7 +14,10 @@ import {
   selectedAddress,
   selectedCustomer,
   dialog,
-  name, phone, address, house, street, city, placeId, clearCustomer, selectedCall, zipcode
+  address,
+  selectedCall, zipcode,
+  clearCustomer,
+  clearDeliveryOrder
 } from './delivery-shared';
 import {
   products,
@@ -116,16 +119,8 @@ export default {
     const router = useRouter();
 
     function back() {
-      resetOrderData()
+      clearDeliveryOrder()
       router.go(-1)
-      selectedCustomer.value = {}
-      name.value = ''
-      phone.value = ''
-      address.value = ''
-      house.value = ''
-      street.value = ''
-      city.value = ''
-      placeId.value = ''
     }
 
     function selectOption(choice, option) {
@@ -283,10 +278,7 @@ export default {
       }
     }
 
-    function resetOrderData() {
-      //fixme: OrderStore:resetOrderData
-      console.warn('PosOrderDelivery2:resetOrderData was not implemented')
-    }
+
 
     // function addProductToOrder(product) {
     //   console.warn('PosOrderDelivery2:addProductToOrder was not implemented')
@@ -683,7 +675,6 @@ export default {
         border-radius: 4px;
         background: #FFFFFF;
         border: 0.4px solid #9E9E9E;
-        margin-right: 8px;
         line-height: 1.2;
         font-size: 14px;
       }

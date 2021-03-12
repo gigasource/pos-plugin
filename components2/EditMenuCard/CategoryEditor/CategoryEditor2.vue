@@ -1,5 +1,5 @@
 <script>
-import ColorSelector from '../../../components/common/ColorSelector';
+import ColorSelector from '../../common/ColorSelector';
 
 import {useI18n} from 'vue-i18n'
 import constants from '../EditMenuCardToolbar/constants';

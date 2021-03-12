@@ -65,8 +65,8 @@ export function orderRightSideHeader(props, {emit}) {
       <g-spacer style="flex: 4 0 0"/>}
       {isMobile.value && showSplitBtn.value && payPrintMode.value === 'pay' && showIcon.value &&
       <g-btn-bs background-color="#FFCB3A"
-                width="75"
-                style="transition-delay: 0.6s; padding: 5px; border: none" onClick={splitOrder}>
+                border-color="#f0f0f0" width="75"
+                style="transition-delay: 0.6s;" onClick={splitOrder}>
         <g-icon>icon-split_check_2</g-icon>
       </g-btn-bs>}
 

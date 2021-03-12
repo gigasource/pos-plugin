@@ -64,6 +64,7 @@ export default {
     display: grid;
     grid-template-columns: 100%;
     grid-template-rows: 40% 60%;
+    background-image: url('../../assets/pos-payment-method-screen-bg.png');
   }
 }
 </style>

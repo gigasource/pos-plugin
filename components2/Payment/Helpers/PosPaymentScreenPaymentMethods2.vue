@@ -166,11 +166,6 @@ export default {
   }
 }
 
-.pos-payment-method {
-  background-image: url('../../../assets/pos-payment-method-screen-bg.png');
-  background-repeat: repeat;
-}
-
 .dialog {
   .g-btn-bs {
     margin: 0;

@@ -1,5 +1,5 @@
 <script>
-
+import { computed } from 'vue'
 import PosOrder2 from "./PosOrder2";
 import PosOrderLayout2 from "./PosOrderLayout2";
 import PosOrderToolbar2 from "./PosOrderToolbar2";
@@ -24,14 +24,19 @@ export default {
     PosOrderVoucherDialog2
   },
   setup() {
+    const orderToolbarHeightStyle = { 'max-height': '64px', height: '64px' }
+    const orderMainHeightStyle = computed(() => {
+      return isMobile.value ? { 'max-height': '100%' } : { 'max-height': 'calc(100% - 64px)' }
+    })
+
     return genScopeId(() => (
         <>
           <div class="order">
-            <div class="order-main">
+            <div class="order-main" style={orderMainHeightStyle.value}>
               <pos-order-layout2 style="flex: 1"/>
               <pos-order2 style={!isMobile.value && {flex: '0 0 25%'}}/>
             </div>
-            {!isMobile.value && <pos-order-toolbar2/>}
+            {!isMobile.value && <pos-order-toolbar2 style={orderToolbarHeightStyle}/>}
           </div>
           <pos-order-split-order2 v-model={orderViewDialog.split}/>
           <pos-order-receipt2 v-model={orderViewDialog.receipt}/>
@@ -52,7 +57,6 @@ export default {
   .order-main {
     flex: 1;
     display: flex;
-    max-height: 100%;
   }
 
   .g-toolbar {

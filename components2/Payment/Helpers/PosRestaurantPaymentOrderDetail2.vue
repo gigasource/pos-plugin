@@ -17,7 +17,7 @@ export default {
 
     return genScopeId(() =>
         <div class="order-detail">
-          <div class="order-detail__header">
+          <div class="order-detail__header mb-2">
             <g-avatar size="36">
               <img src={avatar.value} alt/>
             </g-avatar>

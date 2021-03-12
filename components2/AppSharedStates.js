@@ -1,6 +1,6 @@
 import Hooks from 'schemahandler/hooks/hooks'
 import {computed, ref, watch, reactive} from 'vue';
-import {mobileCheck} from "../components/logic/commonUtils";
+import { mobileCheck } from '../utils/mobileCheck';
 import cms from 'cms';
 import {getCurrentOrder, syncOrderChange} from "./OrderView/pos-logic-be";
 import { initCallSystem } from './Settings/CallSystem/call-system-logics'
