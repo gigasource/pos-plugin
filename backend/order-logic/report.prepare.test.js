@@ -11,7 +11,7 @@ import {
   makeTakeaway,
   makeLastItemDiscount,
   removeItem, addSinglePayment, getRestTotal, addMultiPayment, addVoucher, makeDiscount
-} from "../../components2/OrderView/pos-logic";
+} from "../../components/OrderView/pos-logic";
 import _ from 'lodash';
 
 const moment = require("moment");
