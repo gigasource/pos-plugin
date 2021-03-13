@@ -11,7 +11,7 @@ import {
   showDialogUserDetail,
   showDialogSelectAvatar,
   onSave, userList,
-  init, viewOnlineOrderDashboard, viewOnlineOrderMenu, viewOrder, viewOrderHistory, viewReservation, getUserList
+  init, viewOnlineOrderDashboard, viewOnlineOrderMenu, viewOrder, viewOrderHistory, viewReservation, canChangeTableWaiter, getUserList
 } from './view-user-logics';
 import { genScopeId } from '../../utils';
 import { useI18n } from 'vue-i18n';
@@ -105,6 +105,7 @@ export default {
                       { renderSwitch('settings.viewOnlineOrderMenu', viewOnlineOrderMenu) }
                       { renderSwitch('settings.viewOrderHistory', viewOrderHistory) }
                       { renderSwitch('settings.viewReservation', viewReservation) }
+                      { renderSwitch('settings.changeTableWaiter', canChangeTableWaiter) }
                     </>
                   : <>
                       <div>{/*Blank to push next item to the next row*/}</div>

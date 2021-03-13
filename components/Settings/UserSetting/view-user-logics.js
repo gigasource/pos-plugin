@@ -12,6 +12,7 @@ export const viewOrder = attrComputed(selectedUser, 'viewOrder', false)
 export const viewOnlineOrderMenu = attrComputed(selectedUser, 'viewOnlineOrderMenu', false)
 export const viewOrderHistory = attrComputed(selectedUser, 'viewOrderHistory', false)
 export const viewReservation = attrComputed(selectedUser, 'viewReservation', false)
+export const canChangeTableWaiter = attrComputed(selectedUser, 'canChangeTableWaiter', false)
 
 export const userList = ref([])
 export const selectedUserIsAdmin = computed(() => {

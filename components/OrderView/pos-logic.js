@@ -536,6 +536,10 @@ export function addUser(order, name, date = new Date()) {
   order.user.unshift({name, date});
 }
 
+export function changeUser(order, name, date) {
+  order.user = [{ name, date }];
+}
+
 export function changeCourse(order, query, add = 1) {
   if (typeof query !== 'number') {
     query = _.findIndex(order.items, query);
