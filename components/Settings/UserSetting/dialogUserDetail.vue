@@ -50,8 +50,9 @@ export default {
     }
 
     watch(() => showDialogUserDetail.value, () => {
+      if (!showDialogUserDetail.value) return
       setTimeout(() => {
-        if (refs[`${check.value}Ref`].value)  refs[`${check.value}Ref`].value.focus();
+        if (refs[`${check.value}Ref`].value)  refs[`${check.value}Ref`].value.onFocus();
       }, 200);
       name.value = props.add ? '' : selectedUser.value.name;
       passcode.value = props.add ? '' : selectedUser.value.passcode;

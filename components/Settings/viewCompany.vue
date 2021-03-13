@@ -13,6 +13,26 @@ export default {
     const file = ref(null)
     const dialog = ref(false)
     const companyInfo = ref({})
+    const nameRef = ref(null)
+    const addressRef = ref(null)
+    const address2Ref = ref(null)
+    const zipCodeRef = ref(null)
+    const cityRef = ref(null)
+    const countryRef = ref(null)
+    const telephoneRef = ref(null)
+    const taxNumberRef = ref(null)
+    const ustIdRef = ref(null)
+    const refs = {
+      nameRef,
+      addressRef,
+      address2Ref,
+      zipCodeRef,
+      cityRef,
+      countryRef,
+      telephoneRef,
+      taxNumberRef,
+      ustIdRef
+    }
     const companyInfoDialogData = reactive({
       name: '',
       address: '',
@@ -120,7 +140,7 @@ export default {
       })
     }
 
-    function openDialog() {
+    function openDialog(field) {
       dialog.value = true
       companyInfoDialogData.name = name.value
       companyInfoDialogData.address = address.value
@@ -131,6 +151,9 @@ export default {
       companyInfoDialogData.telephone = telephone.value
       companyInfoDialogData.taxNumber = taxNumber.value
       companyInfoDialogData.ustId = ustId.value
+      setTimeout(() => {
+        refs[`${field}Ref`].value && refs[`${field}Ref`].value.focus()
+      }, 250)
     }
 
     const debounceDirectUpdate = _.debounce(directUpdate, 500)
@@ -139,7 +162,7 @@ export default {
         <div class="main__item">
           <g-text-field-bs label={t(`settings.${i18nField}`)} v-model={companyInfoModel[field]} onUpdate:modelValue={debounceDirectUpdate} required={required} v-slots={{
             'append-inner': () =>
-                <g-icon style="cursor: pointer" onClick={withModifiers(openDialog, ['stop'])}>
+                <g-icon style="cursor: pointer" onClick={withModifiers(() => openDialog(field), ['stop'])}>
                   icon-keyboard
                 </g-icon>
           }}/>
@@ -187,15 +210,15 @@ export default {
     const dialogRender = genScopeId(() => <dialog-form-input v-model={dialog.value} onSubmit={update} v-slots={{
       'input': genScopeId(() =>
           <div class="row-flex flex-wrap ">
-            <pos-textfield-new style="width: 48%" label={t('settings.companyName')} v-model={companyInfoDialogData.name} required/>
-            <pos-textfield-new style="width: 48%" label={t('settings.address')} v-model={companyInfoDialogData.address} required/>
-            <pos-textfield-new style="width: 48%" label={t('settings.address2')} v-model={companyInfoDialogData.address2}/>
-            <pos-textfield-new style="width: 48%" label={t('settings.zipCode')} v-model={companyInfoDialogData.zipCode} required/>
-            <pos-textfield-new style="width: 48%" label={t('settings.city')} v-model={companyInfoDialogData.city} required/>
-            <pos-textfield-new style="width: 48%" label={t('settings.country')} v-model={companyInfoDialogData.country} required/>
-            <pos-textfield-new style="width: 48%" label={t('settings.tel')} v-model={companyInfoDialogData.telephone} required/>
-            <pos-textfield-new style="width: 48%" label={t('settings.taxNo')} v-model={companyInfoDialogData.taxNumber} required/>
-            <pos-textfield-new style="width: 48%" label={t('settings.ustId')} v-model={companyInfoDialogData.ustId}/>
+            <pos-textfield-new ref={nameRef} style="width: 48%" label={t('settings.companyName')} v-model={companyInfoDialogData.name} required/>
+            <pos-textfield-new ref={addressRef} style="width: 48%" label={t('settings.address')} v-model={companyInfoDialogData.address} required/>
+            <pos-textfield-new ref={address2Ref} style="width: 48%" label={t('settings.address2')} v-model={companyInfoDialogData.address2}/>
+            <pos-textfield-new ref={zipCodeRef} style="width: 48%" label={t('settings.zipCode')} v-model={companyInfoDialogData.zipCode} required/>
+            <pos-textfield-new ref={cityRef} style="width: 48%" label={t('settings.city')} v-model={companyInfoDialogData.city} required/>
+            <pos-textfield-new ref={countryRef} style="width: 48%" label={t('settings.country')} v-model={companyInfoDialogData.country} required/>
+            <pos-textfield-new ref={telephoneRef} style="width: 48%" label={t('settings.tel')} v-model={companyInfoDialogData.telephone} required/>
+            <pos-textfield-new ref={taxNumberRef} style="width: 48%" label={t('settings.taxNo')} v-model={companyInfoDialogData.taxNumber} required/>
+            <pos-textfield-new ref={ustIdRef} style="width: 48%" label={t('settings.ustId')} v-model={companyInfoDialogData.ustId}/>
           </div>)
     }}>
     </dialog-form-input>)
