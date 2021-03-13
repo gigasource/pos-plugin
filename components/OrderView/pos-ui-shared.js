@@ -243,6 +243,7 @@ export const orderViewDialog = reactive({
   search: false,
   split: false,
   move: false,
+  changeTableWaiter: false,
   voucher: false,
   receipt: false
 });

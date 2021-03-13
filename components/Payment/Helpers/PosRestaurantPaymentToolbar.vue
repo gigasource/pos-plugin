@@ -37,11 +37,7 @@ export default {
       }
 
       processing.value = false
-      if (!order.table) {
-        router.go(-1);
-      } else {
-        router.push({ path: '/pos-dashboard' })
-      }
+      router.replace('pos-dashboard')
     }
     const promotion = function () {
       if (processing.value) return

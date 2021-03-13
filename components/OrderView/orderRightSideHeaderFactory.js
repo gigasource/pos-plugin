@@ -1,6 +1,5 @@
 import {editModeOL, saveOrderLayoutSetting, showSplitBtn} from "./order-layout-setting-logic";
-import { Transition } from 'vue'
-import {avatar, isMobile, username} from "../AppSharedStates";
+import {avatar, isMobile, user, username, currentUserIsAdmin} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import {
   actionList,
@@ -12,7 +11,7 @@ import {
   showIcon
 } from "./pos-logic-be";
 import {hooks, toggleTakeaway} from './pos-logic'
-import {ref, withModifiers, Transition as transition} from "vue";
+import {ref, withModifiers, Transition, computed} from "vue";
 import {useRouter} from "vue-router";
 import {orderViewDialog} from "./pos-ui-shared";
 import {payPrintBtnFactory} from "./payPrintBtnFactory";
@@ -22,6 +21,14 @@ export function orderRightSideHeader(props, {emit}) {
   let {t} = useI18n();
   const order = getCurrentOrder();
   const menu = ref(false);
+  const orderWaiter = computed(() => order.user && order.user[0]);
+  const canChangeTableWaiter = computed(() => {
+    if (orderWaiter.value == null)
+      return
+    const currentUserIsServingThisOrder = orderWaiter.value.name === username.value
+    const currentUserHasChangeWaiterPermission = user.value.canChangeTableWaiter
+    return currentUserIsAdmin.value || currentUserIsServingThisOrder || currentUserHasChangeWaiterPermission
+  })
 
   function splitOrder() {
     orderViewDialog['split'] = true;
@@ -47,7 +54,11 @@ export function orderRightSideHeader(props, {emit}) {
 
   //todo: fix
   function moveItems() {
-    orderViewDialog['move'] = true;
+    orderViewDialog.move = true;
+  }
+
+  function showTransferUserDialog() {
+    orderViewDialog.changeTableWaiter = true
   }
 
   function toggleTakeAwayOrder() {
@@ -59,8 +70,9 @@ export function orderRightSideHeader(props, {emit}) {
   }
 
   const {renderPayBtn} = payPrintBtnFactory();
-  const renderHeader = () => (
-    <div class="order-detail__header">
+  const renderHeader = () => {
+    return (
+      <div class="order-detail__header">
       {isMobile.value && showSplitBtn.value && payPrintMode.value === 'pay' && showIcon.value &&
       <g-spacer style="flex: 4 0 0"/>}
       {isMobile.value && showSplitBtn.value && payPrintMode.value === 'pay' && showIcon.value &&
@@ -88,7 +100,7 @@ export function orderRightSideHeader(props, {emit}) {
                     <g-btn-bs icon="icon-blue-cog" onClick={() => editModeOL.value = true}>{t('order.editScreen')}</g-btn-bs>
                     <g-btn-bs icon="icon-voucher" onClick={showVoucherDialog}>{t('order.voucher')}</g-btn-bs>
                     <g-btn-bs icon="icon-move-items" onClick={moveItems}>{t('order.moveItem')}</g-btn-bs>
-
+                    { canChangeTableWaiter.value && <g-btn-bs icon="icon-transfer-user" onClick={showTransferUserDialog}>{t('order.transferUser')}</g-btn-bs> }
                     <g-btn-bs icon="icon-delivery" background-color={order.takeAway ? '#2979FF' : '#FFF'}
                               onClick={toggleTakeAwayOrder}>{t('order.takeAway')}
                     </g-btn-bs>
@@ -123,7 +135,8 @@ export function orderRightSideHeader(props, {emit}) {
       {renderPayBtn()}
 
     </div>
-  )
+    )
+  }
 
   const overlayRender = () => <div class="blur-overlay" v-show={menu.value}/>
 

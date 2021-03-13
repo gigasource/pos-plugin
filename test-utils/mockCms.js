@@ -1,4 +1,4 @@
-import {demoData as data} from "../components2/OrderView/__test__/demoData";
+import {demoData as data} from "../components/OrderView/__test__/demoData";
 
 const { Socket, Io } = require('schemahandler/io/io')
 //const Orm = require('schemahandler/orm')

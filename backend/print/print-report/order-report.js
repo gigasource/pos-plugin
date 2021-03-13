@@ -12,7 +12,6 @@ async function makePrintData(cms, order, locale) {
   const items = order.items.filter(i => i.quantity > 0)
   const {
     vSum: orderSum,
-    vTax: orderTax,
     vTaxSum: orderTaxGroups,
     receive: orderCashReceived,
     cashback: orderCashback,
@@ -33,7 +32,6 @@ async function makePrintData(cms, order, locale) {
     orderNumber,
     items,
     orderSum,
-    orderTax,
     orderTaxGroups,
     orderCashReceived,
     orderCashback,
@@ -56,14 +54,14 @@ async function printEscPos(escPrinter, printData) {
     orderNumber,
     items,
     orderSum,
-    orderTax,
     orderTaxGroups,
     orderCashReceived,
     orderCashback,
     orderPaymentType,
     orderBookingNumber,
     discount,
-    payment
+    payment,
+    order
   } = printData;
 
   function convertMoney(value) {
@@ -116,16 +114,17 @@ async function printEscPos(escPrinter, printData) {
     escPrinter.tableCustom([
       {text: product.name, align: 'LEFT', width: 0.4},
       {text: product.quantity, align: 'RIGHT', width: 0.1},
-      {text: convertMoney(productUnitPrice), align: 'RIGHT', width: 0.25},
-      {text: convertMoney(product.quantity * productUnitPrice), align: 'RIGHT', width: 0.22},
+      {text: convertMoney(product.vSum / product.quantity), align: 'RIGHT', width: 0.25},
+      {text: convertMoney(product.quantity * product.vSum), align: 'RIGHT', width: 0.22},
     ]);
   });
   escPrinter.drawLine();
 
-  escPrinter.leftRight('Sub-total', convertMoney(orderSum - orderTax));
+  const net = _.sumBy(_.values(order.vTaxSum), 'net');
+  escPrinter.leftRight('Sub-total', convertMoney(net));
   if (!isNaN(discount) && discount > 0) escPrinter.leftRight('Discount', convertMoney(discount));
-  orderTaxGroups.forEach(taxGroup => {
-    escPrinter.leftRight(`Tax (${taxGroup.taxType}%)`, convertMoney(taxGroup.tax));
+  Object.keys(orderTaxGroups).forEach(taxGroup => {
+    escPrinter.leftRight(`Tax (${taxGroup}%)`, convertMoney(orderTaxGroups[taxGroup].tax));
   });
   escPrinter.drawLine();
 

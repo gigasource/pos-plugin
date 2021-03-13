@@ -9,6 +9,7 @@ import PosOrderSplitOrder from "./Helper/PosOrderSplitOrder";
 import PosOrderReceipt from "./Helper/PosOrderReceipt";
 import PosOrderMoveItems from "./Helper/PosOrderMoveItems";
 import PosOrderVoucherDialog from "./Helper/PosOrderVoucherDialog";
+import PosOrderTransferUserDialog from './Helper/PosOrderTransferUserDialog';
 import {genScopeId} from "../utils";
 
 
@@ -21,7 +22,8 @@ export default {
     PosOrderSplitOrder,
     PosOrderReceipt,
     PosOrderMoveItems,
-    PosOrderVoucherDialog
+    PosOrderVoucherDialog,
+    PosOrderTransferUserDialog
   },
   setup() {
     const orderToolbarHeightStyle = { 'max-height': '64px', height: '64px' }
@@ -42,6 +44,7 @@ export default {
           <pos-order-receipt v-model={orderViewDialog.receipt}/>
           <pos-order-move-items v-model={orderViewDialog.move}/>
           <pos-order-voucher-dialog v-model={orderViewDialog.voucher}/>
+          <pos-order-transfer-user-dialog v-model={orderViewDialog.changeTableWaiter}/>
         </>
     ))
   }
