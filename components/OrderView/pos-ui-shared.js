@@ -15,6 +15,10 @@ export async function loadOrderLayout(type = 'default') {
   orderLayout.value = _orderLayout
 }
 
+cms.socket.on('commit:handler:finish:OrderLayout', async () => {
+  await loadOrderLayout() // todo: set type if necessary
+})
+
 const _selectedLayoutCache = {
   categoryLayout: null,
   productLayout: null
