@@ -1,12 +1,17 @@
-import {computed, ref} from 'vue';
+import {computed, ref, watch} from 'vue';
 import _ from 'lodash';
 import {createRoom} from './RoomLogics';
 import cms from 'cms';
+import { isSameId } from '../utils';
 
 export const roomsStates = ref([]);
 export const rooms = ref([]);
 
 let Room = cms.getModel('Room');
+
+cms.socket.on('commit:handler:finish:Room', async() => {
+  await fetchRooms()
+})
 
 export const fetchRooms = async function () {
   let _rooms = await Room.find({})
@@ -37,6 +42,9 @@ export function roomsFactory(props) {
     });
   } else {
     selectingRoomStates = ref();
+    watch(() => roomsStates.value, () => {
+      if  (selectingRoomStates.value) selectingRoomStates.value = _.find(roomsStates.value, r => isSameId(r.room, selectingRoomStates.value.room))
+    }, { deep: true})
   }
 
   const removeSelectingRoom = async function() {
