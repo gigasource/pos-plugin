@@ -125,7 +125,7 @@ appHooks.on('orderChange', async function () {
 
 cms.socket.on('update-table', () => appHooks.emit('orderChange'))
 
-const _posSettings = ref()
+export const _posSettings = ref()
 export const posSettings = computed(() => {
   if (!_posSettings.value) {
     appHooks.emit('settingChange');
